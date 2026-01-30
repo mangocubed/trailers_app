@@ -1,0 +1,66 @@
+"""
+Implement the DateTime<Utc> scalar
+
+The input/output is a string in RFC3339 format.
+"""
+scalar DateTime
+
+type InfoObject {
+	builtAt: DateTime!
+	version: String!
+}
+
+type MutationRoot {
+	createUser(input: UserInputObject!): UserObject!
+}
+
+"""
+ISO 8601 calendar date without timezone.
+Format: %Y-%m-%d
+
+# Examples
+
+* `1994-11-13`
+* `2000-02-24`
+"""
+scalar NaiveDate
+
+type QueryRoot {
+	info: InfoObject!
+}
+
+input UserInputObject {
+	username: String!
+	email: String!
+	password: String!
+	fullName: String!
+	birthdate: NaiveDate!
+	countryCode: String!
+}
+
+type UserObject {
+	id: ID!
+	username: String!
+	displayName: String!
+	fullName: String!
+	createdAt: DateTime!
+	updatedAt: DateTime
+}
+
+"""
+Directs the executor to include this field or fragment only when the `if` argument is true.
+"""
+directive @include(if: Boolean!) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+"""
+Directs the executor to skip this field or fragment when the `if` argument is true.
+"""
+directive @skip(if: Boolean!) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+"""
+Provides a scalar specification URL for specifying the behavior of custom scalar types.
+"""
+directive @specifiedBy(url: String!) on SCALAR
+schema {
+	query: QueryRoot
+	mutation: MutationRoot
+}
+

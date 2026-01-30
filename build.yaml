@@ -1,0 +1,23 @@
+targets:
+    $default:
+        builders:
+            graphql_codegen:
+                options:
+                    clients:
+                        - graphql
+                        - graphql_flutter
+                    scalars:
+                        JSONObject:
+                            type: Map<String, dynamic>
+                        DateTime:
+                            type: DateTime
+                        NaiveDate:
+                            type: DateTime
+                            toJsonFunctionName: dateToJson
+                            import: package:trailers/graphql/scalars.dart
+                        Duration:
+                            type: Duration
+                            fromJsonFunctionName: jsonToDuration
+                            import: package:trailers/graphql/scalars.dart
+                        UUID:
+                            type: String

@@ -1,0 +1,13 @@
+import 'package:flutter/material.dart';
+
+class SnackBarAlert {
+  static show(BuildContext context, String content) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        content: Text(content),
+        action: SnackBarAction(label: 'Close', onPressed: () => {}),
+      ),
+    );
+  }
+}
