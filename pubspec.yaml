@@ -41,6 +41,7 @@ dependencies:
     google_fonts: ^8.0.0
     graphql_flutter: ^5.2.1
     country_picker: ^2.0.27
+    shared_preferences: ^2.5.4
 
 dev_dependencies:
     flutter_test:

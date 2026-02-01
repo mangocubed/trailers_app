@@ -1,13 +1,15 @@
 import 'package:flutter/widgets.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:trailers/session.dart';
 
 import 'config.dart';
+import 'constants.dart';
 
 extension GraphQLClientExt on GraphQLClient {
   static GraphQLClient setup() => GraphQLClient(
     link: AuthLink(
-      getToken: () => null,
-    ).concat(HttpLink(Config.graphqlServerUrl, defaultHeaders: {'x-token': Config.apiToken})),
+      getToken: () async => 'Bearer ${await Session.getToken()}',
+    ).concat(HttpLink(Config.graphqlServerUrl, defaultHeaders: {headerXApiToken: Config.apiToken})),
     cache: GraphQLCache(store: HiveStore()),
     defaultPolicies: DefaultPolicies(
       query: Policies(fetch: FetchPolicy.networkOnly),

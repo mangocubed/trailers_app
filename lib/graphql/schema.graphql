@@ -12,6 +12,8 @@ type InfoObject {
 
 type MutationRoot {
 	createUser(input: UserInputObject!): UserObject!
+	createSession(input: SessionInputObject!): SessionObject!
+	finishSession: Boolean!
 }
 
 """
@@ -26,7 +28,22 @@ Format: %Y-%m-%d
 scalar NaiveDate
 
 type QueryRoot {
+	currentUser: UserObject
 	info: InfoObject!
+}
+
+input SessionInputObject {
+	usernameOrEmail: String!
+	password: String!
+}
+
+type SessionObject {
+	id: ID!
+	userId: ID!
+	user: UserObject!
+	token: String!
+	createdAt: DateTime!
+	updatedAt: DateTime
 }
 
 input UserInputObject {
@@ -43,6 +60,7 @@ type UserObject {
 	username: String!
 	displayName: String!
 	fullName: String!
+	initials: String!
 	createdAt: DateTime!
 	updatedAt: DateTime
 }

@@ -1,7 +1,8 @@
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:trailers/graphql_client.dart';
+import 'package:trailers/session.dart';
 
 import '../components/loading_dialog.dart';
 import '../components/password_input_field.dart';
@@ -77,7 +78,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (_formRegister.currentState?.validate() == true) {
       _formRegister.currentState?.save();
 
-      final graphQLClient = GraphQLProvider.of(context).value;
+      final graphQLClient = context.graphQLClient.value;
 
       final result = await graphQLClient.mutate$CreateUser(
         Options$Mutation$CreateUser(
@@ -94,7 +95,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
       );
 
-      if (result.hasException) {
+      final createUser = result.parsedData?.createUser;
+
+      if (createUser != null) {
+        if (mounted) {
+          await Session.create(context, _username, _password);
+        }
+
+        if (mounted) {
+          SnackBarAlert.show(context, 'User created successfully');
+          context.goNamed(routeNameHome);
+        }
+      } else {
         if (mounted) {
           SnackBarAlert.show(context, textFailedToCreateUser);
         }
@@ -109,9 +121,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           _errorBirthdate = inputErrors['birthdate'];
           _errorCountry = inputErrors['countryCode'];
         });
-      } else if (mounted) {
-        SnackBarAlert.show(context, 'User created successfully');
-        context.goNamed(routeNameHome);
       }
     } else {
       SnackBarAlert.show(context, textFailedToCreateUser);
@@ -189,6 +198,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
               onTap: _openCountryPicker,
             ),
             SubmitButton(onPressed: _attemptToRegister),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => context.goNamed(routeNameLogin),
+                icon: const Icon(Icons.login_rounded),
+                label: Text('I have an account'),
+              ),
+            ),
           ],
         ),
       ),
