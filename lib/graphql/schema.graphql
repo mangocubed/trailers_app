@@ -5,15 +5,97 @@ The input/output is a string in RFC3339 format.
 """
 scalar DateTime
 
+"""
+Implement the Duration scalar
+
+The input/output is a string in ISO8601 format.
+"""
+scalar Duration
+
+type GenreObject {
+	id: ID!
+	name: String!
+	createdAt: DateTime!
+	updatedAt: DateTime
+}
+
+type GenreObjectConnection {
+	"""
+	Information to aid in pagination.
+	"""
+	pageInfo: PageInfo!
+	"""
+	A list of edges.
+	"""
+	edges: [GenreObjectEdge!]!
+	"""
+	A list of nodes.
+	"""
+	nodes: [GenreObject!]!
+}
+
+"""
+An edge in a connection.
+"""
+type GenreObjectEdge {
+	"""
+	The item at the end of the edge
+	"""
+	node: GenreObject!
+	"""
+	A cursor for use in pagination
+	"""
+	cursor: String!
+}
+
 type InfoObject {
 	builtAt: DateTime!
 	version: String!
+}
+
+type KeywordObject {
+	id: ID!
+	name: String!
+	createdAt: DateTime!
+	updatedAt: DateTime
+}
+
+type KeywordObjectConnection {
+	"""
+	Information to aid in pagination.
+	"""
+	pageInfo: PageInfo!
+	"""
+	A list of edges.
+	"""
+	edges: [KeywordObjectEdge!]!
+	"""
+	A list of nodes.
+	"""
+	nodes: [KeywordObject!]!
+}
+
+"""
+An edge in a connection.
+"""
+type KeywordObjectEdge {
+	"""
+	The item at the end of the edge
+	"""
+	node: KeywordObject!
+	"""
+	A cursor for use in pagination
+	"""
+	cursor: String!
 }
 
 type MutationRoot {
 	createUser(input: UserInputObject!): UserObject!
 	createSession(input: SessionInputObject!): SessionObject!
 	finishSession: Boolean!
+	updateBookmark(input: UserTitleTieInputObject!): UserTitleTieObject!
+	updateLike(input: UserTitleTieInputObject!): UserTitleTieObject!
+	updateWatched(input: UserTitleTieInputObject!): UserTitleTieObject!
 }
 
 """
@@ -27,9 +109,43 @@ Format: %Y-%m-%d
 """
 scalar NaiveDate
 
+"""
+Information about pagination in a connection
+"""
+type PageInfo {
+	"""
+	When paginating backwards, are there more items?
+	"""
+	hasPreviousPage: Boolean!
+	"""
+	When paginating forwards, are there more items?
+	"""
+	hasNextPage: Boolean!
+	"""
+	When paginating backwards, the cursor to continue.
+	"""
+	startCursor: String
+	"""
+	When paginating forwards, the cursor to continue.
+	"""
+	endCursor: String
+}
+
+type PersonObject {
+	id: ID!
+	profileImageUrl: Url
+	name: String!
+	createdAt: DateTime!
+	updatedAt: DateTime
+}
+
 type QueryRoot {
 	currentUser: UserObject
 	info: InfoObject!
+	title(id: ID!): TitleObject
+	titles(query: String, after: UUID, first: Int): TitleObjectConnection!
+	video(id: ID!): VideoObject
+	videos(after: UUID, first: Int, includeViewed: Boolean): VideoObjectConnection!
 }
 
 input SessionInputObject {
@@ -39,12 +155,159 @@ input SessionInputObject {
 
 type SessionObject {
 	id: ID!
-	userId: ID!
 	user: UserObject!
 	token: String!
 	createdAt: DateTime!
 	updatedAt: DateTime
 }
+
+type TitleCastObject {
+	id: ID!
+	person: PersonObject!
+	characterName: String!
+	createdAt: DateTime!
+	updatedAt: DateTime
+}
+
+type TitleCastObjectConnection {
+	"""
+	Information to aid in pagination.
+	"""
+	pageInfo: PageInfo!
+	"""
+	A list of edges.
+	"""
+	edges: [TitleCastObjectEdge!]!
+	"""
+	A list of nodes.
+	"""
+	nodes: [TitleCastObject!]!
+}
+
+"""
+An edge in a connection.
+"""
+type TitleCastObjectEdge {
+	"""
+	The item at the end of the edge
+	"""
+	node: TitleCastObject!
+	"""
+	A cursor for use in pagination
+	"""
+	cursor: String!
+}
+
+enum TitleCrewJob {
+	DIRECTOR
+}
+
+type TitleCrewObject {
+	id: ID!
+	person: PersonObject!
+	job: TitleCrewJob!
+	createdAt: DateTime!
+	updatedAt: DateTime
+}
+
+type TitleCrewObjectConnection {
+	"""
+	Information to aid in pagination.
+	"""
+	pageInfo: PageInfo!
+	"""
+	A list of edges.
+	"""
+	edges: [TitleCrewObjectEdge!]!
+	"""
+	A list of nodes.
+	"""
+	nodes: [TitleCrewObject!]!
+}
+
+"""
+An edge in a connection.
+"""
+type TitleCrewObjectEdge {
+	"""
+	The item at the end of the edge
+	"""
+	node: TitleCrewObject!
+	"""
+	A cursor for use in pagination
+	"""
+	cursor: String!
+}
+
+enum TitleMediaType {
+	MOVIE
+	SERIES
+	SHORT
+}
+
+type TitleObject {
+	id: ID!
+	mediaType: TitleMediaType!
+	backdropImageUrl: Url
+	posterImageUrl: Url
+	name: String!
+	overview: String!
+	runtime: Duration
+	cast(after: UUID, first: Int): TitleCastObjectConnection!
+	crew(after: UUID, first: Int, jobs: [TitleCrewJob!]): TitleCrewObjectConnection!
+	genres(after: ID, first: Int): GenreObjectConnection!
+	keywords(after: ID, first: Int): KeywordObjectConnection!
+	currentUserTie: UserTitleTieObject
+	releasedOn: NaiveDate
+	createdAt: DateTime!
+	updatedAt: DateTime
+}
+
+type TitleObjectConnection {
+	"""
+	Information to aid in pagination.
+	"""
+	pageInfo: PageInfo!
+	"""
+	A list of edges.
+	"""
+	edges: [TitleObjectEdge!]!
+	"""
+	A list of nodes.
+	"""
+	nodes: [TitleObject!]!
+}
+
+"""
+An edge in a connection.
+"""
+type TitleObjectEdge {
+	"""
+	The item at the end of the edge
+	"""
+	node: TitleObject!
+	"""
+	A cursor for use in pagination
+	"""
+	cursor: String!
+}
+
+"""
+A UUID is a unique 128-bit number, stored as 16 octets. UUIDs are parsed as
+Strings within GraphQL. UUIDs are used to assign unique identifiers to
+entities without requiring a central allocating authority.
+
+# References
+
+* [Wikipedia: Universally Unique Identifier](http://en.wikipedia.org/wiki/Universally_unique_identifier)
+* [RFC4122: A Universally Unique Identifier (UUID) URN Namespace](http://tools.ietf.org/html/rfc4122)
+"""
+scalar UUID
+
+"""
+URL is a String implementing the [URL Standard](http://url.spec.whatwg.org/)
+"""
+scalar Url
 
 input UserInputObject {
 	username: String!
@@ -63,6 +326,59 @@ type UserObject {
 	initials: String!
 	createdAt: DateTime!
 	updatedAt: DateTime
+}
+
+input UserTitleTieInputObject {
+	titleId: UUID!
+	isChecked: Boolean!
+	videoId: UUID
+}
+
+type UserTitleTieObject {
+	id: ID!
+	title: TitleObject!
+	isBookmarked: Boolean!
+	isLiked: Boolean!
+	isWatched: Boolean!
+	createdAt: DateTime!
+	updatedAt: DateTime
+}
+
+type VideoObject {
+	id: ID!
+	title: TitleObject!
+	url: Url!
+	createdAt: DateTime!
+	updatedAt: DateTime
+}
+
+type VideoObjectConnection {
+	"""
+	Information to aid in pagination.
+	"""
+	pageInfo: PageInfo!
+	"""
+	A list of edges.
+	"""
+	edges: [VideoObjectEdge!]!
+	"""
+	A list of nodes.
+	"""
+	nodes: [VideoObject!]!
+}
+
+"""
+An edge in a connection.
+"""
+type VideoObjectEdge {
+	"""
+	The item at the end of the edge
+	"""
+	node: VideoObject!
+	"""
+	A cursor for use in pagination
+	"""
+	cursor: String!
 }
 
 """

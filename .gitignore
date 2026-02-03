@@ -47,4 +47,4 @@ app.*.map.json
 *.g.dart
 *.graphql.dart
 
-.zed
+/.zed

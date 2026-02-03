@@ -73,3 +73,7 @@ Duration jsonToDuration(dynamic data) {
 
   return Duration(days: days, hours: hours, minutes: minutes, seconds: seconds);
 }
+
+Uri jsonToUri(dynamic data) {
+  return Uri.parse(data);
+}

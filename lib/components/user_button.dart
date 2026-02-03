@@ -20,7 +20,10 @@ class UserButton extends StatelessWidget {
         if (currentUser != null) {
           child = CircleAvatar(child: Text(currentUser.initials));
         } else {
-          child = IconButton(onPressed: () => context.goNamed(routeNameLogin), icon: const Icon(Icons.login_rounded));
+          child = IconButton(
+            onPressed: () => context.goNamed(routeNameLogin),
+            icon: const Icon(Icons.login_rounded, color: Colors.white),
+          );
         }
 
         return AppLifecycle(

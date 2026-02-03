@@ -1,0 +1,5 @@
+mutation UpdateWatched($input: UserTitleTieInputObject!) {
+    updateWatched(input: $input) {
+        ...UserTitleTieFragment
+    }
+}

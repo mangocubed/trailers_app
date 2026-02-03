@@ -1,0 +1,56 @@
+query TitleQuery($id: ID!) {
+    title(id: $id) {
+        id
+        mediaType
+        posterImageUrl
+        name
+        overview
+        runtime
+        crew(first: 1, jobs: [DIRECTOR]) {
+            nodes {
+                id
+                person {
+                    id
+                    name
+                    createdAt
+                    updatedAt
+                }
+                createdAt
+                updatedAt
+            }
+        }
+        genres {
+            nodes {
+                id
+                name
+                createdAt
+                updatedAt
+            }
+        }
+        cast(first: 50) {
+            nodes {
+                id
+                person {
+                    id
+                    profileImageUrl
+                    name
+                    createdAt
+                    updatedAt
+                }
+                createdAt
+                updatedAt
+            }
+        }
+        currentUserTie {
+            id
+            isBookmarked
+            isLiked
+            isWatched
+            createdAt
+            updatedAt
+        }
+        releasedOn
+        createdAt
+        updatedAt
+    }
+}

@@ -19,5 +19,9 @@ targets:
                             type: Duration
                             fromJsonFunctionName: jsonToDuration
                             import: package:trailers/graphql/scalars.dart
+                        Url:
+                            type: Uri
+                            fromJsonFunctionName: jsonToUri
+                            import: package:trailers/graphql/scalars.dart
                         UUID:
                             type: String

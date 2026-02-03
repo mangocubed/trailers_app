@@ -1,0 +1,5 @@
+mutation UpdateLike($input: UserTitleTieInputObject!) {
+    updateLike(input: $input) {
+        ...UserTitleTieFragment
+    }
+}

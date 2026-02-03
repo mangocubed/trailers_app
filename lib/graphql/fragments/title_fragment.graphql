@@ -1,0 +1,8 @@
+fragment TitleFragment on TitleObject {
+    id
+    name
+    posterImageUrl
+    releasedOn
+    createdAt
+    updatedAt
+}

@@ -1,0 +1,5 @@
+mutation UpdateBookmark($input: UserTitleTieInputObject!) {
+    updateBookmark(input: $input) {
+        ...UserTitleTieFragment
+    }
+}

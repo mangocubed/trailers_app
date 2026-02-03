@@ -1,0 +1,8 @@
+fragment UserTitleTieFragment on UserTitleTieObject {
+    id
+    isBookmarked
+    isLiked
+    isWatched
+    createdAt
+    updatedAt
+}

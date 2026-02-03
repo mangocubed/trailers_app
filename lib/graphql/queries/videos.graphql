@@ -1,0 +1,11 @@
+query Videos($after: UUID) {
+    videos(after: $after) {
+        nodes {
+            ...VideoFragment
+        }
+        pageInfo {
+            endCursor
+            startCursor
+        }
+    }
+}

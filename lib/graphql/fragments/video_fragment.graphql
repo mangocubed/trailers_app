@@ -1,0 +1,40 @@
+fragment VideoFragment on VideoObject {
+    id
+    url
+    title {
+        ...TitleFragment
+        mediaType
+        runtime
+        crew(first: 1, jobs: [DIRECTOR]) {
+            nodes {
+                id
+                person {
+                    id
+                    name
+                    createdAt
+                    updatedAt
+                }
+                createdAt
+                updatedAt
+            }
+        }
+        genres(first: 4) {
+            nodes {
+                id
+                name
+                createdAt
+                updatedAt
+            }
+        }
+        currentUserTie {
+            id
+            isBookmarked
+            isLiked
+            isWatched
+            createdAt
+            updatedAt
+        }
+    }
+    createdAt
+    updatedAt
+}
