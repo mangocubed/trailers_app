@@ -15,6 +15,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final _pageController = PageController();
   bool _resultsChanged = false;
 
   _getRecommendedVideos() {
@@ -30,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
         }
 
         return PageView.builder(
+          controller: _pageController,
           scrollDirection: Axis.vertical,
           physics: const BouncingScrollPhysics(),
           onPageChanged: (value) {

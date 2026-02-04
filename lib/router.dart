@@ -5,7 +5,11 @@ import 'package:trailers/session.dart';
 
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
+import 'screens/not_found_screen.dart';
 import 'screens/register_screen.dart';
+import 'screens/show_title_screen.dart';
+
+final routeObserver = RouteObserver<ModalRoute<void>>();
 
 Future<String?> _requireAuthentication(BuildContext context, GoRouterState state) async {
   if (!await Session.isAuthenticated()) {
@@ -26,6 +30,8 @@ Future<String?> _requireNoAuthentication(BuildContext context, GoRouterState sta
 extension GoRouterExt on GoRouter {
   static GoRouter setup() => GoRouter(
     initialLocation: '/',
+    errorBuilder: (context, state) => const NotFoundScreen(),
+    observers: [routeObserver],
     routes: [
       GoRoute(
         name: routeNameHome,
@@ -43,6 +49,16 @@ extension GoRouterExt on GoRouter {
             path: 'register',
             redirect: _requireNoAuthentication,
             builder: (context, state) => const RegisterScreen(),
+          ),
+          GoRoute(
+            name: routeNameShowTitle,
+            path: 'titles/:$keyTitleId',
+            builder: (context, state) {
+              final id = state.pathParameters[keyTitleId]!;
+              final videoId = state.uri.queryParameters[keyVideoId];
+
+              return ShowTitleScreen(id: id, videoId: videoId);
+            },
           ),
         ],
       ),

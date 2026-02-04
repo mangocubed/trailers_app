@@ -1,4 +1,4 @@
-query TitleQuery($id: ID!) {
+query Title($id: ID!, $countryCode: String) {
     title(id: $id) {
         id
         mediaType
@@ -37,6 +37,21 @@ query TitleQuery($id: ID!) {
                     createdAt
                     updatedAt
                 }
+                createdAt
+                updatedAt
+            }
+        }
+        watchProviders(first: 50, countryCode: $countryCode) {
+            nodes {
+                id
+                watchProvider {
+                    id
+                    name
+                    logoImageUrl
+                    createdAt
+                    updatedAt
+                }
+                countryCodes
                 createdAt
                 updatedAt
             }

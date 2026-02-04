@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
+import 'package:video_player_hdr/video_player_hdr.dart';
+
+import '../router.dart';
 
 class CustomVideoPlayer extends StatefulWidget {
   const CustomVideoPlayer({super.key, required this.videoUrl, this.thumbnailImageUrl, this.onTogglePlayPause});
@@ -12,10 +14,10 @@ class CustomVideoPlayer extends StatefulWidget {
   State<CustomVideoPlayer> createState() => _CustomVideoPlayerState();
 }
 
-class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
-  VideoPlayerController? _videoPlayerController;
+class _CustomVideoPlayerState extends State<CustomVideoPlayer> with RouteAware {
+  VideoPlayerHdrController? _videoPlayerController;
 
-  bool get _isPlaying => _thumbailOpacity == 1.0 || (_videoPlayerController?.value.isPlaying ?? true);
+  bool get _isPlaying => _thumbnailOpacity == 1.0 || (_videoPlayerController?.value.isPlaying ?? true);
 
   _pause() {
     _videoPlayerController?.pause();
@@ -37,7 +39,7 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
     }
   }
 
-  double get _thumbailOpacity {
+  double get _thumbnailOpacity {
     final isReady = _videoPlayerController?.value.isInitialized ?? false;
 
     if (isReady) {
@@ -51,7 +53,7 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
     if (_videoPlayerController?.value.isInitialized == true) {
       return AspectRatio(
         aspectRatio: _videoPlayerController!.value.aspectRatio,
-        child: VideoPlayer(_videoPlayerController!),
+        child: VideoPlayerHdr(_videoPlayerController!),
       );
     } else {
       return const CircularProgressIndicator();
@@ -62,7 +64,7 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
   void initState() {
     super.initState();
 
-    _videoPlayerController ??= VideoPlayerController.networkUrl(widget.videoUrl)
+    _videoPlayerController ??= VideoPlayerHdrController.networkUrl(widget.videoUrl)
       ..setLooping(true)
       ..addListener(() {
         setState(() {});
@@ -74,10 +76,33 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
   }
 
   @override
-  void dispose() {
-    super.dispose();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
 
+    final currentRoute = ModalRoute.of(context);
+
+    if (currentRoute != null) {
+      routeObserver.subscribe(this, currentRoute);
+    }
+  }
+
+  @override
+  void didPushNext() {
+    _pause();
+  }
+
+  @override
+  void didPopNext() {
+    _play();
+  }
+
+  @override
+  void dispose() {
     _videoPlayerController?.dispose();
+
+    routeObserver.unsubscribe(this);
+
+    super.dispose();
   }
 
   @override
@@ -91,7 +116,7 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
         ),
         widget.thumbnailImageUrl != null
             ? AnimatedOpacity(
-                opacity: _thumbailOpacity,
+                opacity: _thumbnailOpacity,
                 duration: const Duration(milliseconds: 250),
                 child: Container(
                   color: Colors.black,

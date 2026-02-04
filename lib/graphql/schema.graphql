@@ -257,6 +257,8 @@ type TitleObject {
 	crew(after: UUID, first: Int, jobs: [TitleCrewJob!]): TitleCrewObjectConnection!
 	genres(after: ID, first: Int): GenreObjectConnection!
 	keywords(after: ID, first: Int): KeywordObjectConnection!
+	videos(after: UUID, first: Int): VideoObjectConnection!
+	watchProviders(after: UUID, first: Int, countryCode: String): TitleWatchProviderObjectConnection!
 	currentUserTie: UserTitleTieObject
 	releasedOn: NaiveDate
 	createdAt: DateTime!
@@ -286,6 +288,43 @@ type TitleObjectEdge {
 	The item at the end of the edge
 	"""
 	node: TitleObject!
+	"""
+	A cursor for use in pagination
+	"""
+	cursor: String!
+}
+
+type TitleWatchProviderObject {
+	id: ID!
+	watchProvider: WatchProviderObject!
+	countryCodes: [String!]!
+	createdAt: DateTime!
+	updatedAt: DateTime
+}
+
+type TitleWatchProviderObjectConnection {
+	"""
+	Information to aid in pagination.
+	"""
+	pageInfo: PageInfo!
+	"""
+	A list of edges.
+	"""
+	edges: [TitleWatchProviderObjectEdge!]!
+	"""
+	A list of nodes.
+	"""
+	nodes: [TitleWatchProviderObject!]!
+}
+
+"""
+An edge in a connection.
+"""
+type TitleWatchProviderObjectEdge {
+	"""
+	The item at the end of the edge
+	"""
+	node: TitleWatchProviderObject!
 	"""
 	A cursor for use in pagination
 	"""
@@ -324,6 +363,7 @@ type UserObject {
 	displayName: String!
 	fullName: String!
 	initials: String!
+	countryCode: String!
 	createdAt: DateTime!
 	updatedAt: DateTime
 }
@@ -379,6 +419,15 @@ type VideoObjectEdge {
 	A cursor for use in pagination
 	"""
 	cursor: String!
+}
+
+type WatchProviderObject {
+	id: ID!
+	logoImageUrl: Url
+	name: String!
+	homeUrl: Url
+	createdAt: DateTime!
+	updatedAt: DateTime
 }
 
 """

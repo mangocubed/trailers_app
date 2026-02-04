@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'constants.dart';
 import 'graphql/mutations/create_session.graphql.dart';
+import 'graphql/queries/current_user.graphql.dart';
 import 'graphql/schema.graphql.dart';
 import 'graphql_client.dart';
 
@@ -51,5 +52,13 @@ class Session {
     final token = await getToken();
 
     return token != null;
+  }
+}
+
+extension SessionExt on BuildContext {
+  Future<Query$CurrentUser$currentUser?> getCurrentUser() async {
+    final result = await graphQLClient.value.query$CurrentUser();
+
+    return result.parsedData?.currentUser;
   }
 }

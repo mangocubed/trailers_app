@@ -4,5 +4,8 @@ query CurrentUser {
         username
         displayName
         initials
+        countryCode
+        createdAt
+        updatedAt
     }
 }

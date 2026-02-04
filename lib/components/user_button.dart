@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:trailers/datetime.dart';
 
-import '../components/app_lifecycle.dart';
+import '../components/screen_lifecycle.dart';
 import '../constants.dart';
 import '../graphql/queries/current_user.graphql.dart';
 
@@ -26,7 +26,7 @@ class UserButton extends StatelessWidget {
           );
         }
 
-        return AppLifecycle(
+        return ScreenLifecycle(
           onResume: () async {
             if (!result.isLoading && result.timestamp.elapsed().inSeconds >= 5) {
               await refetch?.call();

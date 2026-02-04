@@ -43,7 +43,7 @@ dependencies:
     google_fonts: ^8.0.0
     graphql_flutter: ^5.2.1
     shared_preferences: ^2.5.4
-    video_player: ^2.10.1
+    video_player_hdr: ^1.0.0
 
 dev_dependencies:
     flutter_test:
