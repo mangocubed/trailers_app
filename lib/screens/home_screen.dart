@@ -18,7 +18,9 @@ class _HomeScreenState extends State<HomeScreen> {
   final _pageController = PageController();
   bool _resultsChanged = false;
 
-  _getRecommendedVideos() {
+  get _currentPage => _pageController.page?.round() ?? -1;
+
+  Widget _getRecommendedVideos() {
     return Query$Videos$Widget(
       options: Options$Query$Videos(fetchPolicy: FetchPolicy.noCache),
       builder: (result, {fetchMore, refetch}) {
@@ -30,13 +32,12 @@ class _HomeScreenState extends State<HomeScreen> {
           return const SizedBox();
         }
 
-        return PageView.builder(
-          controller: _pageController,
-          scrollDirection: Axis.vertical,
-          physics: const BouncingScrollPhysics(),
-          onPageChanged: (value) {
-            if (result.isLoading || videos!.nodes.length > value + 5) {
-              return;
+        return NotificationListener<ScrollEndNotification>(
+          onNotification: (ScrollEndNotification notification) {
+            setState(() {});
+
+            if (result.isLoading || videos!.nodes.length > _currentPage + 5) {
+              return true;
             }
 
             fetchMore?.call(
@@ -69,16 +70,35 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
             );
-          },
-          itemBuilder: (context, index) {
-            final video = videos!.nodes[index];
 
-            return ShowVideoScreen(video: video, onUpdated: () => _resultsChanged = true);
+            return true;
           },
-          itemCount: result.parsedData?.videos.nodes.length,
+          child: PageView.builder(
+            controller: _pageController,
+            allowImplicitScrolling: true,
+            scrollDirection: Axis.vertical,
+            physics: const BouncingScrollPhysics(),
+            itemBuilder: (context, index) {
+              final video = videos!.nodes[index];
+
+              return ShowVideoScreen(
+                index: index,
+                currentPage: _currentPage,
+                video: video,
+                onUpdated: () => _resultsChanged = true,
+              );
+            },
+            itemCount: result.parsedData?.videos.nodes.length,
+          ),
         );
       },
     );
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   @override

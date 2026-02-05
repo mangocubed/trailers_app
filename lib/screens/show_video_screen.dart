@@ -1,57 +1,138 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:video_player/video_player.dart';
 
 import '../components/action_buttons.dart';
 import '../components/genre_chip.dart';
 import '../components/title_basic_info.dart';
-import '../components/custom_video_player.dart';
 import '../constants.dart';
 import '../graphql/fragments/video_fragment.graphql.dart';
 import '../graphql/queries/video.graphql.dart';
+import '../router.dart';
 
 class ShowVideoScreen extends StatefulWidget {
-  const ShowVideoScreen({super.key, required this.video, this.onUpdated, this.onSeeMore});
+  const ShowVideoScreen({
+    super.key,
+    required this.index,
+    required this.currentPage,
+    required this.video,
+    this.onUpdated,
+  });
 
+  final int index;
+  final int currentPage;
   final Fragment$VideoFragment video;
   final void Function()? onUpdated;
-  final void Function()? onSeeMore;
 
   @override
   createState() => _ShowVideoScreenState();
 }
 
-class _ShowVideoScreenState extends State<ShowVideoScreen> {
-  bool _isPlaying = true;
+class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
+  VideoPlayerController? _videoPlayerController;
   bool _infoIsVisible = true;
 
-  void _toggleInfoVisibility(bool isPlaying) {
-    if (!mounted) {
-      return;
-    }
+  bool get _isPlaying => _videoPlayerController?.value.isPlaying ?? false;
 
-    setState(() => _isPlaying = isPlaying);
+  double get _thumbnailOpacity {
+    final isReady = _videoPlayerController?.value.isInitialized ?? false;
 
-    if (isPlaying) {
-      Future.delayed(const Duration(seconds: 3), () {
-        if (mounted) {
-          setState(() => _infoIsVisible = !_isPlaying);
-        }
-      });
+    if (isReady) {
+      return 0.0;
     } else {
+      return 1.0;
+    }
+  }
+
+  Future<void> _play() async {
+    _videoPlayerController ??= VideoPlayerController.networkUrl(widget.video.url, viewType: VideoViewType.platformView)
+      ..setLooping(true)
+      ..addListener(() {
+        setState(() {});
+      })
+      ..initialize().then((_) {
+        setState(() {});
+      });
+
+    await _videoPlayerController?.play();
+
+    await Future.delayed(const Duration(seconds: 5));
+
+    if (mounted && _isPlaying) {
+      setState(() => _infoIsVisible = false);
+    }
+  }
+
+  Future<void> _pause() async {
+    await _videoPlayerController?.pause();
+
+    if (mounted) {
       setState(() => _infoIsVisible = true);
+    }
+  }
+
+  Future<void> _stop() async {
+    await _videoPlayerController?.pause();
+    await _videoPlayerController?.dispose();
+    _videoPlayerController = null;
+    _infoIsVisible = true;
+  }
+
+  void _togglePlayPause() async {
+    if (_isPlaying) {
+      _pause();
+    } else {
+      _play();
+    }
+  }
+
+  Widget _getVideoPlayer() {
+    if (_videoPlayerController?.value.isInitialized == true) {
+      return AspectRatio(
+        aspectRatio: _videoPlayerController!.value.aspectRatio,
+        child: VideoPlayer(_videoPlayerController!),
+      );
+    } else {
+      return const CircularProgressIndicator();
     }
   }
 
   Widget _getVideoWidget(Fragment$VideoFragment video, {void Function()? onUpdated}) {
     final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    final screenSize = MediaQuery.of(context).size;
 
     return Stack(
       children: [
-        CustomVideoPlayer(
-          videoUrl: video.url,
-          thumbnailImageUrl: video.title.posterImageUrl,
-          onTogglePlayPause: _toggleInfoVisibility,
+        Stack(
+          children: [
+            Center(
+              child: OverflowBox(maxWidth: double.infinity, maxHeight: screenSize.height, child: _getVideoPlayer()),
+            ),
+            video.title.posterImageUrl != null
+                ? AnimatedOpacity(
+                    opacity: _thumbnailOpacity,
+                    duration: const Duration(milliseconds: 250),
+                    child: Container(
+                      color: Colors.black,
+                      width: screenSize.width,
+                      height: screenSize.height,
+                      child: Center(child: Image.network(video.title.posterImageUrl!.toString())),
+                    ),
+                  )
+                : const SizedBox(),
+            InkWell(
+              onTap: _togglePlayPause,
+              child: SizedBox(
+                width: double.infinity,
+                height: double.infinity,
+                child: Visibility(
+                  visible: !_isPlaying && _thumbnailOpacity == 0.0,
+                  child: const Center(child: Icon(Icons.pause_rounded, color: Colors.grey, size: 128)),
+                ),
+              ),
+            ),
+          ],
         ),
         Align(
           alignment: Alignment.centerRight,
@@ -135,11 +216,6 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> {
                             width: double.infinity,
                             child: FilledButton(
                               onPressed: () {
-                                if (widget.onSeeMore != null) {
-                                  widget.onSeeMore?.call();
-                                  return;
-                                }
-
                                 context.goNamed(
                                   routeNameShowTitle,
                                   pathParameters: {keyTitleId: video.title.id},
@@ -169,9 +245,52 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> {
 
   @override
   void initState() {
-    _toggleInfoVisibility(true);
-
     super.initState();
+
+    if (widget.index == 0) {
+      _play();
+    }
+  }
+
+  @override
+  didUpdateWidget(ShowVideoScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.index == widget.currentPage) {
+      _play();
+    } else {
+      _stop();
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final currentRoute = ModalRoute.of(context);
+
+    if (currentRoute != null) {
+      routeObserver.subscribe(this, currentRoute);
+    }
+  }
+
+  @override
+  void didPushNext() {
+    _pause();
+  }
+
+  @override
+  void didPopNext() {
+    _play();
+  }
+
+  @override
+  void dispose() {
+    _stop();
+
+    routeObserver.unsubscribe(this);
+
+    super.dispose();
   }
 
   @override
