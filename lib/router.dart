@@ -7,6 +7,8 @@ import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/not_found_screen.dart';
 import 'screens/register_screen.dart';
+import 'screens/search_results_screen.dart';
+import 'screens/search_screen.dart';
 import 'screens/show_title_screen.dart';
 
 final routeObserver = RouteObserver<ModalRoute<void>>();
@@ -49,6 +51,40 @@ extension GoRouterExt on GoRouter {
             path: 'register',
             redirect: _requireNoAuthentication,
             builder: (context, state) => const RegisterScreen(),
+          ),
+          GoRoute(
+            name: routeNameSearch,
+            path: 'search',
+            builder: (context, state) {
+              final query = state.uri.queryParameters[keyQuery];
+
+              return SearchScreen(query: query);
+            },
+            routes: [
+              GoRoute(
+                name: routeNameSearchResults,
+                path: 'results',
+                builder: (context, state) {
+                  final resultsExtra = state.extra as SearcResultsExtra?;
+
+                  if (resultsExtra == null) {
+                    return const NotFoundScreen();
+                  }
+
+                  return SearchResultsScreen(searchResultsExtra: resultsExtra);
+                },
+              ),
+              GoRoute(
+                name: routeNameSearchResultsTitle,
+                path: 'titles/:$keyTitleId',
+                builder: (context, state) {
+                  final id = state.pathParameters[keyTitleId]!;
+                  final videoId = state.uri.queryParameters[keyVideoId];
+
+                  return ShowTitleScreen(id: id, videoId: videoId);
+                },
+              ),
+            ],
           ),
           GoRoute(
             name: routeNameShowTitle,

@@ -3,6 +3,10 @@ dynamic dateToJson(DateTime data) {
 }
 
 Duration jsonToDuration(dynamic data) {
+  if (data is Duration) {
+    return data;
+  }
+
   final durationString = (data as String);
 
   final timePos = durationString.indexOf('T');
@@ -75,5 +79,9 @@ Duration jsonToDuration(dynamic data) {
 }
 
 Uri jsonToUri(dynamic data) {
+  if (data is Uri) {
+    return data;
+  }
+
   return Uri.parse(data);
 }

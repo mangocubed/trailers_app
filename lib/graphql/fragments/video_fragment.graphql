@@ -27,12 +27,7 @@ fragment VideoFragment on VideoObject {
             }
         }
         currentUserTie {
-            id
-            isBookmarked
-            isLiked
-            isWatched
-            createdAt
-            updatedAt
+            ...UserTitleTieFragment
         }
     }
     createdAt

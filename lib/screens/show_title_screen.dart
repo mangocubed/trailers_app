@@ -195,7 +195,9 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
       builder: (result, {fetchMore, refetch}) {
         final title = result.parsedData?.title;
 
-        if (title == null) {
+        if (result.parsedData == null && result.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (title == null) {
           return const NotFoundScreen();
         }
 
@@ -219,10 +221,7 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
                       ActionButtons(
                         direction: Axis.horizontal,
                         titleId: title.id,
-                        isBookmarked: title.currentUserTie?.isBookmarked == true,
-                        isLiked: title.currentUserTie?.isLiked == true,
-                        isWatched: title.currentUserTie?.isWatched == true,
-                        onUpdated: () => refetch?.call(),
+                        userTitleTie: title.currentUserTie,
                         videoId: widget.videoId,
                       ),
                       const SizedBox(height: 12),

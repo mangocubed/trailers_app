@@ -143,7 +143,7 @@ type QueryRoot {
 	currentUser: UserObject
 	info: InfoObject!
 	title(id: ID!): TitleObject
-	titles(query: String, after: UUID, first: Int): TitleObjectConnection!
+	titles(query: String, after: UUID, first: Int, hasVideos: Boolean): TitleObjectConnection!
 	video(id: ID!): VideoObject
 	videos(after: UUID, first: Int, includeViewed: Boolean): VideoObjectConnection!
 }

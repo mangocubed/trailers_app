@@ -14,16 +14,18 @@ import '../router.dart';
 class ShowVideoScreen extends StatefulWidget {
   const ShowVideoScreen({
     super.key,
+    required this.video,
     required this.index,
     required this.currentPage,
-    required this.video,
     this.onUpdated,
+    this.onSeeMore,
   });
 
   final int index;
   final int currentPage;
   final Fragment$VideoFragment video;
   final void Function()? onUpdated;
+  final void Function()? onSeeMore;
 
   @override
   createState() => _ShowVideoScreenState();
@@ -49,10 +51,14 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
     _videoPlayerController ??= VideoPlayerController.networkUrl(widget.video.url, viewType: VideoViewType.platformView)
       ..setLooping(true)
       ..addListener(() {
-        setState(() {});
+        if (mounted) {
+          setState(() {});
+        }
       })
       ..initialize().then((_) {
-        setState(() {});
+        if (mounted) {
+          setState(() {});
+        }
       });
 
     await _videoPlayerController?.play();
@@ -141,13 +147,7 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
             child: ActionButtons(
               direction: Axis.vertical,
               titleId: video.title.id,
-              isBookmarked: video.title.currentUserTie?.isBookmarked == true,
-              isLiked: video.title.currentUserTie?.isLiked == true,
-              isWatched: video.title.currentUserTie?.isWatched == true,
-              onUpdated: () {
-                onUpdated?.call();
-                widget.onUpdated?.call();
-              },
+              userTitleTie: video.title.currentUserTie,
               videoId: widget.video.id,
             ),
           ),
@@ -216,6 +216,11 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
                             width: double.infinity,
                             child: FilledButton(
                               onPressed: () {
+                                if (widget.onSeeMore != null) {
+                                  widget.onSeeMore?.call();
+                                  return;
+                                }
+
                                 context.goNamed(
                                   routeNameShowTitle,
                                   pathParameters: {keyTitleId: video.title.id},

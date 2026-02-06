@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:trailers/graphql/fragments/user_title_tie_fragment.graphql.dart';
 
 import '../constants.dart';
 import '../graphql/mutations/update_bookmark.graphql.dart';
@@ -11,88 +12,99 @@ import '../graphql_client.dart';
 import '../session.dart';
 
 class ActionButtons extends StatefulWidget {
-  const ActionButtons({
-    super.key,
-    required this.direction,
-    required this.titleId,
-    required this.isBookmarked,
-    required this.isLiked,
-    required this.isWatched,
-    this.videoId,
-    required this.onUpdated,
-  });
+  const ActionButtons({super.key, required this.direction, required this.titleId, this.videoId, this.userTitleTie});
 
   final Axis direction;
   final String titleId;
   final String? videoId;
-  final bool isBookmarked;
-  final bool isLiked;
-  final bool isWatched;
-  final void Function()? onUpdated;
+  final Fragment$UserTitleTieFragment? userTitleTie;
 
   @override
   State<ActionButtons> createState() => _ActionButtonsState();
 }
 
 class _ActionButtonsState extends State<ActionButtons> {
-  _onBookmarkPressed() async {
+  late Fragment$UserTitleTieFragment? _userTitleTie;
+
+  void _setUserTitleTie(Fragment$UserTitleTieFragment? userTitleTie) {
+    if (userTitleTie != null && mounted) {
+      setState(() {
+        _userTitleTie = userTitleTie;
+      });
+    }
+  }
+
+  void _onBookmarkPressed() async {
     if (await Session.isAuthenticated() && mounted) {
-      await context.graphQLClient.value.mutate$UpdateBookmark(
+      final result = await context.graphQLClient.value.mutate$UpdateBookmark(
         Options$Mutation$UpdateBookmark(
           variables: Variables$Mutation$UpdateBookmark(
             input: Input$UserTitleTieInputObject(
               titleId: widget.titleId,
               videoId: widget.videoId,
-              isChecked: !widget.isBookmarked,
+              isChecked: _userTitleTie?.isBookmarked != true,
             ),
           ),
         ),
       );
 
-      widget.onUpdated?.call();
+      final userTitleTie = result.parsedData?.updateBookmark;
+
+      _setUserTitleTie(userTitleTie);
     } else if (mounted) {
       context.goNamed(routeNameLogin);
     }
   }
 
-  _onLikePressed() async {
+  void _onLikePressed() async {
     if (await Session.isAuthenticated() && mounted) {
-      await context.graphQLClient.value.mutate$UpdateLike(
+      final result = await context.graphQLClient.value.mutate$UpdateLike(
         Options$Mutation$UpdateLike(
           variables: Variables$Mutation$UpdateLike(
             input: Input$UserTitleTieInputObject(
               titleId: widget.titleId,
               videoId: widget.videoId,
-              isChecked: !widget.isLiked,
+              isChecked: _userTitleTie?.isLiked != true,
             ),
           ),
         ),
       );
 
-      widget.onUpdated?.call();
+      final userTitleTie = result.parsedData?.updateLike;
+
+      _setUserTitleTie(userTitleTie);
     } else if (mounted) {
       context.goNamed(routeNameLogin);
     }
   }
 
-  _onWatchedPressed() async {
+  void _onWatchedPressed() async {
     if (await Session.isAuthenticated() && mounted) {
-      await context.graphQLClient.value.mutate$UpdateWatched(
+      final result = await context.graphQLClient.value.mutate$UpdateWatched(
         Options$Mutation$UpdateWatched(
           variables: Variables$Mutation$UpdateWatched(
             input: Input$UserTitleTieInputObject(
               titleId: widget.titleId,
               videoId: widget.videoId,
-              isChecked: !widget.isWatched,
+              isChecked: _userTitleTie?.isWatched != true,
             ),
           ),
         ),
       );
 
-      widget.onUpdated?.call();
+      final userTitleTie = result.parsedData?.updateWatched;
+
+      _setUserTitleTie(userTitleTie);
     } else if (mounted) {
       context.goNamed(routeNameLogin);
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _userTitleTie = widget.userTitleTie;
   }
 
   @override
@@ -103,19 +115,23 @@ class _ActionButtonsState extends State<ActionButtons> {
       children: [
         IconButton(
           onPressed: _onWatchedPressed,
-          icon: SvgPicture.asset(widget.isWatched ? 'assets/watched_filled.svg' : 'assets/watched.svg'),
+          icon: SvgPicture.asset(
+            widget.userTitleTie?.isWatched == true ? 'assets/watched_filled.svg' : 'assets/watched.svg',
+          ),
           tooltip: 'Watched',
         ),
         const SizedBox(height: 8, width: 8),
         IconButton(
           onPressed: _onLikePressed,
-          icon: SvgPicture.asset(widget.isLiked ? 'assets/heart_filled.svg' : 'assets/heart.svg'),
+          icon: SvgPicture.asset(widget.userTitleTie?.isLiked == true ? 'assets/heart_filled.svg' : 'assets/heart.svg'),
           tooltip: 'Like',
         ),
         const SizedBox(height: 8, width: 8),
         IconButton(
           onPressed: _onBookmarkPressed,
-          icon: SvgPicture.asset(widget.isBookmarked ? 'assets/bookmark_filled.svg' : 'assets/bookmark.svg'),
+          icon: SvgPicture.asset(
+            widget.userTitleTie?.isBookmarked == true ? 'assets/bookmark_filled.svg' : 'assets/bookmark.svg',
+          ),
           tooltip: 'Bookmark',
         ),
       ],

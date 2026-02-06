@@ -57,12 +57,7 @@ query Title($id: ID!, $countryCode: String) {
             }
         }
         currentUserTie {
-            id
-            isBookmarked
-            isLiked
-            isWatched
-            createdAt
-            updatedAt
+            ...UserTitleTieFragment
         }
         releasedOn
         createdAt
