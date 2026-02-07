@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
+import '../components/sentitive_page_view.dart';
 import '../components/user_button.dart';
 import '../constants.dart';
 import '../graphql/queries/videos.graphql.dart';
 import 'show_video_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -32,12 +33,13 @@ class _HomeScreenState extends State<HomeScreen> {
           return const SizedBox();
         }
 
-        return NotificationListener<ScrollEndNotification>(
-          onNotification: (ScrollEndNotification notification) {
+        return SensitivePageView(
+          controller: _pageController,
+          onPageChanged: (int page) {
             setState(() {});
 
-            if (result.isLoading || videos!.nodes.length > _currentPage + 5) {
-              return true;
+            if (result.isLoading || videos!.nodes.length > page + 5) {
+              return;
             }
 
             fetchMore?.call(
@@ -70,26 +72,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
             );
-
-            return true;
           },
-          child: PageView.builder(
-            controller: _pageController,
-            allowImplicitScrolling: true,
-            scrollDirection: Axis.vertical,
-            physics: const BouncingScrollPhysics(),
-            itemBuilder: (context, index) {
-              final video = videos!.nodes[index];
 
-              return ShowVideoScreen(
-                index: index,
-                currentPage: _currentPage,
-                video: video,
-                onUpdated: () => _resultsChanged = true,
-              );
-            },
-            itemCount: result.parsedData?.videos.nodes.length,
-          ),
+          itemBuilder: (context, index) {
+            final video = videos!.nodes[index];
+
+            return ShowVideoScreen(
+              index: index,
+              currentPage: _currentPage,
+              video: video,
+              onUpdated: () => _resultsChanged = true,
+            );
+          },
+          itemCount: result.parsedData?.videos.nodes.length,
         );
       },
     );

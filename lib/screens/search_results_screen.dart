@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../components/sentitive_page_view.dart';
 import '../constants.dart';
 import '../components/user_button.dart';
 import '../graphql/queries/titles.graphql.dart';
@@ -17,9 +18,9 @@ class SearchResultsScreen extends StatefulWidget {
 }
 
 class _SearchResultsScreenState extends State<SearchResultsScreen> {
-  PageController? _pageController;
+  late PageController _pageController;
 
-  int get _currentPage => _pageController?.page?.round() ?? 0;
+  int get _currentPage => _pageController.page?.round() ?? 0;
 
   Widget _getSearchResultVideos() {
     return Query$Titles$Widget(
@@ -35,12 +36,13 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
 
         _pageController = PageController(initialPage: widget.extra?.page ?? 0);
 
-        return NotificationListener<ScrollEndNotification>(
-          onNotification: (ScrollEndNotification notification) {
+        return SensitivePageView(
+          controller: _pageController,
+          onPageChanged: (page) {
             setState(() {});
 
-            if (result.isLoading || titles.nodes.length > _currentPage + 5) {
-              return true;
+            if (result.isLoading || titles.nodes.length > page + 5) {
+              return;
             }
 
             fetchMore?.call(
@@ -72,29 +74,22 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                 },
               ),
             );
-
-            return true;
           },
-          child: PageView.builder(
-            controller: _pageController,
-            scrollDirection: Axis.vertical,
-            onPageChanged: (value) {},
-            itemBuilder: (context, index) {
-              final video = titles.nodes[index].videos.nodes.first;
+          itemBuilder: (context, index) {
+            final video = titles.nodes[index].videos.nodes.first;
 
-              return ShowVideoScreen(
-                video: video,
-                index: index,
-                currentPage: _currentPage,
-                onSeeMore: () => context.goNamed(
-                  routeNameSearchResultsTitle,
-                  pathParameters: {keyTitleId: video.title.id},
-                  queryParameters: {keyQuery: widget.query, keyVideoId: video.id},
-                ),
-              );
-            },
-            itemCount: titles!.nodes.length,
-          ),
+            return ShowVideoScreen(
+              video: video,
+              index: index,
+              currentPage: _currentPage,
+              onSeeMore: () => context.goNamed(
+                routeNameSearchResultsTitle,
+                pathParameters: {keyTitleId: video.title.id},
+                queryParameters: {keyQuery: widget.query, keyVideoId: video.id},
+              ),
+            );
+          },
+          itemCount: titles!.nodes.length,
         );
       },
     );

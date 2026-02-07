@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
+import '../components/sentitive_page_view.dart';
 import '../constants.dart';
 import '../components/user_button.dart';
 import '../graphql/queries/user_title_ties.graphql.dart';
@@ -18,9 +19,9 @@ class ShowUserBookmarksScreen extends StatefulWidget {
 }
 
 class _ShowUserBookmarksScreenState extends State<ShowUserBookmarksScreen> {
-  PageController? _pageController;
+  late PageController _pageController;
 
-  int get _currentPage => _pageController?.page?.round() ?? 0;
+  int get _currentPage => _pageController.page?.round() ?? 0;
 
   Widget _getBookmarksVideos() {
     return Query$UserTitleTies$Widget(
@@ -37,12 +38,13 @@ class _ShowUserBookmarksScreenState extends State<ShowUserBookmarksScreen> {
 
         _pageController = PageController(initialPage: widget.extra?.page ?? 0);
 
-        return NotificationListener<ScrollEndNotification>(
-          onNotification: (ScrollEndNotification notification) {
+        return SensitivePageView(
+          controller: _pageController,
+          onPageChanged: (page) {
             setState(() {});
 
-            if (result.isLoading || (titleTies?.nodes.length ?? 0) > _currentPage + 5) {
-              return true;
+            if (result.isLoading || (titleTies?.nodes.length ?? 0) > page + 5) {
+              return;
             }
 
             fetchMore?.call(
@@ -77,28 +79,22 @@ class _ShowUserBookmarksScreenState extends State<ShowUserBookmarksScreen> {
                 },
               ),
             );
-
-            return true;
           },
-          child: PageView.builder(
-            controller: _pageController,
-            scrollDirection: Axis.vertical,
-            itemBuilder: (context, index) {
-              final video = titleTies!.nodes[index].title.videos.nodes.first;
+          itemBuilder: (context, index) {
+            final video = titleTies!.nodes[index].title.videos.nodes.first;
 
-              return ShowVideoScreen(
-                video: video,
-                index: index,
-                currentPage: _currentPage,
-                onSeeMore: () => context.goNamed(
-                  routeNameShowUserBookmarksTitle,
-                  pathParameters: {keyUsername: widget.username, keyTitleId: video.title.id},
-                  queryParameters: {keyVideoId: video.id},
-                ),
-              );
-            },
-            itemCount: titleTies?.nodes.length,
-          ),
+            return ShowVideoScreen(
+              video: video,
+              index: index,
+              currentPage: _currentPage,
+              onSeeMore: () => context.goNamed(
+                routeNameShowUserBookmarksTitle,
+                pathParameters: {keyUsername: widget.username, keyTitleId: video.title.id},
+                queryParameters: {keyVideoId: video.id},
+              ),
+            );
+          },
+          itemCount: titleTies?.nodes.length,
         );
       },
     );
