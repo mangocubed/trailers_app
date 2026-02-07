@@ -18,7 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final _pageController = PageController();
   bool _resultsChanged = false;
 
-  int get _currentPage => _pageController.page?.round() ?? -1;
+  int get _currentPage => _pageController.page?.round() ?? 0;
 
   Widget _getRecommendedVideos() {
     return Query$Videos$Widget(
@@ -34,6 +34,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
         return NotificationListener<ScrollEndNotification>(
           onNotification: (ScrollEndNotification notification) {
+            setState(() {});
+
             if (result.isLoading || videos!.nodes.length > _currentPage + 5) {
               return true;
             }
@@ -68,8 +70,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
             );
-
-            setState(() {});
 
             return true;
           },

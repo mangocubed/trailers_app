@@ -144,6 +144,7 @@ type QueryRoot {
 	info: InfoObject!
 	title(id: ID!): TitleObject
 	titles(query: String, after: UUID, first: Int, hasVideos: Boolean): TitleObjectConnection!
+	user(username: String!): UserObject
 	video(id: ID!): VideoObject
 	videos(after: UUID, first: Int, includeViewed: Boolean): VideoObjectConnection!
 }
@@ -364,6 +365,7 @@ type UserObject {
 	fullName: String!
 	initials: String!
 	countryCode: String!
+	titleTies(after: UUID, first: Int, isBookmarked: Boolean, isWatched: Boolean): UserTitleTieObjectConnection!
 	createdAt: DateTime!
 	updatedAt: DateTime
 }
@@ -382,6 +384,35 @@ type UserTitleTieObject {
 	isWatched: Boolean!
 	createdAt: DateTime!
 	updatedAt: DateTime
+}
+
+type UserTitleTieObjectConnection {
+	"""
+	Information to aid in pagination.
+	"""
+	pageInfo: PageInfo!
+	"""
+	A list of edges.
+	"""
+	edges: [UserTitleTieObjectEdge!]!
+	"""
+	A list of nodes.
+	"""
+	nodes: [UserTitleTieObject!]!
+}
+
+"""
+An edge in a connection.
+"""
+type UserTitleTieObjectEdge {
+	"""
+	The item at the end of the edge
+	"""
+	node: UserTitleTieObject!
+	"""
+	A cursor for use in pagination
+	"""
+	cursor: String!
 }
 
 type VideoObject {

@@ -152,11 +152,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                       title: entry.value,
                                       onTap: () => context.goNamed(
                                         routeNameSearchResults,
-                                        extra: SearcResultsExtra(
-                                          query: _queryController.text,
-                                          result: result.parsedData,
-                                          page: entry.key,
-                                        ),
+                                        queryParameters: {keyQuery: _queryController.text},
+                                        extra: SearcResultsExtra(parsedData: result.parsedData, page: entry.key),
                                       ),
                                     ),
                                   )

@@ -10,6 +10,9 @@ import 'screens/register_screen.dart';
 import 'screens/search_results_screen.dart';
 import 'screens/search_screen.dart';
 import 'screens/show_title_screen.dart';
+import 'screens/show_user_bookmarks_screen.dart';
+import 'screens/show_user_screen.dart';
+import 'screens/show_user_watched_screen.dart';
 
 final routeObserver = RouteObserver<ModalRoute<void>>();
 
@@ -65,13 +68,11 @@ extension GoRouterExt on GoRouter {
                 name: routeNameSearchResults,
                 path: 'results',
                 builder: (context, state) {
-                  final resultsExtra = state.extra as SearcResultsExtra?;
+                  final query = state.uri.queryParameters[keyQuery];
 
-                  if (resultsExtra == null) {
-                    return const NotFoundScreen();
-                  }
+                  final extra = state.extra as SearcResultsExtra?;
 
-                  return SearchResultsScreen(searchResultsExtra: resultsExtra);
+                  return SearchResultsScreen(query: query, extra: extra);
                 },
               ),
               GoRoute(
@@ -95,6 +96,56 @@ extension GoRouterExt on GoRouter {
 
               return ShowTitleScreen(id: id, videoId: videoId);
             },
+          ),
+          GoRoute(
+            name: routeNameShowUser,
+            path: 'users/:$keyUsername',
+            builder: (context, state) {
+              final username = state.pathParameters[keyUsername]!;
+              return ShowUserScreen(username: username);
+            },
+            routes: [
+              GoRoute(
+                name: routeNameShowUserBookmarks,
+                path: 'bookmarks',
+                builder: (context, state) {
+                  final username = state.pathParameters[keyUsername]!;
+                  final extra = state.extra as ShowUserBookmarksExtra?;
+
+                  return ShowUserBookmarksScreen(username: username, extra: extra);
+                },
+              ),
+              GoRoute(
+                name: routeNameShowUserBookmarksTitle,
+                path: 'titles/:$keyTitleId',
+                builder: (context, state) {
+                  final id = state.pathParameters[keyTitleId]!;
+                  final videoId = state.uri.queryParameters[keyVideoId];
+
+                  return ShowTitleScreen(id: id, videoId: videoId);
+                },
+              ),
+              GoRoute(
+                name: routeNameShowUserWatched,
+                path: 'watched',
+                builder: (context, state) {
+                  final username = state.pathParameters[keyUsername]!;
+                  final extra = state.extra as ShowUserWatchedExtra?;
+
+                  return ShowUserWatchedScreen(username: username, extra: extra);
+                },
+              ),
+              GoRoute(
+                name: routeNameShowUserWatchedTitle,
+                path: 'titles/:$keyTitleId',
+                builder: (context, state) {
+                  final id = state.pathParameters[keyTitleId]!;
+                  final videoId = state.uri.queryParameters[keyVideoId];
+
+                  return ShowTitleScreen(id: id, videoId: videoId);
+                },
+              ),
+            ],
           ),
         ],
       ),

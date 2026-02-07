@@ -7,35 +7,38 @@ import '../graphql/queries/titles.graphql.dart';
 import 'show_video_screen.dart';
 
 class SearchResultsScreen extends StatefulWidget {
-  const SearchResultsScreen({super.key, required this.searchResultsExtra});
+  const SearchResultsScreen({super.key, required this.query, this.extra});
 
-  final SearcResultsExtra searchResultsExtra;
+  final String? query;
+  final SearcResultsExtra? extra;
 
   @override
   State<SearchResultsScreen> createState() => _SearchResultsScreenState();
 }
 
 class _SearchResultsScreenState extends State<SearchResultsScreen> {
-  PageController? _searchResultController;
+  PageController? _pageController;
 
-  int get _currentPage => _searchResultController?.page?.round() ?? -1;
+  int get _currentPage => _pageController?.page?.round() ?? 0;
 
   Widget _getSearchResultVideos() {
     return Query$Titles$Widget(
       options: Options$Query$Titles(
-        typedOptimisticResult: widget.searchResultsExtra.result,
+        typedOptimisticResult: widget.extra?.parsedData,
         variables: Variables$Query$Titles(
-          query: widget.searchResultsExtra.query,
-          first: widget.searchResultsExtra.result?.titles.nodes.length ?? 12,
+          query: widget.query,
+          first: widget.extra?.parsedData?.titles.nodes.length ?? 12,
         ),
       ),
       builder: (result, {fetchMore, refetch}) {
         final titles = result.parsedData?.titles;
 
-        _searchResultController = PageController(initialPage: widget.searchResultsExtra.page);
+        _pageController = PageController(initialPage: widget.extra?.page ?? 0);
 
         return NotificationListener<ScrollEndNotification>(
           onNotification: (ScrollEndNotification notification) {
+            setState(() {});
+
             if (result.isLoading || titles.nodes.length > _currentPage + 5) {
               return true;
             }
@@ -43,7 +46,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
             fetchMore?.call(
               FetchMoreOptions$Query$Titles(
                 variables: Variables$Query$Titles(
-                  query: widget.searchResultsExtra.query,
+                  query: widget.query,
                   after: result.parsedData?.titles.pageInfo.endCursor,
                 ),
                 updateQuery: (previousResultData, fetchMoreResultData) {
@@ -73,7 +76,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
             return true;
           },
           child: PageView.builder(
-            controller: _searchResultController,
+            controller: _pageController,
             scrollDirection: Axis.vertical,
             onPageChanged: (value) {},
             itemBuilder: (context, index) {
@@ -86,7 +89,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                 onSeeMore: () => context.goNamed(
                   routeNameSearchResultsTitle,
                   pathParameters: {keyTitleId: video.title.id},
-                  queryParameters: {keyVideoId: video.id},
+                  queryParameters: {keyQuery: widget.query, keyVideoId: video.id},
                 ),
               );
             },
@@ -115,7 +118,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(widget.searchResultsExtra.query, style: const TextStyle(fontSize: 16, color: Colors.white)),
+              Text(widget.query ?? '', style: const TextStyle(fontSize: 16, color: Colors.white)),
               const Icon(Icons.search_rounded, color: Colors.white),
             ],
           ),
@@ -128,9 +131,8 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
 }
 
 class SearcResultsExtra {
-  SearcResultsExtra({required this.query, required this.result, required this.page});
+  SearcResultsExtra({required this.parsedData, required this.page});
 
-  final String query;
-  final Query$Titles? result;
+  final Query$Titles? parsedData;
   final int page;
 }

@@ -83,6 +83,10 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
     await _videoPlayerController?.dispose();
     _videoPlayerController = null;
     _infoIsVisible = true;
+
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   void _togglePlayPause() async {
@@ -286,7 +290,9 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
 
   @override
   void didPopNext() {
-    _play();
+    if (widget.index == widget.currentPage) {
+      _play();
+    }
   }
 
   @override

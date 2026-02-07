@@ -115,22 +115,20 @@ class _ActionButtonsState extends State<ActionButtons> {
       children: [
         IconButton(
           onPressed: _onWatchedPressed,
-          icon: SvgPicture.asset(
-            widget.userTitleTie?.isWatched == true ? 'assets/watched_filled.svg' : 'assets/watched.svg',
-          ),
+          icon: SvgPicture.asset(_userTitleTie?.isWatched == true ? 'assets/watched_filled.svg' : 'assets/watched.svg'),
           tooltip: 'Watched',
         ),
         const SizedBox(height: 8, width: 8),
         IconButton(
           onPressed: _onLikePressed,
-          icon: SvgPicture.asset(widget.userTitleTie?.isLiked == true ? 'assets/heart_filled.svg' : 'assets/heart.svg'),
+          icon: SvgPicture.asset(_userTitleTie?.isLiked == true ? 'assets/heart_filled.svg' : 'assets/heart.svg'),
           tooltip: 'Like',
         ),
         const SizedBox(height: 8, width: 8),
         IconButton(
           onPressed: _onBookmarkPressed,
           icon: SvgPicture.asset(
-            widget.userTitleTie?.isBookmarked == true ? 'assets/bookmark_filled.svg' : 'assets/bookmark.svg',
+            _userTitleTie?.isBookmarked == true ? 'assets/bookmark_filled.svg' : 'assets/bookmark.svg',
           ),
           tooltip: 'Bookmark',
         ),

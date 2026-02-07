@@ -18,7 +18,10 @@ class UserButton extends StatelessWidget {
         late Widget child;
 
         if (currentUser != null) {
-          child = CircleAvatar(child: Text(currentUser.initials));
+          child = IconButton(
+            onPressed: () => context.goNamed(routeNameShowUser, pathParameters: {keyUsername: currentUser.username}),
+            icon: CircleAvatar(child: Text(currentUser.initials)),
+          );
         } else {
           child = IconButton(
             onPressed: () => context.goNamed(routeNameLogin),

@@ -1,0 +1,29 @@
+query UserTitleTies($username: String!, $after: UUID, $first: Int, $isBookmarked: Boolean, $isWatched: Boolean) {
+    user(username: $username) {
+        id
+        username
+        initials
+        displayName
+        titleTies(after: $after, first: $first, isBookmarked: $isBookmarked, isWatched: $isWatched) {
+            nodes {
+                id
+                title {
+                    ...TitleFragment
+                    videos(first: 1) {
+                        nodes {
+                            ...VideoFragment
+                        }
+                    }
+                }
+                createdAt
+                updatedAt
+            }
+            pageInfo {
+                endCursor
+                startCursor
+            }
+        }
+        createdAt
+        updatedAt
+    }
+}
