@@ -3,8 +3,6 @@ fragment VideoFragment on VideoObject {
     url
     title {
         ...TitleFragment
-        mediaType
-        runtime
         crew(first: 1, jobs: [DIRECTOR]) {
             nodes {
                 id

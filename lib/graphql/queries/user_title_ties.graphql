@@ -1,9 +1,6 @@
 query UserTitleTies($username: String!, $after: UUID, $first: Int, $isBookmarked: Boolean, $isWatched: Boolean) {
     user(username: $username) {
-        id
-        username
-        initials
-        displayName
+        ...UserFragment
         titleTies(after: $after, first: $first, isBookmarked: $isBookmarked, isWatched: $isWatched) {
             nodes {
                 id
@@ -23,7 +20,5 @@ query UserTitleTies($username: String!, $after: UUID, $first: Int, $isBookmarked
                 startCursor
             }
         }
-        createdAt
-        updatedAt
     }
 }

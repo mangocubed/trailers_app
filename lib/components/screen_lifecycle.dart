@@ -32,6 +32,11 @@ class _ScreenLifecycleState extends State<ScreenLifecycle> with WidgetsBindingOb
   }
 
   @override
+  void didPush() {
+    widget.onResume?.call();
+  }
+
+  @override
   void didPopNext() {
     widget.onResume?.call();
   }

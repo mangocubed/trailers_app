@@ -1,11 +1,5 @@
 query CurrentUser {
     currentUser {
-        id
-        username
-        displayName
-        initials
-        countryCode
-        createdAt
-        updatedAt
+        ...UserFragment
     }
 }

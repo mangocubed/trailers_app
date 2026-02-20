@@ -1,11 +1,7 @@
 query Title($id: ID!, $countryCode: String) {
     title(id: $id) {
-        id
-        mediaType
-        posterImageUrl
-        name
+        ...TitleFragment
         overview
-        runtime
         crew(first: 1, jobs: [DIRECTOR]) {
             nodes {
                 id
@@ -59,8 +55,5 @@ query Title($id: ID!, $countryCode: String) {
         currentUserTie {
             ...UserTitleTieFragment
         }
-        releasedOn
-        createdAt
-        updatedAt
     }
 }

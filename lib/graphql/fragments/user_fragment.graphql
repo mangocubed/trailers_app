@@ -1,0 +1,16 @@
+fragment UserFragment on UserObject {
+    id
+    identityUser {
+        id
+        username
+        displayName
+        initials
+        languageCode
+        countryCode
+        avatarImageUrl
+        createdAt
+        updatedAt
+    }
+    createdAt
+    updatedAt
+}

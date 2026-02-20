@@ -48,6 +48,18 @@ type GenreObjectEdge {
 	cursor: String!
 }
 
+type IdentityUserObject {
+	id: ID!
+	username: String!
+	displayName: String!
+	initials: String!
+	languageCode: String!
+	countryCode: String!
+	avatarImageUrl: Url!
+	createdAt: DateTime!
+	updatedAt: DateTime
+}
+
 type InfoObject {
 	builtAt: DateTime!
 	version: String!
@@ -90,9 +102,6 @@ type KeywordObjectEdge {
 }
 
 type MutationRoot {
-	createUser(input: UserInputObject!): UserObject!
-	createSession(input: SessionInputObject!): SessionObject!
-	finishSession: Boolean!
 	updateBookmark(input: UserTitleTieInputObject!): UserTitleTieObject!
 	updateLike(input: UserTitleTieInputObject!): UserTitleTieObject!
 	updateWatched(input: UserTitleTieInputObject!): UserTitleTieObject!
@@ -147,19 +156,6 @@ type QueryRoot {
 	user(username: String!): UserObject
 	video(id: ID!): VideoObject
 	videos(after: UUID, first: Int, includeViewed: Boolean): VideoObjectConnection!
-}
-
-input SessionInputObject {
-	usernameOrEmail: String!
-	password: String!
-}
-
-type SessionObject {
-	id: ID!
-	user: UserObject!
-	token: String!
-	createdAt: DateTime!
-	updatedAt: DateTime
 }
 
 type TitleCastObject {
@@ -349,22 +345,9 @@ URL is a String implementing the [URL Standard](http://url.spec.whatwg.org/)
 """
 scalar Url
 
-input UserInputObject {
-	username: String!
-	email: String!
-	password: String!
-	fullName: String!
-	birthdate: NaiveDate!
-	countryCode: String!
-}
-
 type UserObject {
 	id: ID!
-	username: String!
-	displayName: String!
-	fullName: String!
-	initials: String!
-	countryCode: String!
+	identityUser: IdentityUserObject!
 	titleTies(after: UUID, first: Int, isBookmarked: Boolean, isWatched: Boolean): UserTitleTieObjectConnection!
 	createdAt: DateTime!
 	updatedAt: DateTime

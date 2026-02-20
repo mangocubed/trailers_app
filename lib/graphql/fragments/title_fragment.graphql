@@ -1,8 +1,10 @@
 fragment TitleFragment on TitleObject {
     id
+    mediaType
     name
-    posterImageUrl
     releasedOn
+    runtime
+    posterImageUrl
     createdAt
     updatedAt
 }

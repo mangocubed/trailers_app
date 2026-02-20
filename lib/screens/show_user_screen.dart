@@ -206,7 +206,11 @@ class _ShowUserScreenState extends State<ShowUserScreen> {
         final user = result.parsedData?.user;
 
         if (user == null) {
-          return const NotFoundScreen();
+          if (result.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else {
+            return const NotFoundScreen();
+          }
         }
 
         return Scaffold(
@@ -219,11 +223,14 @@ class _ShowUserScreenState extends State<ShowUserScreen> {
                 delegate: SliverChildListDelegate([
                   const SizedBox(height: 16),
                   Center(
-                    child: CircleAvatar(radius: 48, child: Text(user.initials, style: TextStyle(fontSize: 48))),
+                    child: CircleAvatar(
+                      radius: 48,
+                      child: Text(user.identityUser.initials, style: TextStyle(fontSize: 48)),
+                    ),
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    '@${user.username}',
+                    '@${user.identityUser.username}',
                     textAlign: TextAlign.center,
                     style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white),
                   ),

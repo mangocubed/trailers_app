@@ -2,7 +2,7 @@ import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../session.dart';
+import '../graphql/queries/current_user.graphql.dart';
 import '../components/action_buttons.dart';
 import '../components/genre_chip.dart';
 import '../components/title_basic_info.dart';
@@ -22,17 +22,7 @@ class ShowTitleScreen extends StatefulWidget {
 class _ShowTitleScreenState extends State<ShowTitleScreen> {
   Country _country = Country.parse('US');
 
-  _loadCurrentUser() async {
-    final currentUser = await context.getCurrentUser();
-
-    if (currentUser != null && currentUser.countryCode.isNotEmpty) {
-      setState(() {
-        _country = Country.tryParse(currentUser.countryCode) ?? Country.parse('US');
-      });
-    }
-  }
-
-  _openCountryPicker(List<String> countryFilter) {
+  void _openCountryPicker(List<String> countryFilter) {
     showCountryPicker(
       countryFilter: countryFilter,
       context: context,
@@ -42,15 +32,6 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
         });
       },
     );
-  }
-
-  @override
-  void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadCurrentUser();
-    });
-
-    super.initState();
   }
 
   Widget _getWatchProviders(String titleName, Query$Title$title$watchProviders titleWatchProviders) {
@@ -77,19 +58,29 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
                   ),
                 ),
               ),
-              IconButton(
-                onPressed: () => _openCountryPicker(
-                  titleWatchProviders.nodes
-                      .map((watchProvider) => watchProvider.countryCodes)
-                      .expand((codes) => codes)
-                      .toList(),
-                ),
-                icon: Row(
-                  children: [
-                    Text(_country.flagEmoji, style: const TextStyle(fontSize: 20)),
-                    const Icon(Icons.arrow_drop_down_rounded, color: Colors.white),
-                  ],
-                ),
+              Query$CurrentUser$Widget(
+                builder: (result, {fetchMore, refetch}) {
+                  final currentUser = result.parsedData?.currentUser;
+
+                  if (currentUser != null) {
+                    _country = Country.tryParse(currentUser.identityUser.countryCode) ?? Country.parse('US');
+                  }
+
+                  return IconButton(
+                    onPressed: () => _openCountryPicker(
+                      titleWatchProviders.nodes
+                          .map((watchProvider) => watchProvider.countryCodes)
+                          .expand((codes) => codes)
+                          .toList(),
+                    ),
+                    icon: Row(
+                      children: [
+                        Text(_country.flagEmoji, style: const TextStyle(fontSize: 20)),
+                        const Icon(Icons.arrow_drop_down_rounded, color: Colors.white),
+                      ],
+                    ),
+                  );
+                },
               ),
             ],
           ),
@@ -195,10 +186,12 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
       builder: (result, {fetchMore, refetch}) {
         final title = result.parsedData?.title;
 
-        if (result.parsedData == null && result.isLoading) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (title == null) {
-          return const NotFoundScreen();
+        if (title == null) {
+          if (result.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else {
+            return const NotFoundScreen();
+          }
         }
 
         return Scaffold(

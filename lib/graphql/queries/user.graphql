@@ -1,10 +1,5 @@
 query User($username: String!) {
     user(username: $username) {
-        id
-        username
-        displayName
-        initials
-        createdAt
-        updatedAt
+        ...UserFragment
     }
 }

@@ -285,7 +285,7 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
 
   @override
   void didPushNext() {
-    _pause();
+    _stop();
   }
 
   @override
