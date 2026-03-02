@@ -30,7 +30,7 @@ jobs:
             - name: Rename package
               run: mv ./build/app/outputs/flutter-apk/app-release.apk ./trailers-app-${{ github.ref_name }}.apk
             - name: Upload artifact
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: trailers_android_app_build
                   path: ./trailers-app-${{ github.ref_name }}.apk
@@ -41,7 +41,7 @@ jobs:
         runs-on: ubuntu-24.04
         steps:
             - uses: actions/checkout@v6
-            - uses: actions/download-artifact@v7
+            - uses: actions/download-artifact@v8
               with:
                   name: trailers_android_app_build
                   path: builds/
