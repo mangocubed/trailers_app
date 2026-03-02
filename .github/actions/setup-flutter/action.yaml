@@ -12,3 +12,6 @@ runs:
         - name: Install dependencies
           shell: bash
           run: flutter pub get
+        - name: Build with build_runner
+          shell: bash
+          run: dart run build_runner build
