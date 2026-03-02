@@ -1,0 +1,52 @@
+name: CD
+
+on:
+    push:
+        tags:
+            - "v*"
+
+    workflow_dispatch:
+
+jobs:
+    build_android_app:
+        runs-on: ubuntu-24.04
+        steps:
+            - uses: actions/checkout@v6
+            - uses: ./.github/actions/setup-flutter
+            - name: Decode keystore file
+              run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
+            - name: Create key.properties
+              run: |
+                  echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
+                  echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
+                  echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
+                  echo "storeFile=keystore.jks" >> android/key.properties
+            - run: |
+                  flutter build apk --release \
+                  --dart-define IDENTITY_API_URL="${{ env.IDENTITY_API_URL }}" \
+                  --dart-define IDENTITY_CLIENT_ID="${{ env.IDENTITY_CLIENT_ID }}" \
+                  --dart-define IDENTITY_URL="${{ env.IDENTITY_URL }}" \
+                  --dart-define TRAILERS_API_URL="${{ env.TRAILERS_API_URL }}"
+            - name: Rename package
+              run: mv ./build/app/outputs/flutter-apk/app-release.apk ./trailers-app-${{ github.ref_name }}.apk
+            - name: Upload artifact
+              uses: actions/upload-artifact@v6
+              with:
+                  name: trailers_android_app_build
+                  path: ./trailers-app-${{ github.ref_name }}.apk
+                  retention-days: 1
+
+    release:
+        needs: [build_android_app]
+        runs-on: ubuntu-24.04
+        steps:
+            - uses: actions/checkout@v6
+            - uses: actions/download-artifact@v7
+              with:
+                  name: trailers_android_app_build
+                  path: builds/
+            - uses: softprops/action-gh-release@v2
+              with:
+                  files: ./builds/trailers-app-${{ github.ref_name }}.apk
+                  generate_release_notes: true
+                  prerelease: ${{ contains(github.ref_name, '-alpha') }}

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class SnackBarAlert {
-  static show(BuildContext context, String content) {
+  static void show(BuildContext context, String content) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         behavior: SnackBarBehavior.floating,
