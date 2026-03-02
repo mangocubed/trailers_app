@@ -14,8 +14,6 @@ analyzer:
         - "lib/**.graphql.dart"
 
 formatter:
-    exclude:
-        - "lib/**.graphql.dart"
     page_width: 120
 
 linter:
