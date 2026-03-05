@@ -3,16 +3,12 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 
 import 'access_token.dart';
 import 'config.dart';
-import 'constants.dart';
 
 extension GraphQLClientExt on GraphQLClient {
   static GraphQLClient setup() => GraphQLClient(
-    link: AuthLink(getToken: () => AccessToken.getBearer()).concat(
-      HttpLink(
-        Config.trailersApiUrl.replace(path: '/graphql').toString(),
-        defaultHeaders: {headerXApiToken: Config.trailersApiToken},
-      ),
-    ),
+    link: AuthLink(
+      getToken: () => AccessToken.getBearer(),
+    ).concat(HttpLink(Config.trailersApiUrl.replace(path: '/graphql').toString())),
     cache: GraphQLCache(store: HiveStore()),
     defaultPolicies: DefaultPolicies(
       query: Policies(fetch: FetchPolicy.networkOnly),
