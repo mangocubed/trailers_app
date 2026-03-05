@@ -1,5 +1,3 @@
-const headerXApiToken = 'X-Api-Token';
-
 const keyAccessToken = 'access_token';
 const keyQuery = 'query';
 const keySessionToken = 'session_token';
