@@ -19,7 +19,9 @@ class CurrentUser extends StatelessWidget {
         return ScreenLifecycle(
           onResume: () async {
             if (!result.isLoading) {
-              await refetch?.call();
+              try {
+                await refetch?.call();
+              } catch (_) {}
             }
           },
           child: builder(user, refetch: refetch),
