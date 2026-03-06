@@ -15,6 +15,7 @@ extension GraphQLClientExt on GraphQLClient {
       mutate: Policies(fetch: FetchPolicy.networkOnly),
       watchQuery: Policies(fetch: FetchPolicy.cacheAndNetwork),
     ),
+    queryRequestTimeout: const Duration(minutes: 1),
   );
 }
 
