@@ -7,8 +7,13 @@ on:
 
     workflow_dispatch:
 
+permissions:
+    contents: write
+
 jobs:
     build_android_app:
+        environment:
+            name: android-app
         runs-on: ubuntu-24.04
         steps:
             - uses: actions/checkout@v6
@@ -23,10 +28,10 @@ jobs:
                   echo "storeFile=keystore.jks" >> android/key.properties
             - run: |
                   flutter build apk --release \
-                  --dart-define IDENTITY_API_URL="${{ env.IDENTITY_API_URL }}" \
-                  --dart-define IDENTITY_CLIENT_ID="${{ env.IDENTITY_CLIENT_ID }}" \
-                  --dart-define IDENTITY_URL="${{ env.IDENTITY_URL }}" \
-                  --dart-define TRAILERS_API_URL="${{ env.TRAILERS_API_URL }}"
+                  --dart-define IDENTITY_API_URL="${{ vars.IDENTITY_API_URL }}" \
+                  --dart-define IDENTITY_CLIENT_ID="${{ vars.IDENTITY_CLIENT_ID }}" \
+                  --dart-define IDENTITY_URL="${{ vars.IDENTITY_URL }}" \
+                  --dart-define TRAILERS_API_URL="${{ vars.TRAILERS_API_URL }}"
             - name: Rename package
               run: mv ./build/app/outputs/flutter-apk/app-release.apk ./trailers-app-${{ github.ref_name }}.apk
             - name: Upload artifact
@@ -35,9 +40,28 @@ jobs:
                   name: trailers_android_app_build
                   path: ./trailers-app-${{ github.ref_name }}.apk
                   retention-days: 1
+                  overwrite: true
+
+    build_web_app:
+        environment:
+            name: web-app
+        runs-on: ubuntu-24.04
+        steps:
+            - uses: actions/checkout@v6
+            - uses: actions/configure-pages@v5
+            - uses: ./.github/actions/setup-flutter
+            - run: flutter build web --release \
+                  --dart-define IDENTITY_API_URL="${{ vars.IDENTITY_API_URL }}" \
+                  --dart-define IDENTITY_CLIENT_ID="${{ vars.IDENTITY_CLIENT_ID }}" \
+                  --dart-define IDENTITY_URL="${{ vars.IDENTITY_URL }}" \
+                  --dart-define TRAILERS_API_URL="${{ vars.TRAILERS_API_URL }}"
+            - name: Upload artifact
+              uses: actions/upload-pages-artifact@v3
+              with:
+                  path: ./build/web
 
     release:
-        needs: [build_android_app]
+        needs: build_android_app
         runs-on: ubuntu-24.04
         steps:
             - uses: actions/checkout@v6
@@ -50,3 +74,14 @@ jobs:
                   files: artifact/trailers-app-${{ github.ref_name }}.apk
                   generate_release_notes: true
                   prerelease: ${{ contains(github.ref_name, '-alpha') }}
+
+    deploy:
+        needs: build_web_app
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+        runs-on: ubuntu-24.04
+        steps:
+            - name: Deploy to GitHub Pages
+              id: deployment
+              uses: actions/deploy-pages@v4
