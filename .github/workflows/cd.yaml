@@ -50,7 +50,8 @@ jobs:
             - uses: actions/checkout@v6
             - uses: actions/configure-pages@v5
             - uses: ./.github/actions/setup-flutter
-            - run: flutter build web --release \
+            - run: |
+                  flutter build web --release \
                   --dart-define IDENTITY_API_URL="${{ vars.IDENTITY_API_URL }}" \
                   --dart-define IDENTITY_CLIENT_ID="${{ vars.IDENTITY_CLIENT_ID }}" \
                   --dart-define IDENTITY_URL="${{ vars.IDENTITY_URL }}" \
