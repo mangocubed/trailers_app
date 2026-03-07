@@ -4,7 +4,8 @@ Movies and TV Series recommendations.
 
 ### Build Requirements
 
-- Rust 1.93.x
+- Dart 3.11.x
+- Flutter 3.41.x
 
 ## Environment variables
 
