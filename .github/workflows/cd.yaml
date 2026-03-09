@@ -92,6 +92,7 @@ jobs:
                   flutter build web --release \
                   --dart-define IDENTITY_API_URL="${{ vars.IDENTITY_API_URL }}" \
                   --dart-define IDENTITY_CLIENT_ID="${{ vars.IDENTITY_CLIENT_ID }}" \
+                  --dart-define IDENTITY_REDIRECT_URL="${{ vars.IDENTITY_REDIRECT_URL }}" \
                   --dart-define IDENTITY_URL="${{ vars.IDENTITY_URL }}" \
                   --dart-define TRAILERS_API_URL="${{ vars.TRAILERS_API_URL }}"
             - name: Upload artifact

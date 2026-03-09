@@ -5,6 +5,10 @@ class Config {
 
   static final String identityClientId = const String.fromEnvironment('IDENTITY_CLIENT_ID', defaultValue: '');
 
+  static final Uri identityRedirectUrl = Uri.parse(
+    const String.fromEnvironment('IDENTITY_REDIRECT_URL', defaultValue: 'app.mango3.trailers://oauth'),
+  );
+
   static final Uri identityUrl = Uri.parse(
     const String.fromEnvironment('IDENTITY_URL', defaultValue: 'http://127.0.0.1:8000'),
   );
