@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
@@ -10,7 +9,6 @@ import 'router.dart';
 
 void main() async {
   await initHiveForFlutter();
-  usePathUrlStrategy();
 
   final graphQLClient = GraphQLClientExt.setup();
 

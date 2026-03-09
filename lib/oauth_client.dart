@@ -13,7 +13,7 @@ extension OAuthClientExt on OAuth2Client {
 
     return OAuth2Client(
       authorizeUrl: authorizeUrl.toString(),
-      redirectUri: 'app.mango3.trailers://oauth',
+      redirectUri: Config.identityRedirectUrl.toString(),
       customUriScheme: 'app.mango3.trailers',
       tokenUrl: tokenUrl.toString(),
       refreshUrl: tokenUrl.toString(),
