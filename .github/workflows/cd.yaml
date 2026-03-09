@@ -63,7 +63,7 @@ jobs:
                   --dart-define IDENTITY_URL="${{ vars.IDENTITY_URL }}" \
                   --dart-define TRAILERS_API_URL="${{ vars.TRAILERS_API_URL }}"
             - name: Upload artifact
-              uses: actions/upload-pages-artifact@v3
+              uses: actions/upload-pages-artifact@v4
               with:
                   path: ./build/web
 
