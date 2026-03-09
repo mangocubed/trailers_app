@@ -17,7 +17,39 @@ concurrency:
     cancel-in-progress: false
 
 jobs:
-    build_android_app:
+    build_android_aab:
+        environment:
+            name: android-app
+        runs-on: ubuntu-24.04
+        steps:
+            - uses: actions/checkout@v6
+            - uses: ./.github/actions/setup-flutter
+            - name: Decode keystore file
+              run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
+            - name: Create key.properties
+              run: |
+                  echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
+                  echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
+                  echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
+                  echo "storeFile=keystore.jks" >> android/key.properties
+            - run: |
+                  flutter build aab --release \
+                  --dart-define IDENTITY_API_URL="${{ vars.IDENTITY_API_URL }}" \
+                  --dart-define IDENTITY_CLIENT_ID="${{ vars.IDENTITY_CLIENT_ID }}" \
+                  --dart-define IDENTITY_REDIRECT_URL="${{ vars.IDENTITY_REDIRECT_URL }}" \
+                  --dart-define IDENTITY_URL="${{ vars.IDENTITY_URL }}" \
+                  --dart-define TRAILERS_API_URL="${{ vars.TRAILERS_API_URL }}"
+            - name: Rename package
+              run: mv ./build/app/outputs/bundle/release/app-release.aab ./trailers-app-${{ github.ref_name }}.aab
+            - name: Upload artifact
+              uses: actions/upload-artifact@v7
+              with:
+                  name: trailers_android_aab_build
+                  path: ./trailers-app-${{ github.ref_name }}.aab
+                  retention-days: 1
+                  overwrite: true
+
+    build_android_apk:
         environment:
             name: android-app
         runs-on: ubuntu-24.04
@@ -48,7 +80,7 @@ jobs:
                   retention-days: 1
                   overwrite: true
 
-    build_web_app:
+    build_web:
         environment:
             name: web-app
         runs-on: ubuntu-24.04
@@ -68,7 +100,7 @@ jobs:
                   path: ./build/web
 
     release:
-        needs: build_android_app
+        needs: [build_android_aab, build_android_apk]
         runs-on: ubuntu-24.04
         steps:
             - uses: actions/checkout@v6
@@ -78,12 +110,14 @@ jobs:
                   path: artifact/
             - uses: softprops/action-gh-release@v2
               with:
-                  files: artifact/trailers-app-${{ github.ref_name }}.apk
+                  files: |
+                      artifact/trailers-app-${{ github.ref_name }}.aab
+                      artifact/trailers-app-${{ github.ref_name }}.apk
                   generate_release_notes: true
                   prerelease: ${{ contains(github.ref_name, '-alpha') }}
 
     deploy:
-        needs: build_web_app
+        needs: build_web
         environment:
             name: github-pages
             url: ${{ steps.deployment.outputs.page_url }}
