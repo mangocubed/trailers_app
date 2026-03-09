@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class SensitivePhysics extends BouncingScrollPhysics {
   const SensitivePhysics({super.parent});
@@ -12,7 +13,7 @@ class SensitivePhysics extends BouncingScrollPhysics {
   SpringDescription get spring => SpringDescription.withDampingRatio(mass: 0.25, stiffness: 1000.0, ratio: 1.1);
 }
 
-class SensitivePageView extends StatelessWidget {
+class SensitivePageView extends StatefulWidget {
   const SensitivePageView({
     super.key,
     required this.controller,
@@ -26,23 +27,59 @@ class SensitivePageView extends StatelessWidget {
   final int? itemCount;
   final void Function(int) onPageChanged;
 
-  int get _currentPage => controller.page?.round() ?? 0;
+  @override
+  State<SensitivePageView> createState() => _SensitivePageViewState();
+}
+
+class _SensitivePageViewState extends State<SensitivePageView> {
+  int get _currentPage => widget.controller.page?.round() ?? 0;
+
+  bool _onKeyDown(KeyEvent event) {
+    if (event is KeyDownEvent) {
+      final keyId = event.logicalKey.keyId;
+
+      switch (keyId) {
+        case 4294968068: // Up arrow
+          widget.controller.previousPage(duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+          break;
+        case 4294968065: // Down arrow
+          widget.controller.nextPage(duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+          break;
+        default:
+          break;
+      }
+    }
+
+    return false;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    ServicesBinding.instance.keyboard.addHandler(_onKeyDown);
+  }
+
+  @override
+  void dispose() {
+    ServicesBinding.instance.keyboard.removeHandler(_onKeyDown);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return NotificationListener<ScrollEndNotification>(
       onNotification: (ScrollEndNotification notification) {
-        onPageChanged(_currentPage);
+        widget.onPageChanged(_currentPage);
 
         return true;
       },
       child: PageView.builder(
-        controller: controller,
+        controller: widget.controller,
         allowImplicitScrolling: true,
         scrollDirection: Axis.vertical,
         physics: SensitivePhysics(),
-        itemCount: itemCount,
-        itemBuilder: itemBuilder,
+        itemCount: widget.itemCount,
+        itemBuilder: widget.itemBuilder,
       ),
     );
   }
