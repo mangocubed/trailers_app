@@ -46,19 +46,20 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
   }
 
   Future<void> _play() async {
+    _videoPlayerController ??= VideoPlayerController.networkUrl(widget.video.url, viewType: VideoViewType.platformView)
+      ..setLooping(true)
+      ..addListener(() {
+        if (mounted) {
+          setState(() {});
+        }
+      });
+
     if (!_isReady) {
-      _videoPlayerController = VideoPlayerController.networkUrl(widget.video.url, viewType: VideoViewType.platformView)
-        ..setLooping(true)
-        ..addListener(() {
-          if (mounted) {
-            setState(() {});
-          }
-        })
-        ..initialize().then((_) {
-          if (mounted) {
-            setState(() {});
-          }
-        });
+      _videoPlayerController?.initialize().then((_) {
+        if (mounted) {
+          setState(() {});
+        }
+      });
     }
 
     await _videoPlayerController?.play();
