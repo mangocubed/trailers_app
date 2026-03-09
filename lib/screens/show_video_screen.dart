@@ -33,14 +33,12 @@ class ShowVideoScreen extends StatefulWidget {
 
 class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
   VideoPlayerController? _videoPlayerController;
-  bool _infoIsVisible = true;
 
+  bool get _isReady => _videoPlayerController?.value.isInitialized ?? false;
   bool get _isPlaying => _videoPlayerController?.value.isPlaying ?? false;
 
   double get _thumbnailOpacity {
-    final isReady = _videoPlayerController?.value.isInitialized ?? false;
-
-    if (isReady) {
+    if (_isReady) {
       return 0.0;
     } else {
       return 1.0;
@@ -48,41 +46,34 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
   }
 
   Future<void> _play() async {
-    _videoPlayerController ??= VideoPlayerController.networkUrl(widget.video.url, viewType: VideoViewType.platformView)
-      ..setLooping(true)
-      ..addListener(() {
-        if (mounted) {
-          setState(() {});
-        }
-      })
-      ..initialize().then((_) {
-        if (mounted) {
-          setState(() {});
-        }
-      });
+    if (!_isReady) {
+      _videoPlayerController = VideoPlayerController.networkUrl(widget.video.url, viewType: VideoViewType.platformView)
+        ..setLooping(true)
+        ..addListener(() {
+          if (mounted) {
+            setState(() {});
+          }
+        })
+        ..initialize().then((_) {
+          if (mounted) {
+            setState(() {});
+          }
+        });
+    }
 
     await _videoPlayerController?.play();
 
     await Future.delayed(const Duration(seconds: 5));
-
-    if (mounted && _isPlaying) {
-      setState(() => _infoIsVisible = false);
-    }
   }
 
   Future<void> _pause() async {
     await _videoPlayerController?.pause();
-
-    if (mounted) {
-      setState(() => _infoIsVisible = true);
-    }
   }
 
   Future<void> _stop() async {
     await _videoPlayerController?.pause();
     await _videoPlayerController?.dispose();
     _videoPlayerController = null;
-    _infoIsVisible = true;
 
     if (mounted) {
       setState(() {});
@@ -137,8 +128,14 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
                 width: double.infinity,
                 height: double.infinity,
                 child: Visibility(
-                  visible: !_isPlaying && _thumbnailOpacity == 0.0,
-                  child: const Center(child: Icon(Icons.pause_rounded, color: Colors.grey, size: 128)),
+                  visible: !_isPlaying,
+                  child: Center(
+                    child: Icon(
+                      _isReady ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                      color: Color(0x999E9E9E),
+                      size: 128,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -160,91 +157,84 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
           bottom: 0,
           left: 0,
           right: 0,
-          child: IgnorePointer(
-            ignoring: !_infoIsVisible,
-            child: AnimatedOpacity(
-              opacity: _infoIsVisible ? 1 : 0,
-              duration: const Duration(milliseconds: 250),
-              child: Container(
-                padding: const EdgeInsets.only(top: 12, right: 24, bottom: 12, left: 24),
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color.fromRGBO(0, 0, 0, 0),
-                      Color.fromRGBO(0, 0, 0, 0.33),
-                      Color.fromRGBO(0, 0, 0, 0.66),
-                      Color(0xFF000000),
-                      Color(0xFF000000),
-                      Color(0xFF000000),
-                    ],
+          child: Container(
+            padding: const EdgeInsets.only(top: 12, right: 24, bottom: 12, left: 24),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color.fromRGBO(0, 0, 0, 0),
+                  Color.fromRGBO(0, 0, 0, 0.33),
+                  Color.fromRGBO(0, 0, 0, 0.66),
+                  Color(0xFF000000),
+                  Color(0xFF000000),
+                  Color(0xFF000000),
+                ],
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  video.title.name,
+                  style: GoogleFonts.blackHanSans(
+                    textStyle: const TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.white,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                const SizedBox(height: 8),
+                Flex(
+                  direction: isPortrait ? Axis.vertical : Axis.horizontal,
+                  crossAxisAlignment: isPortrait ? CrossAxisAlignment.start : CrossAxisAlignment.end,
                   children: [
-                    Text(
-                      video.title.name,
-                      style: GoogleFonts.blackHanSans(
-                        textStyle: const TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.white,
-                          overflow: TextOverflow.ellipsis,
+                    Expanded(
+                      flex: isPortrait ? 0 : 1,
+                      child: TitleBasicInfo(
+                        isCentered: false,
+                        releasedOn: video.title.releasedOn,
+                        directorName: widget.video.title.crew.nodes.firstOrNull?.person.name,
+                        runtime: video.title.runtime,
+                        mediaType: video.title.mediaType,
+                        extraChips: video.title.genres.nodes
+                            .map((genre) => Flexible(child: GenreChip(name: genre.name)))
+                            .toList(),
+                      ),
+                    ),
+                    const SizedBox(height: 8, width: 8),
+                    Expanded(
+                      flex: isPortrait ? 0 : 1,
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: FilledButton(
+                          onPressed: () {
+                            if (widget.onSeeMore != null) {
+                              widget.onSeeMore?.call();
+                              return;
+                            }
+
+                            context.goNamed(
+                              routeNameShowTitle,
+                              pathParameters: {keyTitleId: video.title.id},
+                              queryParameters: {keyVideoId: video.id},
+                            );
+                          },
+                          style: FilledButton.styleFrom(
+                            textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                            backgroundColor: const Color(0xffFC7753),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          ),
+                          child: Text('More details'),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Flex(
-                      direction: isPortrait ? Axis.vertical : Axis.horizontal,
-                      crossAxisAlignment: isPortrait ? CrossAxisAlignment.start : CrossAxisAlignment.end,
-                      children: [
-                        Expanded(
-                          flex: isPortrait ? 0 : 1,
-                          child: TitleBasicInfo(
-                            isCentered: false,
-                            releasedOn: video.title.releasedOn,
-                            directorName: widget.video.title.crew.nodes.firstOrNull?.person.name,
-                            runtime: video.title.runtime,
-                            mediaType: video.title.mediaType,
-                            extraChips: video.title.genres.nodes
-                                .map((genre) => Flexible(child: GenreChip(name: genre.name)))
-                                .toList(),
-                          ),
-                        ),
-                        const SizedBox(height: 8, width: 8),
-                        Expanded(
-                          flex: isPortrait ? 0 : 1,
-                          child: SizedBox(
-                            width: double.infinity,
-                            child: FilledButton(
-                              onPressed: () {
-                                if (widget.onSeeMore != null) {
-                                  widget.onSeeMore?.call();
-                                  return;
-                                }
-
-                                context.goNamed(
-                                  routeNameShowTitle,
-                                  pathParameters: {keyTitleId: video.title.id},
-                                  queryParameters: {keyVideoId: video.id},
-                                );
-                              },
-                              style: FilledButton.styleFrom(
-                                textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                                backgroundColor: const Color(0xffFC7753),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                              ),
-                              child: Text('More details'),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
                   ],
                 ),
-              ),
+              ],
             ),
           ),
         ),
