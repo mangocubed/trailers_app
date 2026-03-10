@@ -33,19 +33,26 @@ jobs:
                   echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
                   echo "storeFile=keystore.jks" >> android/key.properties
             - run: |
-                  flutter build aab --release \
+                  flutter build appbundle --release --obfuscate --split-debug-info=./build/symbols \
                   --dart-define IDENTITY_API_URL="${{ vars.IDENTITY_API_URL }}" \
                   --dart-define IDENTITY_CLIENT_ID="${{ vars.IDENTITY_CLIENT_ID }}" \
-                  --dart-define IDENTITY_REDIRECT_URL="${{ vars.IDENTITY_REDIRECT_URL }}" \
                   --dart-define IDENTITY_URL="${{ vars.IDENTITY_URL }}" \
                   --dart-define TRAILERS_API_URL="${{ vars.TRAILERS_API_URL }}"
-            - name: Rename package
-              run: mv ./build/app/outputs/bundle/release/app-release.aab ./trailers-app-${{ github.ref_name }}.aab
+            - run: |
+                  mkdir artifact
+                  mv build/app/outputs/bundle/release/app-release.aab artifact/trailers-app-${{ github.ref_name }}.aab
+                  mv build/app/outputs/mapping/release/mapping.txt artifact/mapping.txt
+                  mkdir -p artifact/symbols/arm64-v8a
+                  mkdir artifact/symbols/armeabi-v7a
+                  mkdir artifact/symbols/x86_64
+                  cp build/symbols/app.android-arm64.symbols artifact/symbols/arm64-v8a/libapp.so.sym
+                  cp build/symbols/app.android-arm.symbols artifact/symbols/armeabi-v7a/libapp.so.sym
+                  cp build/symbols/app.android-x64.symbols artifact/symbols/x86_64/libapp.so.sym
             - name: Upload artifact
               uses: actions/upload-artifact@v7
               with:
                   name: trailers_android_aab_build
-                  path: ./trailers-app-${{ github.ref_name }}.aab
+                  path: ./artifact/
                   retention-days: 1
                   overwrite: true
 
@@ -101,7 +108,22 @@ jobs:
                   path: ./build/web
 
     release:
-        needs: [build_android_aab, build_android_apk]
+        needs: build_android_apk
+        runs-on: ubuntu-24.04
+        steps:
+            - uses: actions/checkout@v6
+            - uses: actions/download-artifact@v8
+              with:
+                  name: trailers_android_apk_build
+                  path: artifact/
+            - uses: softprops/action-gh-release@v2
+              with:
+                  files: artifact/trailers-app-${{ github.ref_name }}.apk
+                  generate_release_notes: true
+                  prerelease: ${{ contains(github.ref_name, '-alpha') }}
+
+    publish_android_aab:
+        needs: build_android_aab
         runs-on: ubuntu-24.04
         steps:
             - uses: actions/checkout@v6
@@ -109,19 +131,18 @@ jobs:
               with:
                   name: trailers_android_aab_build
                   path: artifact/
-            - uses: actions/download-artifact@v8
+            - uses: r0adkll/upload-google-play@v1
               with:
-                  name: trailers_android_apk_build
-                  path: artifact/
-            - uses: softprops/action-gh-release@v2
-              with:
-                  files: |
-                      artifact/trailers-app-${{ github.ref_name }}.aab
-                      artifact/trailers-app-${{ github.ref_name }}.apk
-                  generate_release_notes: true
-                  prerelease: ${{ contains(github.ref_name, '-alpha') }}
+                  serviceAccountJsonPlainText: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+                  packageName: app.mango3.trailers
+                  releaseFiles: artifact/trailers-app-${{ github.ref_name }}.aab
+                  mappingFile: artifact/mapping.txt
+                  debugSymbols: artifact/symbols
+                  status: ${{ vars.GOOGLE_PLAY_STATUS }}
+                  track: ${{ vars.GOOGLE_PLAY_TRACK }}
+                  releaseName: ${{ github.ref_name }}
 
-    deploy:
+    deploy_web:
         needs: build_web
         environment:
             name: github-pages
