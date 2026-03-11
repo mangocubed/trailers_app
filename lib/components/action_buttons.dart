@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:trailers/graphql/fragments/user_title_tie_fragment.graphql.dart';
-import 'package:trailers/oauth_client.dart';
 
 import '../graphql/mutations/update_bookmark.graphql.dart';
 import '../graphql/mutations/update_like.graphql.dart';
 import '../graphql/mutations/update_watched.graphql.dart';
 import '../graphql/schema.graphql.dart';
 import '../graphql_client.dart';
+import '../identity_client.dart';
 import 'current_user.dart';
 
 class ActionButtons extends StatefulWidget {
@@ -107,7 +107,7 @@ class _ActionButtonsState extends State<ActionButtons> {
                 if (user != null) {
                   await _onWatchedPressed();
                 } else {
-                  await OAuthClientExt.authorize(context);
+                  await IdentityClient.authorize(context);
 
                   await refetch?.call();
                 }
@@ -123,7 +123,7 @@ class _ActionButtonsState extends State<ActionButtons> {
                 if (user != null) {
                   await _onLikePressed();
                 } else {
-                  await OAuthClientExt.authorize(context);
+                  await IdentityClient.authorize(context);
 
                   await refetch?.call();
                 }
@@ -137,7 +137,7 @@ class _ActionButtonsState extends State<ActionButtons> {
                 if (user != null) {
                   await _onBookmarkPressed();
                 } else {
-                  await OAuthClientExt.authorize(context);
+                  await IdentityClient.authorize(context);
 
                   await refetch?.call();
                 }
