@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:trailers/identity_client.dart';
 
 import '../constants.dart';
-import '../oauth_client.dart';
 import 'current_user.dart';
 
 class UserButton extends StatelessWidget {
@@ -21,7 +21,7 @@ class UserButton extends StatelessWidget {
         } else {
           return IconButton(
             onPressed: () async {
-              await OAuthClientExt.authorize(context);
+              await IdentityClient.authorize(context);
 
               await refetch?.call();
             },
