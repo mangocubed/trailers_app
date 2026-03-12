@@ -52,8 +52,5 @@ query Title($id: ID!, $countryCode: String) {
                 updatedAt
             }
         }
-        currentUserTie {
-            ...UserTitleTieFragment
-        }
     }
 }

@@ -1,0 +1,10 @@
+query TitleCurrentUserTie($id: ID!) {
+    title(id: $id) {
+        id
+        currentUserTie {
+            ...UserTitleTieFragment
+        }
+        createdAt
+        updatedAt
+    }
+}

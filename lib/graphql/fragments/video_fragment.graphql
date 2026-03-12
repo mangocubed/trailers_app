@@ -24,9 +24,6 @@ fragment VideoFragment on VideoObject {
                 updatedAt
             }
         }
-        currentUserTie {
-            ...UserTitleTieFragment
-        }
     }
     createdAt
     updatedAt

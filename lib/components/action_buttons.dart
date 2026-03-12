@@ -1,153 +1,161 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:trailers/graphql/fragments/user_title_tie_fragment.graphql.dart';
 
+import '../components/screen_lifecycle.dart';
+import '../graphql/fragments/user_title_tie_fragment.graphql.dart';
 import '../graphql/mutations/update_bookmark.graphql.dart';
 import '../graphql/mutations/update_like.graphql.dart';
 import '../graphql/mutations/update_watched.graphql.dart';
 import '../graphql/schema.graphql.dart';
+import '../graphql/queries/title_current_user_tie.graphql.dart';
 import '../graphql_client.dart';
 import '../identity_client.dart';
-import 'current_user.dart';
 
-class ActionButtons extends StatefulWidget {
-  const ActionButtons({super.key, required this.direction, required this.titleId, this.videoId, this.userTitleTie});
+class ActionButtons extends StatelessWidget {
+  const ActionButtons({super.key, required this.direction, required this.titleId, this.videoId});
 
   final Axis direction;
   final String titleId;
   final String? videoId;
-  final Fragment$UserTitleTieFragment? userTitleTie;
 
-  @override
-  State<ActionButtons> createState() => _ActionButtonsState();
-}
-
-class _ActionButtonsState extends State<ActionButtons> {
-  late Fragment$UserTitleTieFragment? _userTitleTie;
-
-  void _setUserTitleTie(Fragment$UserTitleTieFragment? userTitleTie) {
-    if (userTitleTie != null && mounted) {
-      setState(() {
-        _userTitleTie = userTitleTie;
-      });
+  void _updateCache(BuildContext context, Fragment$UserTitleTieFragment? userTitleTie) {
+    if (userTitleTie == null) {
+      return;
     }
+
+    context.graphQLClient.value.writeFragment$UserTitleTieFragment(
+      data: userTitleTie,
+      idFields: {'id': userTitleTie.id, '__typename': userTitleTie.$__typename},
+      broadcast: true,
+    );
   }
 
-  Future<void> _onBookmarkPressed() async {
+  Future<void> _onBookmarkPressed(BuildContext context, bool isChecked) async {
     final result = await context.graphQLClient.value.mutate$UpdateBookmark(
       Options$Mutation$UpdateBookmark(
         variables: Variables$Mutation$UpdateBookmark(
-          input: Input$UserTitleTieInputObject(
-            titleId: widget.titleId,
-            videoId: widget.videoId,
-            isChecked: _userTitleTie?.isBookmarked != true,
-          ),
+          input: Input$UserTitleTieInputObject(titleId: titleId, videoId: videoId, isChecked: isChecked),
         ),
       ),
     );
 
-    final userTitleTie = result.parsedData?.updateBookmark;
-
-    _setUserTitleTie(userTitleTie);
+    if (context.mounted) {
+      _updateCache(context, result.parsedData?.updateBookmark);
+    }
   }
 
-  Future<void> _onLikePressed() async {
+  Future<void> _onLikePressed(BuildContext context, bool isChecked) async {
     final result = await context.graphQLClient.value.mutate$UpdateLike(
       Options$Mutation$UpdateLike(
         variables: Variables$Mutation$UpdateLike(
-          input: Input$UserTitleTieInputObject(
-            titleId: widget.titleId,
-            videoId: widget.videoId,
-            isChecked: _userTitleTie?.isLiked != true,
-          ),
+          input: Input$UserTitleTieInputObject(titleId: titleId, videoId: videoId, isChecked: isChecked),
         ),
       ),
     );
 
-    final userTitleTie = result.parsedData?.updateLike;
-
-    _setUserTitleTie(userTitleTie);
+    if (context.mounted) {
+      _updateCache(context, result.parsedData?.updateLike);
+    }
   }
 
-  Future<void> _onWatchedPressed() async {
+  Future<void> _onWatchedPressed(BuildContext context, bool isChecked) async {
     final result = await context.graphQLClient.value.mutate$UpdateWatched(
       Options$Mutation$UpdateWatched(
         variables: Variables$Mutation$UpdateWatched(
-          input: Input$UserTitleTieInputObject(
-            titleId: widget.titleId,
-            videoId: widget.videoId,
-            isChecked: _userTitleTie?.isWatched != true,
-          ),
+          input: Input$UserTitleTieInputObject(titleId: titleId, videoId: videoId, isChecked: isChecked),
         ),
       ),
     );
 
-    final userTitleTie = result.parsedData?.updateWatched;
-
-    _setUserTitleTie(userTitleTie);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    _userTitleTie = widget.userTitleTie;
+    if (context.mounted) {
+      _updateCache(context, result.parsedData?.updateWatched);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return CurrentUser(
-      builder: (user, {refetch}) {
-        return Flex(
-          mainAxisSize: MainAxisSize.min,
-          direction: widget.direction,
-          children: [
-            IconButton(
-              onPressed: () async {
-                if (user != null) {
-                  await _onWatchedPressed();
-                } else {
-                  await IdentityClient.authorize(context);
+    return Query$TitleCurrentUserTie$Widget(
+      options: Options$Query$TitleCurrentUserTie(variables: Variables$Query$TitleCurrentUserTie(id: titleId)),
+      builder: (result, {fetchMore, refetch}) {
+        final userTitleTie = result.parsedData?.title?.currentUserTie;
 
-                  await refetch?.call();
-                }
-              },
-              icon: SvgPicture.asset(
-                _userTitleTie?.isWatched == true ? 'assets/watched_filled.svg' : 'assets/watched.svg',
+        final isWatched = userTitleTie?.isWatched ?? false;
+        final isLiked = userTitleTie?.isLiked ?? false;
+        final isBookmarked = userTitleTie?.isBookmarked ?? false;
+
+        return ScreenLifecycle(
+          onResume: () async {
+            if (!result.isLoading) {
+              try {
+                await refetch?.call();
+              } catch (_) {}
+            }
+          },
+          child: Flex(
+            mainAxisSize: MainAxisSize.min,
+            direction: direction,
+            children: [
+              IconButton(
+                onPressed: () async {
+                  final isAuthorized = await IdentityClient.isAuthorized();
+
+                  if (!context.mounted) {
+                    return;
+                  }
+
+                  if (isAuthorized) {
+                    await _onWatchedPressed(context, !isWatched);
+
+                    await refetch?.call();
+                  } else {
+                    await IdentityClient.authorize(context);
+                  }
+                },
+                icon: SvgPicture.asset(isWatched ? 'assets/watched_filled.svg' : 'assets/watched.svg'),
+                tooltip: 'Watched',
               ),
-              tooltip: 'Watched',
-            ),
-            const SizedBox(height: 8, width: 8),
-            IconButton(
-              onPressed: () async {
-                if (user != null) {
-                  await _onLikePressed();
-                } else {
-                  await IdentityClient.authorize(context);
+              const SizedBox(height: 8, width: 8),
+              IconButton(
+                onPressed: () async {
+                  final isAuthorized = await IdentityClient.isAuthorized();
 
-                  await refetch?.call();
-                }
-              },
-              icon: SvgPicture.asset(_userTitleTie?.isLiked == true ? 'assets/heart_filled.svg' : 'assets/heart.svg'),
-              tooltip: 'Like',
-            ),
-            const SizedBox(height: 8, width: 8),
-            IconButton(
-              onPressed: () async {
-                if (user != null) {
-                  await _onBookmarkPressed();
-                } else {
-                  await IdentityClient.authorize(context);
+                  if (!context.mounted) {
+                    return;
+                  }
 
-                  await refetch?.call();
-                }
-              },
-              icon: SvgPicture.asset(
-                _userTitleTie?.isBookmarked == true ? 'assets/bookmark_filled.svg' : 'assets/bookmark.svg',
+                  if (isAuthorized) {
+                    await _onLikePressed(context, !isLiked);
+
+                    await refetch?.call();
+                  } else {
+                    await IdentityClient.authorize(context);
+                  }
+                },
+                icon: SvgPicture.asset(isLiked ? 'assets/heart_filled.svg' : 'assets/heart.svg'),
+                tooltip: 'Like',
               ),
-              tooltip: 'Bookmark',
-            ),
-          ],
+              const SizedBox(height: 8, width: 8),
+              IconButton(
+                onPressed: () async {
+                  final isAuthorized = await IdentityClient.isAuthorized();
+
+                  if (!context.mounted) {
+                    return;
+                  }
+
+                  if (isAuthorized) {
+                    await _onBookmarkPressed(context, !isBookmarked);
+
+                    await refetch?.call();
+                  } else {
+                    await IdentityClient.authorize(context);
+                  }
+                },
+                icon: SvgPicture.asset(isBookmarked ? 'assets/bookmark_filled.svg' : 'assets/bookmark.svg'),
+                tooltip: 'Bookmark',
+              ),
+            ],
+          ),
         );
       },
     );

@@ -211,12 +211,7 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
                           ? Image.network(title.posterImageUrl.toString(), width: 200)
                           : const SizedBox(),
                       const SizedBox(height: 12),
-                      ActionButtons(
-                        direction: Axis.horizontal,
-                        titleId: title.id,
-                        userTitleTie: title.currentUserTie,
-                        videoId: widget.videoId,
-                      ),
+                      ActionButtons(direction: Axis.horizontal, titleId: title.id, videoId: widget.videoId),
                       const SizedBox(height: 12),
                       Text(
                         title.name,
