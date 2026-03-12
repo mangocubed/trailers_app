@@ -43,6 +43,7 @@ dependencies:
     google_fonts: ^8.0.2
     graphql_flutter: ^5.2.1
     oauth2_client: ^4.2.3
+    restart_app: ^1.7.3
     video_player: ^2.11.1
 
 dev_dependencies:
