@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:oauth2_client/access_token_response.dart';
 import 'package:oauth2_client/oauth2_client.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:restart_app/restart_app.dart';
 
 import 'constants.dart';
 import 'components/snackbar_alert.dart';
@@ -81,6 +82,8 @@ class IdentityClient {
       if (context.mounted) {
         SnackBarAlert.show(context, 'User authenticated successfully');
       }
+
+      await Restart.restartApp();
     } catch (error) {
       if (context.mounted) {
         SnackBarAlert.show(context, 'Failed to authenticate user');
