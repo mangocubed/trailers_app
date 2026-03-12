@@ -97,4 +97,8 @@ class IdentityClient {
 
     return 'Bearer ${accessToken.accessToken}';
   }
+
+  static Future<bool> isAuthorized() async {
+    return (await _getAccessToken()) != null;
+  }
 }

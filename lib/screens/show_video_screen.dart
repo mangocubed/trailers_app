@@ -146,12 +146,7 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
           alignment: Alignment.centerRight,
           child: Padding(
             padding: const EdgeInsets.only(right: 6),
-            child: ActionButtons(
-              direction: Axis.vertical,
-              titleId: video.title.id,
-              userTitleTie: video.title.currentUserTie,
-              videoId: widget.video.id,
-            ),
+            child: ActionButtons(direction: Axis.vertical, titleId: video.title.id, videoId: widget.video.id),
           ),
         ),
         Positioned(
