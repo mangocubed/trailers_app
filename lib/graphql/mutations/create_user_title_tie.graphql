@@ -1,0 +1,5 @@
+mutation CreateUserTitleTie($input: UserTitleTieInputObject!) {
+    createUserTitleTie(input: $input) {
+        ...UserTitleTieFragment
+    }
+}

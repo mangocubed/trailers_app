@@ -8,12 +8,12 @@ import '../components/genre_chip.dart';
 import '../components/title_basic_info.dart';
 import '../graphql/queries/title.graphql.dart';
 import '../screens/not_found_screen.dart';
+import '../utils.dart';
 
 class ShowTitleScreen extends StatefulWidget {
-  const ShowTitleScreen({super.key, required this.id, this.videoId});
+  const ShowTitleScreen({super.key, required this.id});
 
   final String id;
-  final String? videoId;
 
   @override
   State<ShowTitleScreen> createState() => _ShowTitleScreenState();
@@ -194,6 +194,8 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
           }
         }
 
+        createUserTitleTie(context, title);
+
         return Scaffold(
           appBar: AppBar(
             iconTheme: const IconThemeData(color: Color(0xffF3EAF4)),
@@ -211,7 +213,7 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
                           ? Image.network(title.posterImageUrl.toString(), width: 200)
                           : const SizedBox(),
                       const SizedBox(height: 12),
-                      ActionButtons(direction: Axis.horizontal, titleId: title.id, videoId: widget.videoId),
+                      ActionButtons(direction: Axis.horizontal, titleId: title.id),
                       const SizedBox(height: 12),
                       Text(
                         title.name,

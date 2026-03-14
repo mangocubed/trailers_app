@@ -39,7 +39,7 @@ class _SearchScreenState extends State<SearchScreen> {
         !_scrollController.position.outOfRange) {
       _fetchMore?.call(
         FetchMoreOptions$Query$Titles(
-          variables: Variables$Query$Titles(after: _endCursor),
+          variables: Variables$Query$Titles(query: _queryText, after: _endCursor, includeViewed: true),
           updateQuery: (previousResultData, fetchMoreResultData) {
             if (fetchMoreResultData == null || fetchMoreResultData['titles']['nodes'].length == 0) {
               return previousResultData;
@@ -130,7 +130,9 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
       body: _queryController.text.length > 1
           ? Query$Titles$Widget(
-              options: Options$Query$Titles(variables: Variables$Query$Titles(query: _queryText, first: 12)),
+              options: Options$Query$Titles(
+                variables: Variables$Query$Titles(query: _queryText, first: 12, includeViewed: true),
+              ),
               builder: (result, {fetchMore, refetch}) {
                 final titles = result.parsedData?.titles;
 
@@ -153,7 +155,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                       onTap: () => context.goNamed(
                                         routeNameSearchResults,
                                         queryParameters: {keyQuery: _queryController.text},
-                                        extra: SearcResultsExtra(parsedData: result.parsedData, page: entry.key),
+                                        extra: SearchResultsExtra(parsedData: result.parsedData, page: entry.key),
                                       ),
                                     ),
                                   )

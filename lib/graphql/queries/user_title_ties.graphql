@@ -6,11 +6,6 @@ query UserTitleTies($username: String!, $after: UUID, $first: Int, $isBookmarked
                 id
                 title {
                     ...TitleFragment
-                    videos(first: 1) {
-                        nodes {
-                            ...VideoFragment
-                        }
-                    }
                 }
                 createdAt
                 updatedAt

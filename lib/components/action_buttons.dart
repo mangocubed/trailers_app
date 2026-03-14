@@ -12,11 +12,10 @@ import '../graphql_client.dart';
 import '../identity_client.dart';
 
 class ActionButtons extends StatelessWidget {
-  const ActionButtons({super.key, required this.direction, required this.titleId, this.videoId});
+  const ActionButtons({super.key, required this.direction, required this.titleId});
 
   final Axis direction;
   final String titleId;
-  final String? videoId;
 
   void _updateCache(BuildContext context, Fragment$UserTitleTieFragment? userTitleTie) {
     if (userTitleTie == null) {
@@ -34,7 +33,7 @@ class ActionButtons extends StatelessWidget {
     final result = await context.graphQLClient.value.mutate$UpdateBookmark(
       Options$Mutation$UpdateBookmark(
         variables: Variables$Mutation$UpdateBookmark(
-          input: Input$UserTitleTieInputObject(titleId: titleId, videoId: videoId, isChecked: isChecked),
+          input: Input$UserTitleTieInputObject(titleId: titleId, isChecked: isChecked),
         ),
       ),
     );
@@ -48,7 +47,7 @@ class ActionButtons extends StatelessWidget {
     final result = await context.graphQLClient.value.mutate$UpdateLike(
       Options$Mutation$UpdateLike(
         variables: Variables$Mutation$UpdateLike(
-          input: Input$UserTitleTieInputObject(titleId: titleId, videoId: videoId, isChecked: isChecked),
+          input: Input$UserTitleTieInputObject(titleId: titleId, isChecked: isChecked),
         ),
       ),
     );
@@ -62,7 +61,7 @@ class ActionButtons extends StatelessWidget {
     final result = await context.graphQLClient.value.mutate$UpdateWatched(
       Options$Mutation$UpdateWatched(
         variables: Variables$Mutation$UpdateWatched(
-          input: Input$UserTitleTieInputObject(titleId: titleId, videoId: videoId, isChecked: isChecked),
+          input: Input$UserTitleTieInputObject(titleId: titleId, isChecked: isChecked),
         ),
       ),
     );

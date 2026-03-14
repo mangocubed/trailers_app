@@ -1,12 +1,7 @@
-query Titles($query: String, $after: UUID, $first: Int) {
-    titles(query: $query, after: $after, first: $first, hasVideos: true) {
+query Titles($query: String, $after: UUID, $first: Int, $includeViewed: Boolean) {
+    titles(query: $query, after: $after, first: $first, includeViewed: $includeViewed) {
         nodes {
             ...TitleFragment
-            videos(first: 1) {
-                nodes {
-                    ...VideoFragment
-                }
-            }
         }
         pageInfo {
             endCursor

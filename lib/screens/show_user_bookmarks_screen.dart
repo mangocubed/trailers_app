@@ -81,16 +81,15 @@ class _ShowUserBookmarksScreenState extends State<ShowUserBookmarksScreen> {
             );
           },
           itemBuilder: (context, index) {
-            final video = titleTies!.nodes[index].title.videos.nodes.first;
+            final title = titleTies!.nodes[index].title;
 
             return ShowVideoScreen(
-              video: video,
+              title: title,
               index: index,
               currentPage: _currentPage,
               onSeeMore: () => context.goNamed(
                 routeNameShowUserBookmarksTitle,
-                pathParameters: {keyUsername: widget.username, keyTitleId: video.title.id},
-                queryParameters: {keyVideoId: video.id},
+                pathParameters: {keyUsername: widget.username, keyTitleId: title.id},
               ),
             );
           },

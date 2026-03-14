@@ -5,6 +5,38 @@ fragment TitleFragment on TitleObject {
     releasedOn
     runtime
     posterImageUrl
+    crew(first: 1, jobs: [DIRECTOR]) {
+        nodes {
+            id
+            person {
+                id
+                name
+                createdAt
+                updatedAt
+            }
+            createdAt
+            updatedAt
+        }
+    }
+    genres {
+        nodes {
+            id
+            name
+            createdAt
+            updatedAt
+        }
+    }
+    videos(first: 1) {
+        nodes {
+            id
+            url
+            createdAt
+            updatedAt
+        }
+    }
+    currentUserTie {
+        ...UserTitleTieFragment
+    }
     createdAt
     updatedAt
 }
