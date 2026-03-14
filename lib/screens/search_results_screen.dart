@@ -11,7 +11,7 @@ class SearchResultsScreen extends StatefulWidget {
   const SearchResultsScreen({super.key, required this.query, this.extra});
 
   final String? query;
-  final SearcResultsExtra? extra;
+  final SearchResultsExtra? extra;
 
   @override
   State<SearchResultsScreen> createState() => _SearchResultsScreenState();
@@ -29,6 +29,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
         variables: Variables$Query$Titles(
           query: widget.query,
           first: widget.extra?.parsedData?.titles.nodes.length ?? 12,
+          includeViewed: true,
         ),
       ),
       builder: (result, {fetchMore, refetch}) {
@@ -50,6 +51,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                 variables: Variables$Query$Titles(
                   query: widget.query,
                   after: result.parsedData?.titles.pageInfo.endCursor,
+                  includeViewed: true,
                 ),
                 updateQuery: (previousResultData, fetchMoreResultData) {
                   if (fetchMoreResultData == null || fetchMoreResultData['titles']['nodes'].length == 0) {
@@ -76,16 +78,16 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
             );
           },
           itemBuilder: (context, index) {
-            final video = titles.nodes[index].videos.nodes.first;
+            final title = titles.nodes[index];
 
             return ShowVideoScreen(
-              video: video,
+              title: title,
               index: index,
               currentPage: _currentPage,
               onSeeMore: () => context.goNamed(
                 routeNameSearchResultsTitle,
-                pathParameters: {keyTitleId: video.title.id},
-                queryParameters: {keyQuery: widget.query, keyVideoId: video.id},
+                pathParameters: {keyTitleId: title.id},
+                queryParameters: {keyQuery: widget.query},
               ),
             );
           },
@@ -125,8 +127,8 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
   }
 }
 
-class SearcResultsExtra {
-  SearcResultsExtra({required this.parsedData, required this.page});
+class SearchResultsExtra {
+  SearchResultsExtra({required this.parsedData, required this.page});
 
   final Query$Titles? parsedData;
   final int page;

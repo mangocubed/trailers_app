@@ -3,7 +3,6 @@ const keyQuery = 'query';
 const keySessionToken = 'session_token';
 const keyTitleId = 'title_id';
 const keyUsername = 'username';
-const keyVideoId = 'video_id';
 
 const routeNameHome = 'home';
 const routeNameSearch = 'search';

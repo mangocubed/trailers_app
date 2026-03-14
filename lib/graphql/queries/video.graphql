@@ -1,5 +1,0 @@
-query Video($id: ID!) {
-    video(id: $id) {
-        ...VideoFragment
-    }
-}

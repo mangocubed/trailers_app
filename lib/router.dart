@@ -38,7 +38,7 @@ extension GoRouterExt on GoRouter {
                 builder: (context, state) {
                   final query = state.uri.queryParameters[keyQuery];
 
-                  final extra = state.extra as SearcResultsExtra?;
+                  final extra = state.extra as SearchResultsExtra?;
 
                   return SearchResultsScreen(query: query, extra: extra);
                 },
@@ -48,9 +48,8 @@ extension GoRouterExt on GoRouter {
                 path: 'titles/:$keyTitleId',
                 builder: (context, state) {
                   final id = state.pathParameters[keyTitleId]!;
-                  final videoId = state.uri.queryParameters[keyVideoId];
 
-                  return ShowTitleScreen(id: id, videoId: videoId);
+                  return ShowTitleScreen(id: id);
                 },
               ),
             ],
@@ -60,9 +59,8 @@ extension GoRouterExt on GoRouter {
             path: 'titles/:$keyTitleId',
             builder: (context, state) {
               final id = state.pathParameters[keyTitleId]!;
-              final videoId = state.uri.queryParameters[keyVideoId];
 
-              return ShowTitleScreen(id: id, videoId: videoId);
+              return ShowTitleScreen(id: id);
             },
           ),
           GoRoute(
@@ -88,9 +86,8 @@ extension GoRouterExt on GoRouter {
                 path: 'titles/:$keyTitleId',
                 builder: (context, state) {
                   final id = state.pathParameters[keyTitleId]!;
-                  final videoId = state.uri.queryParameters[keyVideoId];
 
-                  return ShowTitleScreen(id: id, videoId: videoId);
+                  return ShowTitleScreen(id: id);
                 },
               ),
               GoRoute(
@@ -108,9 +105,8 @@ extension GoRouterExt on GoRouter {
                 path: 'titles/:$keyTitleId',
                 builder: (context, state) {
                   final id = state.pathParameters[keyTitleId]!;
-                  final videoId = state.uri.queryParameters[keyVideoId];
 
-                  return ShowTitleScreen(id: id, videoId: videoId);
+                  return ShowTitleScreen(id: id);
                 },
               ),
             ],

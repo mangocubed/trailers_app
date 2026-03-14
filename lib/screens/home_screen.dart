@@ -5,7 +5,7 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import '../components/sentitive_page_view.dart';
 import '../components/user_button.dart';
 import '../constants.dart';
-import '../graphql/queries/videos.graphql.dart';
+import '../graphql/queries/titles.graphql.dart';
 import 'show_video_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -21,15 +21,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   int get _currentPage => _pageController.page?.round() ?? 0;
 
-  Widget _getRecommendedVideos() {
-    return Query$Videos$Widget(
-      options: Options$Query$Videos(fetchPolicy: FetchPolicy.noCache),
+  Widget _getRecommendedTitles() {
+    return Query$Titles$Widget(
+      options: Options$Query$Titles(fetchPolicy: FetchPolicy.noCache),
       builder: (result, {fetchMore, refetch}) {
-        final videos = result.parsedData?.videos;
+        final titles = result.parsedData?.titles;
 
         if (result.parsedData == null && result.isLoading) {
           return const Center(child: CircularProgressIndicator());
-        } else if (videos?.nodes.isNotEmpty != true) {
+        } else if (titles?.nodes.isNotEmpty != true) {
           return const SizedBox();
         }
 
@@ -38,35 +38,33 @@ class _HomeScreenState extends State<HomeScreen> {
           onPageChanged: (int page) {
             setState(() {});
 
-            if (result.isLoading || videos!.nodes.length > page + 5) {
+            if (result.isLoading || titles!.nodes.length > page + 5) {
               return;
             }
 
             fetchMore?.call(
-              FetchMoreOptions$Query$Videos(
-                variables: Variables$Query$Videos(after: _resultsChanged ? null : videos.pageInfo.endCursor),
+              FetchMoreOptions$Query$Titles(
+                variables: Variables$Query$Titles(after: _resultsChanged ? null : titles.pageInfo.endCursor),
                 updateQuery: (previousResultData, fetchMoreResultData) {
-                  if (fetchMoreResultData == null || fetchMoreResultData['videos']['nodes'].length == 0) {
+                  if (fetchMoreResultData == null || fetchMoreResultData['titles']['nodes'].length == 0) {
                     return previousResultData;
                   }
 
                   _resultsChanged = false;
 
-                  fetchMoreResultData['videos']['nodes'] = [
-                    ...previousResultData?['videos']['nodes'],
-                    ...fetchMoreResultData['videos']['nodes']
+                  fetchMoreResultData['titles']['nodes'] = [
+                    ...previousResultData?['titles']['nodes'],
+                    ...fetchMoreResultData['titles']['nodes']
                         .where(
                           (node) =>
-                              previousResultData?['videos']['nodes']
-                                  .map((node1) => node1['title']['id'])
-                                  .contains(node['title']['id']) !=
+                              previousResultData?['titles']['nodes'].map((node1) => node1['id']).contains(node['id']) !=
                               true,
                         )
                         .toList(),
                   ];
 
-                  fetchMoreResultData['videos']['pageInfo']['startCursor'] =
-                      previousResultData?['videos']['pageInfo']['startCursor'];
+                  fetchMoreResultData['titles']['pageInfo']['startCursor'] =
+                      previousResultData?['titles']['pageInfo']['startCursor'];
 
                   return fetchMoreResultData;
                 },
@@ -75,16 +73,16 @@ class _HomeScreenState extends State<HomeScreen> {
           },
 
           itemBuilder: (context, index) {
-            final video = videos!.nodes[index];
+            final title = titles!.nodes[index];
 
             return ShowVideoScreen(
               index: index,
               currentPage: _currentPage,
-              video: video,
+              title: title,
               onUpdated: () => _resultsChanged = true,
             );
           },
-          itemCount: result.parsedData?.videos.nodes.length,
+          itemCount: result.parsedData?.titles.nodes.length,
         );
       },
     );
@@ -120,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         actions: const [Padding(padding: EdgeInsets.only(right: 12), child: UserButton())],
       ),
-      body: _getRecommendedVideos(),
+      body: _getRecommendedTitles(),
     );
   }
 }

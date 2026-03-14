@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:trailers/utils.dart';
 import 'package:video_player/video_player.dart';
 
 import '../components/action_buttons.dart';
 import '../components/genre_chip.dart';
 import '../components/title_basic_info.dart';
 import '../constants.dart';
-import '../graphql/fragments/video_fragment.graphql.dart';
-import '../graphql/queries/video.graphql.dart';
+import '../graphql/fragments/title_fragment.graphql.dart';
 import '../router.dart';
 
 class ShowVideoScreen extends StatefulWidget {
   const ShowVideoScreen({
     super.key,
-    required this.video,
+    required this.title,
     required this.index,
     required this.currentPage,
     this.onUpdated,
@@ -23,7 +23,7 @@ class ShowVideoScreen extends StatefulWidget {
 
   final int index;
   final int currentPage;
-  final Fragment$VideoFragment video;
+  final Fragment$TitleFragment title;
   final void Function()? onUpdated;
   final void Function()? onSeeMore;
 
@@ -37,6 +37,8 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
   bool get _isReady => _videoPlayerController?.value.isInitialized ?? false;
   bool get _isPlaying => _videoPlayerController?.value.isPlaying ?? false;
 
+  Fragment$TitleFragment$videos$nodes get _video => widget.title.videos.nodes.first;
+
   double get _thumbnailOpacity {
     if (_isReady) {
       return 0.0;
@@ -46,7 +48,7 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
   }
 
   Future<void> _play() async {
-    _videoPlayerController ??= VideoPlayerController.networkUrl(widget.video.url, viewType: VideoViewType.platformView)
+    _videoPlayerController ??= VideoPlayerController.networkUrl(_video.url, viewType: VideoViewType.platformView)
       ..setLooping(true)
       ..addListener(() {
         if (mounted) {
@@ -100,7 +102,63 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
     }
   }
 
-  Widget _getVideoWidget(Fragment$VideoFragment video, {void Function()? onUpdated}) {
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.index == 0) {
+      _play();
+      createUserTitleTie(context, widget.title);
+    }
+  }
+
+  @override
+  didUpdateWidget(ShowVideoScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.index == widget.currentPage) {
+      _play();
+      createUserTitleTie(context, widget.title);
+    } else {
+      _stop();
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final currentRoute = ModalRoute.of(context);
+
+    if (currentRoute != null) {
+      routeObserver.subscribe(this, currentRoute);
+    }
+  }
+
+  @override
+  void didPushNext() {
+    _stop();
+  }
+
+  @override
+  void didPopNext() {
+    if (widget.index == widget.currentPage) {
+      _play();
+      createUserTitleTie(context, widget.title);
+    }
+  }
+
+  @override
+  void dispose() {
+    _stop();
+
+    routeObserver.unsubscribe(this);
+
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
     final screenSize = MediaQuery.of(context).size;
 
@@ -111,7 +169,7 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
             Center(
               child: OverflowBox(maxWidth: double.infinity, maxHeight: screenSize.height, child: _getVideoPlayer()),
             ),
-            video.title.posterImageUrl != null
+            widget.title.posterImageUrl != null
                 ? AnimatedOpacity(
                     opacity: _thumbnailOpacity,
                     duration: const Duration(milliseconds: 250),
@@ -119,7 +177,7 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
                       color: Colors.black,
                       width: screenSize.width,
                       height: screenSize.height,
-                      child: Center(child: Image.network(video.title.posterImageUrl!.toString())),
+                      child: Center(child: Image.network(widget.title.posterImageUrl!.toString())),
                     ),
                   )
                 : const SizedBox(),
@@ -146,7 +204,7 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
           alignment: Alignment.centerRight,
           child: Padding(
             padding: const EdgeInsets.only(right: 6),
-            child: ActionButtons(direction: Axis.vertical, titleId: video.title.id, videoId: widget.video.id),
+            child: ActionButtons(direction: Axis.vertical, titleId: widget.title.id),
           ),
         ),
         Positioned(
@@ -173,7 +231,7 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  video.title.name,
+                  widget.title.name,
                   style: GoogleFonts.blackHanSans(
                     textStyle: const TextStyle(
                       fontSize: 32,
@@ -192,11 +250,11 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
                       flex: isPortrait ? 0 : 1,
                       child: TitleBasicInfo(
                         isCentered: false,
-                        releasedOn: video.title.releasedOn,
-                        directorName: widget.video.title.crew.nodes.firstOrNull?.person.name,
-                        runtime: video.title.runtime,
-                        mediaType: video.title.mediaType,
-                        extraChips: video.title.genres.nodes
+                        releasedOn: widget.title.releasedOn,
+                        directorName: widget.title.crew.nodes.firstOrNull?.person.name,
+                        runtime: widget.title.runtime,
+                        mediaType: widget.title.mediaType,
+                        extraChips: widget.title.genres.nodes
                             .map((genre) => Flexible(child: GenreChip(name: genre.name)))
                             .toList(),
                       ),
@@ -213,11 +271,7 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
                               return;
                             }
 
-                            context.goNamed(
-                              routeNameShowTitle,
-                              pathParameters: {keyTitleId: video.title.id},
-                              queryParameters: {keyVideoId: video.id},
-                            );
+                            context.goNamed(routeNameShowTitle, pathParameters: {keyTitleId: widget.title.id});
                           },
                           style: FilledButton.styleFrom(
                             textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
@@ -235,70 +289,6 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
           ),
         ),
       ],
-    );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    if (widget.index == 0) {
-      _play();
-    }
-  }
-
-  @override
-  didUpdateWidget(ShowVideoScreen oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (widget.index == widget.currentPage) {
-      _play();
-    } else {
-      _stop();
-    }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    final currentRoute = ModalRoute.of(context);
-
-    if (currentRoute != null) {
-      routeObserver.subscribe(this, currentRoute);
-    }
-  }
-
-  @override
-  void didPushNext() {
-    _stop();
-  }
-
-  @override
-  void didPopNext() {
-    if (widget.index == widget.currentPage) {
-      _play();
-    }
-  }
-
-  @override
-  void dispose() {
-    _stop();
-
-    routeObserver.unsubscribe(this);
-
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Query$Video$Widget(
-      options: Options$Query$Video(variables: Variables$Query$Video(id: widget.video.id)),
-      builder: (result, {fetchMore, refetch}) {
-        final video = result.parsedData?.video ?? widget.video;
-
-        return _getVideoWidget(video, onUpdated: () => refetch?.call());
-      },
     );
   }
 }

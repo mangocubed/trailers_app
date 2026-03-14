@@ -1,0 +1,17 @@
+import 'package:flutter/widgets.dart';
+
+import 'graphql/fragments/title_fragment.graphql.dart';
+import 'graphql/mutations/create_user_title_tie.graphql.dart';
+import 'graphql/schema.graphql.dart';
+import 'graphql_client.dart';
+import 'identity_client.dart';
+
+Future<void> createUserTitleTie(BuildContext context, Fragment$TitleFragment title) async {
+  if (title.currentUserTie == null && await IdentityClient.isAuthorized() && context.mounted) {
+    await context.graphQLClient.value.mutate$CreateUserTitleTie(
+      Options$Mutation$CreateUserTitleTie(
+        variables: Variables$Mutation$CreateUserTitleTie(input: Input$UserTitleTieInputObject(titleId: title.id)),
+      ),
+    );
+  }
+}
