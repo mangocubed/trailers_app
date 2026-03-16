@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:trailers/components/current_user.dart';
 import 'package:trailers/utils.dart';
 import 'package:video_player/video_player.dart';
 
@@ -9,6 +10,7 @@ import '../components/genre_chip.dart';
 import '../components/title_basic_info.dart';
 import '../constants.dart';
 import '../graphql/fragments/title_fragment.graphql.dart';
+import '../graphql/queries/title_watch_providers.graphql.dart';
 import '../router.dart';
 
 class ShowVideoScreen extends StatefulWidget {
@@ -248,15 +250,63 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
                   children: [
                     Expanded(
                       flex: isPortrait ? 0 : 1,
-                      child: TitleBasicInfo(
-                        isCentered: false,
-                        releasedOn: widget.title.releasedOn,
-                        directorName: widget.title.crew.nodes.firstOrNull?.person.name,
-                        runtime: widget.title.runtime,
-                        mediaType: widget.title.mediaType,
-                        extraChips: widget.title.genres.nodes
-                            .map((genre) => Flexible(child: GenreChip(name: genre.name)))
-                            .toList(),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TitleBasicInfo(
+                            isCentered: false,
+                            releasedOn: widget.title.releasedOn,
+                            directorName: widget.title.crew.nodes.firstOrNull?.person.name,
+                            runtime: widget.title.runtime,
+                            mediaType: widget.title.mediaType,
+                            extraChips: widget.title.genres.nodes
+                                .map((genre) => Flexible(child: GenreChip(name: genre.name)))
+                                .toList(),
+                          ),
+                          const SizedBox(height: 8),
+                          CurrentUser(
+                            builder: (user, {refetch}) {
+                              return Query$TitleWatchProviders$Widget(
+                                options: Options$Query$TitleWatchProviders(
+                                  variables: Variables$Query$TitleWatchProviders(
+                                    id: widget.title.id,
+                                    countryCode: user?.identityUser.countryCode ?? 'US',
+                                  ),
+                                ),
+                                builder: (result, {fetchMore, refetch}) {
+                                  final titleWatchProviders = result.parsedData?.title?.watchProviders;
+
+                                  if (titleWatchProviders?.nodes.isNotEmpty != true) {
+                                    return const SizedBox();
+                                  }
+
+                                  return SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      children: titleWatchProviders!.nodes
+                                          .map(
+                                            (watchProvider) => IconButton(
+                                              onPressed: () async {},
+                                              tooltip: watchProvider.watchProvider.name,
+                                              icon: ClipRRect(
+                                                borderRadius: BorderRadius.circular(6.0),
+                                                child: watchProvider.watchProvider.logoImageUrl != null
+                                                    ? Image.network(
+                                                        watchProvider.watchProvider.logoImageUrl.toString(),
+                                                        height: 32,
+                                                      )
+                                                    : Text(watchProvider.watchProvider.name),
+                                              ),
+                                            ),
+                                          )
+                                          .toList(),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 8, width: 8),

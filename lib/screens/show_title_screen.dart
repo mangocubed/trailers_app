@@ -1,8 +1,9 @@
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:trailers/graphql/queries/title_watch_providers.graphql.dart';
 
-import '../graphql/queries/current_user.graphql.dart';
+import '../components/current_user.dart';
 import '../components/action_buttons.dart';
 import '../components/genre_chip.dart';
 import '../components/title_basic_info.dart';
@@ -20,95 +21,103 @@ class ShowTitleScreen extends StatefulWidget {
 }
 
 class _ShowTitleScreenState extends State<ShowTitleScreen> {
-  Country _country = Country.parse('US');
+  String? _countryCode;
 
-  void _openCountryPicker(List<String> countryFilter) {
-    showCountryPicker(
-      countryFilter: countryFilter,
-      context: context,
-      onSelect: (value) {
-        setState(() {
-          _country = value;
-        });
-      },
-    );
-  }
+  Country get _country => Country.parse(_countryCode ?? 'US');
 
-  Widget _getWatchProviders(String titleName, Query$Title$title$watchProviders titleWatchProviders) {
-    if (titleWatchProviders.nodes.isEmpty) {
-      return const SizedBox();
-    }
+  Widget _getWatchProviders(Query$Title$title title) {
+    return CurrentUser(
+      builder: (user, {refetch}) {
+        _countryCode ??= user?.identityUser.countryCode;
 
-    return Column(
-      children: [
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 14),
-          width: double.infinity,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Watch in',
-                style: GoogleFonts.blackHanSans(
-                  textStyle: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.white,
-                    overflow: TextOverflow.ellipsis,
+        return Query$TitleWatchProviders$Widget(
+          options: Options$Query$TitleWatchProviders(
+            variables: Variables$Query$TitleWatchProviders(id: title.id, countryCode: _country.countryCode),
+          ),
+          builder: (result, {fetchMore, refetch}) {
+            final titleWatchProviders = result.parsedData?.title?.watchProviders;
+
+            if (titleWatchProviders?.nodes.isNotEmpty != true) {
+              if (result.isLoading) {
+                return const Center(child: CircularProgressIndicator());
+              } else {
+                return const SizedBox();
+              }
+            }
+
+            return Column(
+              children: [
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 14),
+                  width: double.infinity,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Watch in',
+                        style: GoogleFonts.blackHanSans(
+                          textStyle: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.white,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => showCountryPicker(
+                          countryFilter: title.watchProviders.nodes
+                              .map((watchProvider) => watchProvider.countryCodes)
+                              .expand((codes) => codes)
+                              .toList(),
+
+                          context: context,
+                          onSelect: (value) {
+                            setState(() {
+                              _countryCode = value.countryCode;
+                            });
+                            refetch?.call();
+                          },
+                        ),
+                        icon: Row(
+                          children: [
+                            Text(_country.flagEmoji, style: const TextStyle(fontSize: 20)),
+                            const Icon(Icons.arrow_drop_down_rounded, color: Colors.white),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-              Query$CurrentUser$Widget(
-                builder: (result, {fetchMore, refetch}) {
-                  final currentUser = result.parsedData?.currentUser;
-
-                  if (currentUser != null) {
-                    _country = Country.tryParse(currentUser.identityUser.countryCode) ?? Country.parse('US');
-                  }
-
-                  return IconButton(
-                    onPressed: () => _openCountryPicker(
-                      titleWatchProviders.nodes
-                          .map((watchProvider) => watchProvider.countryCodes)
-                          .expand((codes) => codes)
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 14),
+                  width: double.infinity,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: titleWatchProviders!.nodes
+                          .map(
+                            (watchProvider) => IconButton(
+                              onPressed: () async {},
+                              tooltip: watchProvider.watchProvider.name,
+                              icon: ClipRRect(
+                                borderRadius: BorderRadius.circular(12.0),
+                                child: watchProvider.watchProvider.logoImageUrl != null
+                                    ? Image.network(watchProvider.watchProvider.logoImageUrl.toString(), height: 64)
+                                    : Text(watchProvider.watchProvider.name),
+                              ),
+                            ),
+                          )
                           .toList(),
                     ),
-                    icon: Row(
-                      children: [
-                        Text(_country.flagEmoji, style: const TextStyle(fontSize: 20)),
-                        const Icon(Icons.arrow_drop_down_rounded, color: Colors.white),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 8),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: titleWatchProviders.nodes
-                .where((watchProvider) => watchProvider.countryCodes.contains(_country.countryCode))
-                .map(
-                  (watchProvider) => IconButton(
-                    onPressed: () async {},
-                    tooltip: watchProvider.watchProvider.name,
-                    icon: ClipRRect(
-                      borderRadius: BorderRadius.circular(12.0),
-                      child: watchProvider.watchProvider.logoImageUrl != null
-                          ? Image.network(watchProvider.watchProvider.logoImageUrl.toString(), height: 64)
-                          : Text(watchProvider.watchProvider.name),
-                    ),
                   ),
-                )
-                .toList(),
-          ),
-        ),
-        const SizedBox(height: 32),
-      ],
+                ),
+                const SizedBox(height: 32),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
@@ -126,7 +135,7 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
             'Cast',
             style: GoogleFonts.blackHanSans(
               textStyle: const TextStyle(
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: FontWeight.w400,
                 color: Colors.white,
                 overflow: TextOverflow.ellipsis,
@@ -236,7 +245,7 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
                     ],
                   ),
                 ),
-                _getWatchProviders(title.name, title.watchProviders),
+                _getWatchProviders(title),
                 Container(
                   margin: const EdgeInsets.only(right: 14, bottom: 32, left: 14),
                   child: Column(
@@ -247,7 +256,7 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
                           'Synopsis',
                           style: GoogleFonts.blackHanSans(
                             textStyle: const TextStyle(
-                              fontSize: 18,
+                              fontSize: 20,
                               fontWeight: FontWeight.w400,
                               color: Colors.white,
                               overflow: TextOverflow.ellipsis,
