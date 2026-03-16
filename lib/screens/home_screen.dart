@@ -30,7 +30,24 @@ class _HomeScreenState extends State<HomeScreen> {
         if (result.parsedData == null && result.isLoading) {
           return const Center(child: CircularProgressIndicator());
         } else if (titles?.nodes.isNotEmpty != true) {
-          return const SizedBox();
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              spacing: 14,
+              children: [
+                Text(
+                  titles == null ? 'Something went wrong 🫠' : 'We couldn\'t find anything for you 👀',
+                  style: TextStyle(fontSize: 18, color: Colors.white),
+                ),
+                OutlinedButton(
+                  onPressed: () {
+                    refetch?.call();
+                  },
+                  child: Text('Retry'),
+                ),
+              ],
+            ),
+          );
         }
 
         return SensitivePageView(

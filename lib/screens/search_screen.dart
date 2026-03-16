@@ -136,6 +136,14 @@ class _SearchScreenState extends State<SearchScreen> {
               builder: (result, {fetchMore, refetch}) {
                 final titles = result.parsedData?.titles;
 
+                if (result.parsedData == null && result.isLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (titles?.nodes.isNotEmpty != true) {
+                  return Center(
+                    child: Text('No results for "$_queryText" 💨', style: TextStyle(fontSize: 18, color: Colors.white)),
+                  );
+                }
+
                 _endCursor = titles?.pageInfo.endCursor;
                 _fetchMore = fetchMore;
 
