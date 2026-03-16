@@ -1,4 +1,4 @@
-query Title($id: ID!, $countryCode: String) {
+query Title($id: ID!) {
     title(id: $id) {
         ...TitleFragment
         overview
@@ -16,16 +16,9 @@ query Title($id: ID!, $countryCode: String) {
                 updatedAt
             }
         }
-        watchProviders(first: 50, countryCode: $countryCode) {
+        watchProviders(first: 50) {
             nodes {
                 id
-                watchProvider {
-                    id
-                    name
-                    logoImageUrl
-                    createdAt
-                    updatedAt
-                }
                 countryCodes
                 createdAt
                 updatedAt

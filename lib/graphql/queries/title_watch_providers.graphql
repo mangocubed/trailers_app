@@ -1,0 +1,22 @@
+query TitleWatchProviders($id: ID!, $countryCode: String!) {
+    title(id: $id) {
+        id
+        watchProviders(first: 10, countryCode: $countryCode) {
+            nodes {
+                id
+                watchProvider {
+                    id
+                    name
+                    logoImageUrl
+                    createdAt
+                    updatedAt
+                }
+                countryCodes
+                createdAt
+                updatedAt
+            }
+        }
+        createdAt
+        updatedAt
+    }
+}
