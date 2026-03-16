@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
+import '../components/current_user.dart';
 import '../components/title_card.dart';
+import '../config.dart';
 import '../constants.dart';
 import '../graphql/queries/user.graphql.dart';
 import '../graphql/queries/user_title_ties.graphql.dart';
@@ -215,7 +218,36 @@ class _ShowUserScreenState extends State<ShowUserScreen> {
 
         return Scaffold(
           backgroundColor: const Color(0xff353535),
-          appBar: AppBar(foregroundColor: Colors.white, backgroundColor: Colors.transparent),
+          appBar: AppBar(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.transparent,
+            actions: [
+              Padding(
+                padding: EdgeInsets.only(right: 12),
+                child: CurrentUser(
+                  builder: (currentUser, {refetch}) {
+                    if (currentUser != null && currentUser.id == user.id) {
+                      return IconButton(
+                        onPressed: () {
+                          launchUrl(
+                            Config.identityUrl,
+                            customTabsOptions: CustomTabsOptions(
+                              showTitle: true,
+                              browser: const CustomTabsBrowserConfiguration(prefersDefaultBrowser: true),
+                            ),
+                          );
+                        },
+                        tooltip: 'Account Settings',
+                        icon: SvgPicture.asset('assets/cog.svg'),
+                      );
+                    } else {
+                      return const SizedBox();
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
           body: CustomScrollView(
             controller: _scrollController,
             slivers: [
