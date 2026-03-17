@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -50,13 +51,17 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
   }
 
   Future<void> _play() async {
-    _videoPlayerController ??= VideoPlayerController.networkUrl(_video.url, viewType: VideoViewType.platformView)
-      ..setLooping(true)
-      ..addListener(() {
-        if (mounted) {
-          setState(() {});
-        }
-      });
+    _videoPlayerController ??=
+        VideoPlayerController.networkUrl(
+            (_video.hlsUrl != null && !kIsWeb ? _video.hlsUrl! : _video.url),
+            viewType: VideoViewType.platformView,
+          )
+          ..setLooping(true)
+          ..addListener(() {
+            if (mounted) {
+              setState(() {});
+            }
+          });
 
     if (!_isReady) {
       _videoPlayerController?.initialize().then((_) {
