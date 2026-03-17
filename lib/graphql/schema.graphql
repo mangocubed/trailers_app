@@ -153,10 +153,8 @@ type QueryRoot {
 	currentUser: UserObject
 	info: InfoObject!
 	title(id: ID!): TitleObject
-	titles(query: String, after: UUID, first: Int, includeViewed: Boolean, hasVideos: Boolean @deprecated(reason: "Not used anymore")): TitleObjectConnection!
+	titles(query: String, after: UUID, first: Int, includeViewed: Boolean): TitleObjectConnection!
 	user(username: String!): UserObject
-	video(id: ID!): VideoObject
-	videos(after: UUID, first: Int, includeViewed: Boolean): VideoObjectConnection! @deprecated(reason: "To be removed")
 }
 
 type TitleCastObject {
@@ -357,7 +355,6 @@ type UserObject {
 input UserTitleTieInputObject {
 	titleId: UUID!
 	isChecked: Boolean! = true
-	videoId: UUID @deprecated(reason: "Not used anymore")
 }
 
 type UserTitleTieObject {
@@ -401,8 +398,8 @@ type UserTitleTieObjectEdge {
 
 type VideoObject {
 	id: ID!
-	title: TitleObject! @deprecated(reason: "To avoid infinite nesting, shouldn't be used")
 	url: Url!
+	hlsUrl: Url
 	createdAt: DateTime!
 	updatedAt: DateTime
 }
@@ -445,10 +442,6 @@ type WatchProviderObject {
 	updatedAt: DateTime
 }
 
-"""
-Marks an element of a GraphQL schema as no longer supported.
-"""
-directive @deprecated(reason: String = "No longer supported") on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | ENUM_VALUE
 """
 Directs the executor to include this field or fragment only when the `if` argument is true.
 """

@@ -30,6 +30,7 @@ fragment TitleFragment on TitleObject {
         nodes {
             id
             url
+            hlsUrl
             createdAt
             updatedAt
         }
