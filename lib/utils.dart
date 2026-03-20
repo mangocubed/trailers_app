@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import 'constants.dart';
 import 'graphql/fragments/title_fragment.graphql.dart';
 import 'graphql/mutations/create_user_title_tie.graphql.dart';
 import 'graphql/schema.graphql.dart';
@@ -24,4 +25,18 @@ Future<void> createUserTitleTie(BuildContext context, Fragment$TitleFragment tit
       ),
     );
   }
+}
+
+Map<String, dynamic> getTitlesFilterQueryParams({Enum$TitleMediaType? mediaType, List<String>? genresIds}) {
+  final Map<String, String> queryParams = {};
+
+  if (mediaType != null) {
+    queryParams[keyMediaType] = mediaType.toJson();
+  }
+
+  if (genresIds != null && genresIds.isNotEmpty) {
+    queryParams[keyGenresIds] = genresIds.join(',');
+  }
+
+  return queryParams;
 }

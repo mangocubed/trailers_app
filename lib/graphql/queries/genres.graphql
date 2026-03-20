@@ -1,0 +1,13 @@
+query Genres($ids: [UUID!]) {
+    genres(first: 50, ids: $ids) {
+        nodes {
+            id
+            name
+            createdAt
+            updatedAt
+        }
+        pageInfo {
+            endCursor
+        }
+    }
+}
