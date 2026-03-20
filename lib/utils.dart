@@ -6,6 +6,16 @@ import 'graphql/schema.graphql.dart';
 import 'graphql_client.dart';
 import 'identity_client.dart';
 
+extension StringExt on String {
+  String capitalize() {
+    if (isEmpty) {
+      return this;
+    }
+
+    return "${this[0].toUpperCase()}${substring(1).toLowerCase()}";
+  }
+}
+
 Future<void> createUserTitleTie(BuildContext context, Fragment$TitleFragment title) async {
   if (title.currentUserTie == null && await IdentityClient.isAuthorized() && context.mounted) {
     await context.graphQLClient.value.mutate$CreateUserTitleTie(

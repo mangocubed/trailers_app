@@ -86,6 +86,8 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = TextTheme.of(context);
+
     return Scaffold(
       backgroundColor: const Color(0xFF172121),
       appBar: AppBar(
@@ -139,9 +141,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 if (result.parsedData == null && result.isLoading) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (titles?.nodes.isNotEmpty != true) {
-                  return Center(
-                    child: Text('No results for "$_queryText" 💨', style: TextStyle(fontSize: 18, color: Colors.white)),
-                  );
+                  return Center(child: Text('No results for "$_queryText" 💨', style: textTheme.bodyLarge));
                 }
 
                 _endCursor = titles?.pageInfo.endCursor;

@@ -39,44 +39,52 @@ class App extends StatelessWidget {
       child: MaterialApp.router(
         title: 'Trailers',
         scrollBehavior: const MobileLikeScrollBehavior(),
+        themeMode: ThemeMode.dark,
         theme: ThemeData(
-          // This is the theme of your application.
-          //
-          // TRY THIS: Try running your application with "flutter run". You'll see
-          // the application has a purple toolbar. Then, without quitting the app,
-          // try changing the seedColor in the colorScheme below to Colors.green
-          // and then invoke "hot reload" (save your changes or press the "hot
-          // reload" button in a Flutter-supported IDE, or press "r" if you used
-          // the command line to start the app).
-          //
-          // Notice that the counter didn't reset back to zero; the application
-          // state is not lost during the reload. To reset the state, use hot
-          // restart instead.
-          //
-          // This works for code too, not just values: Most code changes can be
-          // tested with just a hot reload.
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          colorScheme: ColorScheme.fromSeed(seedColor: Color(0xffFC7753), brightness: Brightness.dark),
           useMaterial3: true,
-          textTheme: GoogleFonts.amikoTextTheme(),
-          elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.all(16),
-              textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              backgroundColor: Colors.deepPurple,
-              foregroundColor: Colors.white,
+          textTheme: TextTheme(
+            bodyLarge: GoogleFonts.amiko(fontSize: 18, fontWeight: FontWeight.w400, color: Colors.white),
+            bodyMedium: GoogleFonts.amiko(fontSize: 16, fontWeight: FontWeight.w400, color: Colors.white),
+            bodySmall: GoogleFonts.amiko(fontSize: 14, fontWeight: FontWeight.w400, color: Colors.white),
+          ),
+          filledButtonTheme: FilledButtonThemeData(
+            style: FilledButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              textStyle: GoogleFonts.amiko(fontSize: 14, fontWeight: FontWeight.w700),
+              backgroundColor: const Color(0xffFC7753),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
           ),
           outlinedButtonTheme: OutlinedButtonThemeData(
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.all(16),
-              textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              side: const BorderSide(color: Colors.deepPurple),
+            style: FilledButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              textStyle: GoogleFonts.amiko(fontSize: 14, fontWeight: FontWeight.w700),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
           ),
           textButtonTheme: TextButtonThemeData(
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.all(16),
-              textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            style: FilledButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              textStyle: GoogleFonts.amiko(fontSize: 14, fontWeight: FontWeight.w700),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            ),
+          ),
+          chipTheme: ChipThemeData(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.0)),
+            labelPadding: const EdgeInsets.all(4),
+            side: BorderSide(color: Color(0xFFDBFCFF)),
+            brightness: Brightness.dark,
+            selectedColor: Color(0xFFDBFCFF),
+            backgroundColor: Colors.transparent,
+            checkmarkColor: Colors.black,
+            deleteIconColor: Colors.black,
+            labelStyle: GoogleFonts.amiko(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: WidgetStateColor.resolveWith((state) {
+                return state.contains(WidgetState.selected) ? Colors.black : Color(0xFFDBFCFF);
+              }),
             ),
           ),
         ),

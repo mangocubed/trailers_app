@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:trailers/constants.dart';
+import 'package:trailers/graphql/schema.graphql.dart';
 import 'screens/home_screen.dart';
 import 'screens/not_found_screen.dart';
 import 'screens/search_results_screen.dart';
@@ -21,7 +22,17 @@ extension GoRouterExt on GoRouter {
       GoRoute(
         name: routeNameHome,
         path: '/',
-        builder: (context, state) => const HomeScreen(),
+        builder: (context, state) {
+          final queryMediaType = state.uri.queryParameters[keyMediaType];
+
+          Enum$TitleMediaType? mediaType;
+
+          if (queryMediaType != null) {
+            mediaType = Enum$TitleMediaType.fromJson(queryMediaType);
+          }
+
+          return HomeScreen(mediaType: mediaType);
+        },
         routes: [
           GoRoute(
             name: routeNameSearch,

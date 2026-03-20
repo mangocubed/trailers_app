@@ -151,10 +151,12 @@ type PersonObject {
 
 type QueryRoot {
 	currentUser: UserObject
+	genres(after: UUID, first: Int): GenreObjectConnection!
 	info: InfoObject!
 	title(id: ID!): TitleObject
-	titles(query: String, after: UUID, first: Int, includeViewed: Boolean): TitleObjectConnection!
+	titles(after: UUID, first: Int, query: String, mediaType: TitleMediaType, genreIds: [UUID!], watchProviderIds: [UUID!], countryCode: String, includeViewed: Boolean): TitleObjectConnection!
 	user(username: String!): UserObject
+	watchProviders(after: UUID, first: Int, countryCode: String): WatchProviderObjectConnection!
 }
 
 type TitleCastObject {
@@ -440,6 +442,35 @@ type WatchProviderObject {
 	homeUrl: Url
 	createdAt: DateTime!
 	updatedAt: DateTime
+}
+
+type WatchProviderObjectConnection {
+	"""
+	Information to aid in pagination.
+	"""
+	pageInfo: PageInfo!
+	"""
+	A list of edges.
+	"""
+	edges: [WatchProviderObjectEdge!]!
+	"""
+	A list of nodes.
+	"""
+	nodes: [WatchProviderObject!]!
+}
+
+"""
+An edge in a connection.
+"""
+type WatchProviderObjectEdge {
+	"""
+	The item at the end of the edge
+	"""
+	node: WatchProviderObject!
+	"""
+	A cursor for use in pagination
+	"""
+	cursor: String!
 }
 
 """
