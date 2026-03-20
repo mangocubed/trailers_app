@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:trailers/graphql/schema.graphql.dart';
 
+import '../graphql/queries/genres.graphql.dart';
+import '../graphql/schema.graphql.dart';
 import '../components/titles_filter_dialog.dart';
 import '../components/sentitive_page_view.dart';
 import '../components/user_button.dart';
@@ -13,9 +15,10 @@ import '../utils.dart';
 import 'show_video_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key, this.mediaType});
+  const HomeScreen({super.key, this.mediaType, this.genresIds});
 
   final Enum$TitleMediaType? mediaType;
+  final List<String>? genresIds;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -27,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   int get _currentPage => _pageController.page?.round() ?? 0;
 
-  bool get _isFiltered => widget.mediaType != null;
+  bool get _isFiltered => widget.mediaType != null || widget.genresIds != null;
 
   Widget _getFilters() {
     if (!_isFiltered) {
@@ -43,10 +46,63 @@ class _HomeScreenState extends State<HomeScreen> {
           showCheckmark: false,
           selected: true,
           onSelected: (value) {
-            context.goNamed(routeNameHome);
+            context.goNamed(routeNameHome, queryParameters: getTitlesFilterQueryParams(genresIds: widget.genresIds));
           },
           onDeleted: () {
-            context.goNamed(routeNameHome);
+            context.goNamed(routeNameHome, queryParameters: getTitlesFilterQueryParams(genresIds: widget.genresIds));
+          },
+        ),
+      );
+    }
+
+    if (widget.genresIds != null && widget.genresIds!.isNotEmpty) {
+      filters.add(
+        Query$Genres$Widget(
+          options: Options$Query$Genres(variables: Variables$Query$Genres(ids: widget.genresIds!)),
+          builder: (result, {fetchMore, refetch}) {
+            final genres = result.parsedData?.genres.nodes;
+
+            return Row(
+              spacing: 8,
+              children:
+                  genres
+                      ?.map(
+                        (genre) => FilterChip(
+                          label: Text(genre.name),
+                          labelStyle: GoogleFonts.amiko(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: WidgetStateColor.resolveWith((state) {
+                              return state.contains(WidgetState.selected) ? Colors.black : Color(0xFFC3D350);
+                            }),
+                          ),
+                          side: BorderSide(color: Color(0xFFC3D350)),
+                          selectedColor: Color(0xFFC3D350),
+                          selected: true,
+                          onSelected: (value) {
+                            context.goNamed(
+                              routeNameHome,
+                              queryParameters: getTitlesFilterQueryParams(
+                                mediaType: widget.mediaType,
+                                genresIds: widget.genresIds?.where((id) => id != genre.id).toList(),
+                              ),
+                            );
+                          },
+
+                          onDeleted: () {
+                            context.goNamed(
+                              routeNameHome,
+                              queryParameters: getTitlesFilterQueryParams(
+                                mediaType: widget.mediaType,
+                                genresIds: widget.genresIds?.where((id) => id != genre.id).toList(),
+                              ),
+                            );
+                          },
+                        ),
+                      )
+                      .toList() ??
+                  [],
+            );
           },
         ),
       );
@@ -55,7 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return SingleChildScrollView(
       padding: const EdgeInsets.only(left: 14),
       scrollDirection: Axis.horizontal,
-      child: Row(mainAxisSize: MainAxisSize.max, children: filters),
+      child: Row(mainAxisSize: MainAxisSize.max, spacing: 8, children: filters),
     );
   }
 
@@ -65,7 +121,11 @@ class _HomeScreenState extends State<HomeScreen> {
     return Query$Titles$Widget(
       options: Options$Query$Titles(
         fetchPolicy: FetchPolicy.noCache,
-        variables: Variables$Query$Titles(mediaType: widget.mediaType, includeViewed: _isFiltered),
+        variables: Variables$Query$Titles(
+          mediaType: widget.mediaType,
+          genreIds: widget.genresIds,
+          includeViewed: _isFiltered,
+        ),
       ),
       builder: (result, {fetchMore, refetch}) {
         final titles = result.parsedData?.titles;
@@ -107,6 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 variables: Variables$Query$Titles(
                   after: _resultsChanged ? null : titles.pageInfo.endCursor,
                   mediaType: widget.mediaType,
+                  genreIds: widget.genresIds,
                   includeViewed: _isFiltered,
                 ),
                 updateQuery: (previousResultData, fetchMoreResultData) {
@@ -190,7 +251,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 colorFilter: _isFiltered ? ColorFilter.mode(Colors.black, BlendMode.srcIn) : null,
               ),
               onPressed: () async {
-                TitlesFilterDialog(context, mediaType: widget.mediaType);
+                TitlesFilterDialog(context, mediaType: widget.mediaType, genresIds: widget.genresIds);
               },
             ),
           ),

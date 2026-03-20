@@ -23,7 +23,6 @@ query Titles(
         }
         pageInfo {
             endCursor
-            startCursor
         }
     }
 }

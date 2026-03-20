@@ -1,4 +1,5 @@
 const keyAccessToken = 'access_token';
+const keyGenresIds = 'genres_ids';
 const keyMediaType = 'media_type';
 const keyQuery = 'query';
 const keySessionToken = 'session_token';

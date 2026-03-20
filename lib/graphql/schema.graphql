@@ -151,12 +151,12 @@ type PersonObject {
 
 type QueryRoot {
 	currentUser: UserObject
-	genres(after: UUID, first: Int): GenreObjectConnection!
+	genres(after: UUID, first: Int, ids: [UUID!]): GenreObjectConnection!
 	info: InfoObject!
 	title(id: ID!): TitleObject
 	titles(after: UUID, first: Int, query: String, mediaType: TitleMediaType, genreIds: [UUID!], watchProviderIds: [UUID!], countryCode: String, includeViewed: Boolean): TitleObjectConnection!
 	user(username: String!): UserObject
-	watchProviders(after: UUID, first: Int, countryCode: String): WatchProviderObjectConnection!
+	watchProviders(after: UUID, first: Int, ids: [UUID!], countryCode: String): WatchProviderObjectConnection!
 }
 
 type TitleCastObject {
