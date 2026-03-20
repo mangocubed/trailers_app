@@ -19,7 +19,7 @@ class UserButton extends StatelessWidget {
             icon: CircleAvatar(child: Text(user.identityUser.initials)),
           );
         } else {
-          return IconButton(
+          return IconButton.outlined(
             onPressed: () async {
               await IdentityClient.authorize(context);
 

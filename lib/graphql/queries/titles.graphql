@@ -1,5 +1,23 @@
-query Titles($query: String, $after: UUID, $first: Int, $includeViewed: Boolean) {
-    titles(query: $query, after: $after, first: $first, includeViewed: $includeViewed) {
+query Titles(
+    $after: UUID
+    $first: Int
+    $query: String
+    $mediaType: TitleMediaType
+    $genreIds: [UUID!]
+    $watchProviderIds: [UUID!]
+    $countryCode: String
+    $includeViewed: Boolean
+) {
+    titles(
+        after: $after
+        first: $first
+        query: $query
+        mediaType: $mediaType
+        genreIds: $genreIds
+        watchProviderIds: $watchProviderIds
+        countryCode: $countryCode
+        includeViewed: $includeViewed
+    ) {
         nodes {
             ...TitleFragment
         }

@@ -328,12 +328,7 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
 
                             context.goNamed(routeNameShowTitle, pathParameters: {keyTitleId: widget.title.id});
                           },
-                          style: FilledButton.styleFrom(
-                            textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                            backgroundColor: const Color(0xffFC7753),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                          ),
-                          child: Text('More details'),
+                          child: Text('MORE DETAILS'),
                         ),
                       ),
                     ),

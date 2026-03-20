@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../graphql/schema.graphql.dart';
+import '../utils.dart';
 
 class MediaTypeChip extends StatelessWidget {
   const MediaTypeChip({super.key, required this.mediaType});
@@ -9,17 +10,6 @@ class MediaTypeChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String mediaTypeText = '';
-
-    switch (mediaType) {
-      case Enum$TitleMediaType.SERIES:
-        mediaTypeText = 'Series';
-      case Enum$TitleMediaType.SHORT:
-        mediaTypeText = 'Short';
-      default:
-        mediaTypeText = 'Movie';
-    }
-
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
@@ -27,7 +17,7 @@ class MediaTypeChip extends StatelessWidget {
         border: Border.all(color: const Color(0xFFDBFCFF)),
       ),
       child: Text(
-        mediaTypeText,
+        mediaType.toJson().capitalize(),
         style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFFDBFCFF)),
       ),
     );

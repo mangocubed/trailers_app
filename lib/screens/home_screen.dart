@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:trailers/graphql/schema.graphql.dart';
 
+import '../components/titles_filter_dialog.dart';
 import '../components/sentitive_page_view.dart';
 import '../components/user_button.dart';
 import '../constants.dart';
 import '../graphql/queries/titles.graphql.dart';
+import '../utils.dart';
 import 'show_video_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, this.mediaType});
+
+  final Enum$TitleMediaType? mediaType;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -21,9 +27,46 @@ class _HomeScreenState extends State<HomeScreen> {
 
   int get _currentPage => _pageController.page?.round() ?? 0;
 
+  bool get _isFiltered => widget.mediaType != null;
+
+  Widget _getFilters() {
+    if (!_isFiltered) {
+      return const SizedBox();
+    }
+
+    final List<Widget> filters = [];
+
+    if (widget.mediaType != null) {
+      filters.add(
+        FilterChip(
+          label: Text(widget.mediaType!.toJson().capitalize()),
+          showCheckmark: false,
+          selected: true,
+          onSelected: (value) {
+            context.goNamed(routeNameHome);
+          },
+          onDeleted: () {
+            context.goNamed(routeNameHome);
+          },
+        ),
+      );
+    }
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.only(left: 14),
+      scrollDirection: Axis.horizontal,
+      child: Row(mainAxisSize: MainAxisSize.max, children: filters),
+    );
+  }
+
   Widget _getRecommendedTitles() {
+    final textTheme = TextTheme.of(context);
+
     return Query$Titles$Widget(
-      options: Options$Query$Titles(fetchPolicy: FetchPolicy.noCache),
+      options: Options$Query$Titles(
+        fetchPolicy: FetchPolicy.noCache,
+        variables: Variables$Query$Titles(mediaType: widget.mediaType, includeViewed: _isFiltered),
+      ),
       builder: (result, {fetchMore, refetch}) {
         final titles = result.parsedData?.titles;
 
@@ -37,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Text(
                   titles == null ? 'Something went wrong 🫠' : 'We couldn\'t find anything for you 👀',
-                  style: TextStyle(fontSize: 18, color: Colors.white),
+                  style: textTheme.bodyLarge,
                 ),
                 OutlinedButton(
                   onPressed: () {
@@ -61,7 +104,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
             fetchMore?.call(
               FetchMoreOptions$Query$Titles(
-                variables: Variables$Query$Titles(after: _resultsChanged ? null : titles.pageInfo.endCursor),
+                variables: Variables$Query$Titles(
+                  after: _resultsChanged ? null : titles.pageInfo.endCursor,
+                  mediaType: widget.mediaType,
+                  includeViewed: _isFiltered,
+                ),
                 updateQuery: (previousResultData, fetchMoreResultData) {
                   if (fetchMoreResultData == null || fetchMoreResultData['titles']['nodes'].length == 0) {
                     return previousResultData;
@@ -133,9 +180,29 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-        actions: const [Padding(padding: EdgeInsets.only(right: 12), child: UserButton())],
+        actions: [
+          Padding(
+            padding: EdgeInsets.only(right: 12),
+            child: IconButton.outlined(
+              isSelected: _isFiltered,
+              icon: SvgPicture.asset(
+                'assets/adjust.svg',
+                colorFilter: _isFiltered ? ColorFilter.mode(Colors.black, BlendMode.srcIn) : null,
+              ),
+              onPressed: () async {
+                TitlesFilterDialog(context, mediaType: widget.mediaType);
+              },
+            ),
+          ),
+          Padding(padding: EdgeInsets.only(right: 12), child: UserButton()),
+        ],
       ),
-      body: _getRecommendedTitles(),
+      body: Stack(
+        children: [
+          _getRecommendedTitles(),
+          SafeArea(child: _getFilters()),
+        ],
+      ),
     );
   }
 }

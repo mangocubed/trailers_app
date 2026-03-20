@@ -1,4 +1,5 @@
 const keyAccessToken = 'access_token';
+const keyMediaType = 'media_type';
 const keyQuery = 'query';
 const keySessionToken = 'session_token';
 const keyTitleId = 'title_id';
