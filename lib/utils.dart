@@ -27,15 +27,28 @@ Future<void> createUserTitleTie(BuildContext context, Fragment$TitleFragment tit
   }
 }
 
-Map<String, dynamic> getTitlesFilterQueryParams({Enum$TitleMediaType? mediaType, List<String>? genresIds}) {
+Map<String, dynamic> getTitlesFilterQueryParams({
+  Enum$TitleMediaType? mediaType,
+  List<String>? genreIds,
+  List<String>? watchProviderIds,
+  String? countryCode,
+}) {
   final Map<String, String> queryParams = {};
 
   if (mediaType != null) {
     queryParams[keyMediaType] = mediaType.toJson();
   }
 
-  if (genresIds != null && genresIds.isNotEmpty) {
-    queryParams[keyGenresIds] = genresIds.join(',');
+  if (genreIds != null && genreIds.isNotEmpty) {
+    queryParams[keyGenreIds] = genreIds.join(',');
+  }
+
+  if (watchProviderIds != null && watchProviderIds.isNotEmpty) {
+    queryParams[keyWatchProviderIds] = watchProviderIds.join(',');
+  }
+
+  if (countryCode != null && countryCode.isNotEmpty) {
+    queryParams[keyCountryCode] = countryCode;
   }
 
   return queryParams;

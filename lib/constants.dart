@@ -1,10 +1,12 @@
 const keyAccessToken = 'access_token';
-const keyGenresIds = 'genres_ids';
+const keyGenreIds = 'genre_ids';
 const keyMediaType = 'media_type';
 const keyQuery = 'query';
 const keySessionToken = 'session_token';
 const keyTitleId = 'title_id';
 const keyUsername = 'username';
+const keyWatchProviderIds = 'watch_provider_ids';
+const keyCountryCode = 'country_code';
 
 const routeNameHome = 'home';
 const routeNameSearch = 'search';

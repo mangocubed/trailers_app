@@ -26,6 +26,8 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
   Country get _country => Country.parse(_countryCode ?? 'US');
 
   Widget _getWatchProviders(Query$Title$title title) {
+    final textTheme = TextTheme.of(context);
+
     return CurrentUser(
       builder: (user, {refetch}) {
         _countryCode ??= user?.identityUser.countryCode;
@@ -35,14 +37,30 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
             variables: Variables$Query$TitleWatchProviders(id: title.id, countryCode: _country.countryCode),
           ),
           builder: (result, {fetchMore, refetch}) {
-            final titleWatchProviders = result.parsedData?.title?.watchProviders;
+            final nodes = result.parsedData?.title?.watchProviders.nodes;
+            late final Widget watchProviders;
 
-            if (titleWatchProviders?.nodes.isNotEmpty != true) {
-              if (result.isLoading) {
-                return const Center(child: CircularProgressIndicator());
-              } else {
-                return const SizedBox();
-              }
+            if (nodes != null && nodes.isNotEmpty) {
+              watchProviders = Row(
+                children: nodes
+                    .map(
+                      (watchProvider) => IconButton(
+                        onPressed: () async {},
+                        tooltip: watchProvider.watchProvider.name,
+                        icon: ClipRRect(
+                          borderRadius: BorderRadius.circular(12.0),
+                          child: watchProvider.watchProvider.logoImageUrl != null
+                              ? Image.network(watchProvider.watchProvider.logoImageUrl.toString(), height: 64)
+                              : Text(watchProvider.watchProvider.name),
+                        ),
+                      ),
+                    )
+                    .toList(),
+              );
+            } else if (result.isLoading) {
+              watchProviders = const Center(child: CircularProgressIndicator());
+            } else {
+              watchProviders = Center(child: Text('No services found in this country 🙁', style: textTheme.bodySmall));
             }
 
             return Column(
@@ -92,25 +110,7 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 14),
                   width: double.infinity,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: titleWatchProviders!.nodes
-                          .map(
-                            (watchProvider) => IconButton(
-                              onPressed: () async {},
-                              tooltip: watchProvider.watchProvider.name,
-                              icon: ClipRRect(
-                                borderRadius: BorderRadius.circular(12.0),
-                                child: watchProvider.watchProvider.logoImageUrl != null
-                                    ? Image.network(watchProvider.watchProvider.logoImageUrl.toString(), height: 64)
-                                    : Text(watchProvider.watchProvider.name),
-                              ),
-                            ),
-                          )
-                          .toList(),
-                    ),
-                  ),
+                  child: SingleChildScrollView(scrollDirection: Axis.horizontal, child: watchProviders),
                 ),
                 const SizedBox(height: 32),
               ],

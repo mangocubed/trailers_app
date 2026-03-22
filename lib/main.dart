@@ -50,7 +50,7 @@ class App extends StatelessWidget {
           ),
           filledButtonTheme: FilledButtonThemeData(
             style: FilledButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 20),
+              padding: const EdgeInsets.all(20),
               textStyle: GoogleFonts.amiko(fontSize: 14, fontWeight: FontWeight.w700),
               backgroundColor: const Color(0xffFC7753),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -58,14 +58,14 @@ class App extends StatelessWidget {
           ),
           outlinedButtonTheme: OutlinedButtonThemeData(
             style: FilledButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 20),
+              padding: const EdgeInsets.all(20),
               textStyle: GoogleFonts.amiko(fontSize: 14, fontWeight: FontWeight.w700),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
           ),
           textButtonTheme: TextButtonThemeData(
             style: FilledButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 20),
+              padding: const EdgeInsets.all(20),
               textStyle: GoogleFonts.amiko(fontSize: 14, fontWeight: FontWeight.w700),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
