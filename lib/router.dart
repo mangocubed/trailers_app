@@ -24,7 +24,9 @@ extension GoRouterExt on GoRouter {
         path: '/',
         builder: (context, state) {
           final queryMediaType = state.uri.queryParameters[keyMediaType];
-          final genresIds = state.uri.queryParameters[keyGenresIds]?.split(',');
+          final genresIds = state.uri.queryParameters[keyGenreIds]?.split(',');
+          final watchProviderIds = state.uri.queryParameters[keyWatchProviderIds]?.split(',');
+          final countryCode = state.uri.queryParameters[keyCountryCode];
 
           Enum$TitleMediaType? mediaType;
 
@@ -32,7 +34,12 @@ extension GoRouterExt on GoRouter {
             mediaType = Enum$TitleMediaType.fromJson(queryMediaType);
           }
 
-          return HomeScreen(mediaType: mediaType, genresIds: genresIds);
+          return HomeScreen(
+            mediaType: mediaType,
+            genresIds: genresIds,
+            watchProviderIds: watchProviderIds,
+            countryCode: countryCode,
+          );
         },
         routes: [
           GoRoute(

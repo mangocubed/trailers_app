@@ -20,6 +20,7 @@ class ShowVideoScreen extends StatefulWidget {
     required this.title,
     required this.index,
     required this.currentPage,
+    this.countryCode,
     this.onUpdated,
     this.onSeeMore,
   });
@@ -27,6 +28,7 @@ class ShowVideoScreen extends StatefulWidget {
   final int index;
   final int currentPage;
   final Fragment$TitleFragment title;
+  final String? countryCode;
   final void Function()? onUpdated;
   final void Function()? onSeeMore;
 
@@ -275,7 +277,7 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
                                 options: Options$Query$TitleWatchProviders(
                                   variables: Variables$Query$TitleWatchProviders(
                                     id: widget.title.id,
-                                    countryCode: user?.identityUser.countryCode ?? 'US',
+                                    countryCode: widget.countryCode ?? user?.identityUser.countryCode ?? 'US',
                                   ),
                                 ),
                                 builder: (result, {fetchMore, refetch}) {
