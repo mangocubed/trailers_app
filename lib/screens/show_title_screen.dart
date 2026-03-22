@@ -94,7 +94,6 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
                             setState(() {
                               _countryCode = value.countryCode;
                             });
-                            refetch?.call();
                           },
                         ),
                         icon: Row(

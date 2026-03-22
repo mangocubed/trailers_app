@@ -169,7 +169,6 @@ class _TitlesFilterDialogBodyState extends State<_TitlesFilterDialogBody> {
                       setState(() {
                         _countryCode = value.countryCode;
                       });
-                      refetch?.call();
                     },
                   ),
                   icon: Row(
