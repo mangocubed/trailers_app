@@ -33,11 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   int get _currentPage => _pageController.page?.round() ?? 0;
 
-  bool get _isFiltered =>
-      widget.mediaType != null ||
-      widget.genresIds != null ||
-      widget.watchProviderIds != null ||
-      widget.countryCode != null;
+  bool get _isFiltered => widget.mediaType != null || widget.genresIds != null || widget.watchProviderIds != null;
 
   Widget _getFilters() {
     if (!_isFiltered) {

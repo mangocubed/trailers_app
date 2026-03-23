@@ -8,6 +8,7 @@ import '../graphql/schema.graphql.dart';
 import '../graphql/queries/genres.graphql.dart';
 import '../graphql/queries/watch_providers.graphql.dart';
 import '../utils.dart';
+import 'current_user.dart';
 
 class TitlesFilterDialog {
   TitlesFilterDialog(
@@ -50,138 +51,144 @@ class _TitlesFilterDialogBodyState extends State<_TitlesFilterDialogBody> {
 
   Widget _getWatchProviders() {
     final textTheme = TextTheme.of(context);
-    return Query$WatchProviders$Widget(
-      options: Options$Query$WatchProviders(
-        variables: Variables$Query$WatchProviders(countryCode: _country.countryCode),
-      ),
-      builder: (result, {refetch, fetchMore}) {
-        final nodes = result.parsedData?.watchProviders.nodes;
-        final pageInfo = result.parsedData?.watchProviders.pageInfo;
-        late final Widget watchProviders;
+    return CurrentUser(
+      builder: (user, {refetch}) {
+        _countryCode ??= user?.identityUser.countryCode;
 
-        if (nodes != null && nodes.isNotEmpty) {
-          watchProviders = Column(
-            spacing: 8,
-            children: [
-              Wrap(
+        return Query$WatchProviders$Widget(
+          options: Options$Query$WatchProviders(
+            variables: Variables$Query$WatchProviders(countryCode: _country.countryCode),
+          ),
+          builder: (result, {refetch, fetchMore}) {
+            final nodes = result.parsedData?.watchProviders.nodes;
+            final pageInfo = result.parsedData?.watchProviders.pageInfo;
+            late final Widget watchProviders;
+
+            if (nodes != null && nodes.isNotEmpty) {
+              watchProviders = Column(
                 spacing: 8,
-                runSpacing: 8,
-                children: nodes
-                    .map(
-                      (watchProvider) => FilterChip(
-                        avatar: watchProvider.logoImageUrl != null
-                            ? CircleAvatar(backgroundImage: NetworkImage(watchProvider.logoImageUrl!.toString()))
-                            : null,
-                        label: Text(watchProvider.name),
-                        labelStyle: GoogleFonts.amiko(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: WidgetStateColor.resolveWith((state) {
-                            return state.contains(WidgetState.selected) ? Colors.black : Colors.lightBlue;
-                          }),
-                        ),
-                        side: BorderSide(color: Colors.lightBlue),
-                        selectedColor: Colors.lightBlue,
-                        selected: _watchProviderIds?.contains(watchProvider.id) ?? false,
-                        onSelected: (value) {
-                          _watchProviderIds ??= [];
+                children: [
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: nodes
+                        .map(
+                          (watchProvider) => FilterChip(
+                            avatar: watchProvider.logoImageUrl != null
+                                ? CircleAvatar(backgroundImage: NetworkImage(watchProvider.logoImageUrl!.toString()))
+                                : null,
+                            label: Text(watchProvider.name),
+                            labelStyle: GoogleFonts.amiko(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: WidgetStateColor.resolveWith((state) {
+                                return state.contains(WidgetState.selected) ? Colors.black : Colors.lightBlue;
+                              }),
+                            ),
+                            side: BorderSide(color: Colors.lightBlue),
+                            selectedColor: Colors.lightBlue,
+                            selected: _watchProviderIds?.contains(watchProvider.id) ?? false,
+                            onSelected: (value) {
+                              _watchProviderIds ??= [];
 
+                              setState(() {
+                                if (value) {
+                                  if (!_watchProviderIds!.contains(watchProvider.id)) {
+                                    _watchProviderIds?.add(watchProvider.id);
+                                  }
+                                } else {
+                                  _watchProviderIds?.remove(watchProvider.id);
+                                }
+                              });
+                            },
+                          ),
+                        )
+                        .toList(),
+                  ),
+                  pageInfo?.hasNextPage == true
+                      ? Center(
+                          child: result.isLoading
+                              ? CircularProgressIndicator()
+                              : TextButton(
+                                  onPressed: () {
+                                    fetchMore?.call(
+                                      FetchMoreOptions$Query$WatchProviders(
+                                        variables: Variables$Query$WatchProviders(
+                                          countryCode: _country.countryCode,
+                                          after: pageInfo?.endCursor,
+                                        ),
+                                        updateQuery: (previousResult, fetchMoreResult) {
+                                          if (fetchMoreResult == null ||
+                                              fetchMoreResult['watchProviders']['nodes'].length == 0) {
+                                            return previousResult;
+                                          }
+
+                                          fetchMoreResult['watchProviders']['nodes'] = [
+                                            ...previousResult?['watchProviders']['nodes'],
+                                            ...fetchMoreResult['watchProviders']['nodes']
+                                                .where(
+                                                  (node) =>
+                                                      previousResult?['watchProviders']['nodes']
+                                                          .map((node1) => node1['id'])
+                                                          .contains(node['id']) !=
+                                                      true,
+                                                )
+                                                .toList(),
+                                          ];
+
+                                          return fetchMoreResult;
+                                        },
+                                      ),
+                                    );
+                                  },
+                                  child: Text('Load more'),
+                                ),
+                        )
+                      : SizedBox(),
+                ],
+              );
+            } else if (result.isLoading) {
+              watchProviders = const Center(child: CircularProgressIndicator());
+            } else {
+              watchProviders = Center(child: Text('No services found in this country 🙁', style: textTheme.bodyLarge));
+            }
+
+            return Column(
+              spacing: 8,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Avalable in...',
+                      style: GoogleFonts.blackHanSans(
+                        color: const Color(0xFFF3EAF4),
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => showCountryPicker(
+                        context: context,
+                        onSelect: (value) {
                           setState(() {
-                            if (value) {
-                              if (!_watchProviderIds!.contains(watchProvider.id)) {
-                                _watchProviderIds?.add(watchProvider.id);
-                              }
-                            } else {
-                              _watchProviderIds?.remove(watchProvider.id);
-                            }
+                            _countryCode = value.countryCode;
                           });
                         },
                       ),
-                    )
-                    .toList(),
-              ),
-              pageInfo?.hasNextPage == true
-                  ? Center(
-                      child: result.isLoading
-                          ? CircularProgressIndicator()
-                          : TextButton(
-                              onPressed: () {
-                                fetchMore?.call(
-                                  FetchMoreOptions$Query$WatchProviders(
-                                    variables: Variables$Query$WatchProviders(
-                                      countryCode: _country.countryCode,
-                                      after: pageInfo?.endCursor,
-                                    ),
-                                    updateQuery: (previousResult, fetchMoreResult) {
-                                      if (fetchMoreResult == null ||
-                                          fetchMoreResult['watchProviders']['nodes'].length == 0) {
-                                        return previousResult;
-                                      }
-
-                                      fetchMoreResult['watchProviders']['nodes'] = [
-                                        ...previousResult?['watchProviders']['nodes'],
-                                        ...fetchMoreResult['watchProviders']['nodes']
-                                            .where(
-                                              (node) =>
-                                                  previousResult?['watchProviders']['nodes']
-                                                      .map((node1) => node1['id'])
-                                                      .contains(node['id']) !=
-                                                  true,
-                                            )
-                                            .toList(),
-                                      ];
-
-                                      return fetchMoreResult;
-                                    },
-                                  ),
-                                );
-                              },
-                              child: Text('Load more'),
-                            ),
-                    )
-                  : SizedBox(),
-            ],
-          );
-        } else if (result.isLoading) {
-          watchProviders = const Center(child: CircularProgressIndicator());
-        } else {
-          watchProviders = Center(child: Text('No services found in this country 🙁', style: textTheme.bodyLarge));
-        }
-
-        return Column(
-          spacing: 8,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Avalable in...',
-                  style: GoogleFonts.blackHanSans(
-                    color: const Color(0xFFF3EAF4),
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                      icon: Row(
+                        children: [
+                          Text(_country.flagEmoji, style: const TextStyle(fontSize: 20)),
+                          const Icon(Icons.arrow_drop_down_rounded, color: Colors.white),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                IconButton(
-                  onPressed: () => showCountryPicker(
-                    context: context,
-                    onSelect: (value) {
-                      setState(() {
-                        _countryCode = value.countryCode;
-                      });
-                    },
-                  ),
-                  icon: Row(
-                    children: [
-                      Text(_country.flagEmoji, style: const TextStyle(fontSize: 20)),
-                      const Icon(Icons.arrow_drop_down_rounded, color: Colors.white),
-                    ],
-                  ),
-                ),
+                watchProviders,
               ],
-            ),
-            watchProviders,
-          ],
+            );
+          },
         );
       },
     );
