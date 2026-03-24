@@ -1,223 +1,66 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
-import '../graphql/queries/genres.graphql.dart';
-import '../graphql/queries/watch_providers.graphql.dart';
+import '../components/filters_row.dart';
+import '../components/search_dialog.dart';
+import '../components/search_field.dart';
 import '../graphql/schema.graphql.dart';
 import '../components/titles_filter_dialog.dart';
 import '../components/sentitive_page_view.dart';
 import '../components/user_button.dart';
 import '../constants.dart';
 import '../graphql/queries/titles.graphql.dart';
-import '../utils.dart';
 import 'show_video_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key, this.mediaType, this.genresIds, this.watchProviderIds, this.countryCode});
+  const HomeScreen({super.key, this.queryParams, this.extraParams});
 
-  final Enum$TitleMediaType? mediaType;
-  final List<String>? genresIds;
-  final List<String>? watchProviderIds;
-  final String? countryCode;
+  final HomeQueryParams? queryParams;
+  final HomeExtraParams? extraParams;
+
+  String? get query => queryParams?.query;
+  Enum$TitleMediaType? get mediaType => queryParams?.mediaType;
+  List<String>? get genreIds => queryParams?.genreIds;
+  List<String>? get watchProviderIds => queryParams?.watchProviderIds;
+  String? get countryCode => queryParams?.countryCode;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final _pageController = PageController();
-  bool _resultsChanged = false;
+  PageController? _pageController;
+  final _queryController = TextEditingController();
 
-  int get _currentPage => _pageController.page?.round() ?? 0;
+  int get _currentPage => _pageController?.page?.round() ?? 0;
 
-  bool get _isFiltered => widget.mediaType != null || widget.genresIds != null || widget.watchProviderIds != null;
+  bool get _hasFilters => widget.queryParams?.hasFilters == true;
 
-  Widget _getFilters() {
-    if (!_isFiltered) {
-      return const SizedBox();
-    }
-
-    final List<Widget> filters = [];
-
-    if (widget.mediaType != null) {
-      filters.add(
-        FilterChip(
-          label: Text(widget.mediaType!.toJson().capitalize()),
-          showCheckmark: false,
-          selected: true,
-          onSelected: (value) {
-            context.goNamed(
-              routeNameHome,
-              queryParameters: getTitlesFilterQueryParams(
-                genreIds: widget.genresIds,
-                watchProviderIds: widget.watchProviderIds,
-                countryCode: widget.countryCode,
-              ),
-            );
-          },
-          onDeleted: () {
-            context.goNamed(
-              routeNameHome,
-              queryParameters: getTitlesFilterQueryParams(
-                genreIds: widget.genresIds,
-                watchProviderIds: widget.watchProviderIds,
-                countryCode: widget.countryCode,
-              ),
-            );
-          },
-        ),
-      );
-    }
-
-    if (widget.genresIds != null && widget.genresIds!.isNotEmpty) {
-      filters.add(
-        Query$Genres$Widget(
-          options: Options$Query$Genres(variables: Variables$Query$Genres(ids: widget.genresIds!)),
-          builder: (result, {fetchMore, refetch}) {
-            final genres = result.parsedData?.genres.nodes;
-
-            return Row(
-              spacing: 8,
-              children:
-                  genres
-                      ?.map(
-                        (genre) => FilterChip(
-                          label: Text(genre.name),
-                          labelStyle: GoogleFonts.amiko(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: WidgetStateColor.resolveWith((state) {
-                              return state.contains(WidgetState.selected) ? Colors.black : Color(0xFFC3D350);
-                            }),
-                          ),
-                          side: BorderSide(color: Color(0xFFC3D350)),
-                          selectedColor: Color(0xFFC3D350),
-                          selected: true,
-                          onSelected: (value) {
-                            context.goNamed(
-                              routeNameHome,
-                              queryParameters: getTitlesFilterQueryParams(
-                                mediaType: widget.mediaType,
-                                genreIds: widget.genresIds?.where((id) => id != genre.id).toList(),
-                                watchProviderIds: widget.watchProviderIds,
-                                countryCode: widget.countryCode,
-                              ),
-                            );
-                          },
-
-                          onDeleted: () {
-                            context.goNamed(
-                              routeNameHome,
-                              queryParameters: getTitlesFilterQueryParams(
-                                mediaType: widget.mediaType,
-                                genreIds: widget.genresIds?.where((id) => id != genre.id).toList(),
-                                watchProviderIds: widget.watchProviderIds,
-                                countryCode: widget.countryCode,
-                              ),
-                            );
-                          },
-                        ),
-                      )
-                      .toList() ??
-                  [],
-            );
-          },
-        ),
-      );
-    }
-
-    if (widget.watchProviderIds != null && widget.watchProviderIds!.isNotEmpty) {
-      filters.add(
-        Query$WatchProviders$Widget(
-          options: Options$Query$WatchProviders(
-            variables: Variables$Query$WatchProviders(ids: widget.watchProviderIds, countryCode: widget.countryCode),
-          ),
-          builder: (result, {fetchMore, refetch}) {
-            final watchProviders = result.parsedData?.watchProviders.nodes;
-
-            return Row(
-              spacing: 8,
-              children:
-                  watchProviders
-                      ?.map(
-                        (watchProvider) => FilterChip(
-                          avatar: watchProvider.logoImageUrl != null
-                              ? CircleAvatar(backgroundImage: NetworkImage(watchProvider.logoImageUrl!.toString()))
-                              : null,
-                          label: Text(watchProvider.name),
-                          labelStyle: GoogleFonts.amiko(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: WidgetStateColor.resolveWith((state) {
-                              return state.contains(WidgetState.selected) ? Colors.black : Colors.lightBlue;
-                            }),
-                          ),
-                          side: BorderSide(color: Colors.lightBlue),
-                          selectedColor: Colors.lightBlue,
-                          selected: true,
-                          onSelected: (value) {
-                            context.goNamed(
-                              routeNameHome,
-                              queryParameters: getTitlesFilterQueryParams(
-                                mediaType: widget.mediaType,
-                                genreIds: widget.genresIds,
-                                watchProviderIds: widget.watchProviderIds
-                                    ?.where((id) => id != watchProvider.id)
-                                    .toList(),
-                                countryCode: widget.countryCode,
-                              ),
-                            );
-                          },
-
-                          onDeleted: () {
-                            context.goNamed(
-                              routeNameHome,
-                              queryParameters: getTitlesFilterQueryParams(
-                                mediaType: widget.mediaType,
-                                genreIds: widget.genresIds,
-                                watchProviderIds: widget.watchProviderIds
-                                    ?.where((id) => id != watchProvider.id)
-                                    .toList(),
-                                countryCode: widget.countryCode,
-                              ),
-                            );
-                          },
-                        ),
-                      )
-                      .toList() ??
-                  [],
-            );
-          },
-        ),
-      );
-    }
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.only(left: 14),
-      scrollDirection: Axis.horizontal,
-      child: Row(mainAxisSize: MainAxisSize.max, spacing: 8, children: filters),
-    );
-  }
+  bool get _hasQuery => widget.queryParams?.hasQuery == true;
 
   Widget _getTitles() {
     final textTheme = TextTheme.of(context);
 
     return Query$Titles$Widget(
       options: Options$Query$Titles(
-        fetchPolicy: FetchPolicy.noCache,
+        fetchPolicy: !_hasFilters && !_hasQuery ? FetchPolicy.noCache : null,
+        typedOptimisticResult: widget.extraParams?.parsedData,
         variables: Variables$Query$Titles(
+          first: widget.extraParams?.parsedData?.titles.nodes.length ?? 12,
+          query: widget.query,
           mediaType: widget.mediaType,
-          genreIds: widget.genresIds,
+          genreIds: widget.genreIds,
           watchProviderIds: widget.watchProviderIds,
           countryCode: widget.countryCode,
-          includeViewed: _isFiltered,
+          includeViewed: _hasFilters || _hasQuery,
         ),
       ),
       builder: (result, {fetchMore, refetch}) {
         final titles = result.parsedData?.titles;
+
+        _pageController ??= PageController(initialPage: widget.extraParams?.page ?? 0);
 
         if (result.parsedData == null && result.isLoading) {
           return const Center(child: CircularProgressIndicator());
@@ -243,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
         }
 
         return SensitivePageView(
-          controller: _pageController,
+          controller: _pageController!,
           onPageChanged: (int page) {
             setState(() {});
 
@@ -254,17 +97,18 @@ class _HomeScreenState extends State<HomeScreen> {
             fetchMore?.call(
               FetchMoreOptions$Query$Titles(
                 variables: Variables$Query$Titles(
-                  after: _resultsChanged && !_isFiltered ? null : titles.pageInfo.endCursor,
+                  after: titles.pageInfo.endCursor,
+                  query: widget.query,
                   mediaType: widget.mediaType,
-                  genreIds: widget.genresIds,
-                  includeViewed: _isFiltered,
+                  genreIds: widget.genreIds,
+                  watchProviderIds: widget.watchProviderIds,
+                  countryCode: widget.countryCode,
+                  includeViewed: _hasFilters || _hasQuery,
                 ),
                 updateQuery: (previousResultData, fetchMoreResultData) {
                   if (fetchMoreResultData == null || fetchMoreResultData['titles']['nodes'].length == 0) {
                     return previousResultData;
                   }
-
-                  _resultsChanged = false;
 
                   fetchMoreResultData['titles']['nodes'] = [
                     ...previousResultData?['titles']['nodes'],
@@ -291,7 +135,13 @@ class _HomeScreenState extends State<HomeScreen> {
               currentPage: _currentPage,
               title: title,
               countryCode: widget.countryCode,
-              onUpdated: () => _resultsChanged = true,
+              onSeeMore: () {
+                context.goNamed(
+                  routeNameShowTitle,
+                  pathParameters: {keyTitleId: title.id},
+                  queryParameters: widget.queryParams?.toMap() ?? {},
+                );
+              },
             );
           },
           itemCount: result.parsedData?.titles.nodes.length,
@@ -301,8 +151,27 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _queryController.text = widget.query ?? '';
+  }
+
+  @override
+  void didUpdateWidget(covariant HomeScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.query != oldWidget.query) {
+      _queryController.text = widget.query ?? '';
+    }
+
+    if (widget.extraParams?.page != _pageController?.page) {
+      _pageController?.jumpToPage(widget.extraParams?.page ?? 0);
+    }
+  }
+
+  @override
   void dispose() {
-    _pageController.dispose();
+    _pageController?.dispose();
+    _queryController.dispose();
     super.dispose();
   }
 
@@ -313,38 +182,31 @@ class _HomeScreenState extends State<HomeScreen> {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: OutlinedButton(
-          onPressed: () => context.goNamed(routeNameSearch),
-          style: OutlinedButton.styleFrom(
-            side: const BorderSide(color: Colors.white),
-            padding: const EdgeInsets.only(top: 8, right: 8, bottom: 8, left: 16),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Search', style: const TextStyle(fontSize: 16, color: Color(0x88FFFFFF))),
-              const Icon(Icons.search_rounded, color: Colors.white),
-            ],
-          ),
+        title: SearchField(
+          controller: _queryController,
+          readOnly: true,
+          onTap: () {
+            SearchDialog(context, queryParams: widget.queryParams);
+          },
+          onClear: () {
+            final queryParams = widget.queryParams!;
+
+            queryParams.query = null;
+
+            context.goNamed(routeNameHome, queryParameters: queryParams.toMap());
+          },
         ),
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 12),
             child: IconButton.outlined(
-              isSelected: _isFiltered,
+              isSelected: _hasFilters,
               icon: SvgPicture.asset(
                 'assets/adjust.svg',
-                colorFilter: _isFiltered ? ColorFilter.mode(Colors.black, BlendMode.srcIn) : null,
+                colorFilter: _hasFilters ? ColorFilter.mode(Colors.black, BlendMode.srcIn) : null,
               ),
-              onPressed: () async {
-                TitlesFilterDialog(
-                  context,
-                  mediaType: widget.mediaType,
-                  genreIds: widget.genresIds,
-                  watchProviderIds: widget.watchProviderIds,
-                  countryCode: widget.countryCode,
-                );
+              onPressed: () {
+                TitlesFilterDialog(context, queryParams: widget.queryParams);
               },
             ),
           ),
@@ -354,9 +216,77 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Stack(
         children: [
           _getTitles(),
-          SafeArea(child: _getFilters()),
+          SafeArea(child: FiltersRow(queryParams: widget.queryParams)),
         ],
       ),
     );
   }
+}
+
+class HomeQueryParams {
+  HomeQueryParams({this.query, this.mediaType, this.genreIds, this.watchProviderIds, this.countryCode});
+
+  String? query;
+  Enum$TitleMediaType? mediaType;
+  final List<String>? genreIds;
+  final List<String>? watchProviderIds;
+  final String? countryCode;
+
+  bool get hasQuery => query != null && query!.length > 1;
+  bool get hasFilters => mediaType != null || genreIds != null || watchProviderIds != null;
+
+  static HomeQueryParams fromMap(Map<String, String> value) {
+    final String? query = value[keyQuery];
+    final String? mediaTypeStr = value[keyMediaType];
+    final genreIds = value[keyGenreIds]?.split(',');
+    final watchProviderIds = value[keyWatchProviderIds]?.split(',');
+    final countryCode = value[keyCountryCode];
+
+    Enum$TitleMediaType? mediaType;
+
+    if (mediaTypeStr != null) {
+      mediaType = Enum$TitleMediaType.fromJson(mediaTypeStr);
+    }
+
+    return HomeQueryParams(
+      query: query,
+      mediaType: mediaType,
+      genreIds: genreIds,
+      watchProviderIds: watchProviderIds,
+      countryCode: countryCode,
+    );
+  }
+
+  Map<String, String> toMap() {
+    final Map<String, String> queryParams = {};
+
+    if (hasQuery) {
+      queryParams[keyQuery] = query!;
+    }
+
+    if (mediaType != null) {
+      queryParams[keyMediaType] = mediaType!.toJson();
+    }
+
+    if (genreIds != null && genreIds!.isNotEmpty) {
+      queryParams[keyGenreIds] = genreIds!.join(',');
+    }
+
+    if (watchProviderIds != null && watchProviderIds!.isNotEmpty) {
+      queryParams[keyWatchProviderIds] = watchProviderIds!.join(',');
+    }
+
+    if (countryCode != null && countryCode!.isNotEmpty) {
+      queryParams[keyCountryCode] = countryCode!;
+    }
+
+    return queryParams;
+  }
+}
+
+class HomeExtraParams {
+  HomeExtraParams({required this.parsedData, required this.page});
+
+  final Query$Titles? parsedData;
+  final int page;
 }
