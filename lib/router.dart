@@ -1,11 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
-import 'package:trailers/constants.dart';
-import 'package:trailers/graphql/schema.graphql.dart';
+
+import 'constants.dart';
 import 'screens/home_screen.dart';
 import 'screens/not_found_screen.dart';
-import 'screens/search_results_screen.dart';
-import 'screens/search_screen.dart';
 import 'screens/show_title_screen.dart';
 import 'screens/show_user_bookmarks_screen.dart';
 import 'screens/show_user_screen.dart';
@@ -22,57 +20,11 @@ extension GoRouterExt on GoRouter {
       GoRoute(
         name: routeNameHome,
         path: '/',
-        builder: (context, state) {
-          final queryMediaType = state.uri.queryParameters[keyMediaType];
-          final genresIds = state.uri.queryParameters[keyGenreIds]?.split(',');
-          final watchProviderIds = state.uri.queryParameters[keyWatchProviderIds]?.split(',');
-          final countryCode = state.uri.queryParameters[keyCountryCode];
-
-          Enum$TitleMediaType? mediaType;
-
-          if (queryMediaType != null) {
-            mediaType = Enum$TitleMediaType.fromJson(queryMediaType);
-          }
-
-          return HomeScreen(
-            mediaType: mediaType,
-            genresIds: genresIds,
-            watchProviderIds: watchProviderIds,
-            countryCode: countryCode,
-          );
-        },
+        builder: (context, state) => HomeScreen(
+          queryParams: HomeQueryParams.fromMap(state.uri.queryParameters),
+          extraParams: state.extra as HomeExtraParams?,
+        ),
         routes: [
-          GoRoute(
-            name: routeNameSearch,
-            path: 'search',
-            builder: (context, state) {
-              final query = state.uri.queryParameters[keyQuery];
-
-              return SearchScreen(query: query);
-            },
-            routes: [
-              GoRoute(
-                name: routeNameSearchResults,
-                path: 'results',
-                builder: (context, state) {
-                  final query = state.uri.queryParameters[keyQuery];
-
-                  final extra = state.extra as SearchResultsExtra?;
-
-                  return SearchResultsScreen(query: query, extra: extra);
-                },
-              ),
-              GoRoute(
-                name: routeNameSearchResultsTitle,
-                path: 'titles/:$keyTitleId',
-                builder: (context, state) {
-                  final id = state.pathParameters[keyTitleId]!;
-
-                  return ShowTitleScreen(id: id);
-                },
-              ),
-            ],
-          ),
           GoRoute(
             name: routeNameShowTitle,
             path: 'titles/:$keyTitleId',

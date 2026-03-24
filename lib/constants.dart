@@ -9,7 +9,6 @@ const keyWatchProviderIds = 'watch_provider_ids';
 const keyCountryCode = 'country_code';
 
 const routeNameHome = 'home';
-const routeNameSearch = 'search';
 const routeNameSearchResults = 'search_results';
 const routeNameSearchResultsTitle = 'search_results_title';
 const routeNameShowTitle = 'show_title';

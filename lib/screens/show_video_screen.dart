@@ -2,10 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:trailers/components/current_user.dart';
-import 'package:trailers/utils.dart';
 import 'package:video_player/video_player.dart';
 
+import '../components/current_user.dart';
+import '../utils.dart';
 import '../components/action_buttons.dart';
 import '../components/genre_chip.dart';
 import '../components/title_basic_info.dart';
@@ -53,17 +53,19 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
   }
 
   Future<void> _play() async {
-    _videoPlayerController ??=
-        VideoPlayerController.networkUrl(
-            (_video.hlsUrl != null && !kIsWeb ? _video.hlsUrl! : _video.url),
-            viewType: VideoViewType.platformView,
-          )
-          ..setLooping(true)
-          ..addListener(() {
-            if (mounted) {
-              setState(() {});
-            }
-          });
+    final sourceUrl = _video.hlsUrl != null && !kIsWeb ? _video.hlsUrl! : _video.url;
+
+    if (_videoPlayerController?.dataSource != sourceUrl.toString()) {
+      await _stop();
+
+      _videoPlayerController = VideoPlayerController.networkUrl(sourceUrl, viewType: VideoViewType.platformView)
+        ..setLooping(true)
+        ..addListener(() {
+          if (mounted) {
+            setState(() {});
+          }
+        });
+    }
 
     if (!_isReady) {
       _videoPlayerController?.initialize().then((_) {
@@ -74,8 +76,6 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
     }
 
     await _videoPlayerController?.play();
-
-    await Future.delayed(const Duration(seconds: 5));
   }
 
   Future<void> _pause() async {
@@ -83,7 +83,6 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
   }
 
   Future<void> _stop() async {
-    await _videoPlayerController?.pause();
     await _videoPlayerController?.dispose();
     _videoPlayerController = null;
 
@@ -115,7 +114,7 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
   void initState() {
     super.initState();
 
-    if (widget.index == 0) {
+    if (widget.index == widget.currentPage) {
       _play();
       createUserTitleTie(context, widget.title);
     }
@@ -125,7 +124,7 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
   didUpdateWidget(ShowVideoScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.index == widget.currentPage) {
+    if (ModalRoute.of(context)?.isCurrent == true && widget.index == widget.currentPage) {
       _play();
       createUserTitleTie(context, widget.title);
     } else {

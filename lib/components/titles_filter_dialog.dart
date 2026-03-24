@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:country_picker/country_picker.dart';
+import 'package:trailers/screens/home_screen.dart';
 
 import '../constants.dart';
 import '../graphql/schema.graphql.dart';
@@ -11,31 +12,27 @@ import '../utils.dart';
 import 'current_user.dart';
 
 class TitlesFilterDialog {
-  TitlesFilterDialog(
-    BuildContext context, {
-    Enum$TitleMediaType? mediaType,
-    List<String>? genreIds,
-    List<String>? watchProviderIds,
-    String? countryCode,
-  }) {
+  TitlesFilterDialog(BuildContext context, {HomeQueryParams? queryParams}) {
     showDialog(
       context: context,
       barrierDismissible: false,
       fullscreenDialog: true,
       builder: (context) {
-        return Dialog.fullscreen(child: _TitlesFilterDialogBody(mediaType, genreIds, watchProviderIds, countryCode));
+        return Dialog.fullscreen(child: _TitlesFilterDialogBody(queryParams: queryParams));
       },
     );
   }
 }
 
 class _TitlesFilterDialogBody extends StatefulWidget {
-  const _TitlesFilterDialogBody(this.mediaType, this.genreIds, this.watchProviderIds, this.countryCode);
+  const _TitlesFilterDialogBody({this.queryParams});
 
-  final Enum$TitleMediaType? mediaType;
-  final List<String>? genreIds;
-  final List<String>? watchProviderIds;
-  final String? countryCode;
+  final HomeQueryParams? queryParams;
+
+  Enum$TitleMediaType? get mediaType => queryParams?.mediaType;
+  List<String>? get genreIds => queryParams?.genreIds;
+  List<String>? get watchProviderIds => queryParams?.watchProviderIds;
+  String? get countryCode => queryParams?.countryCode;
 
   @override
   State<_TitlesFilterDialogBody> createState() => _TitlesFilterDialogBodyState();
@@ -314,12 +311,13 @@ class _TitlesFilterDialogBodyState extends State<_TitlesFilterDialogBody> {
                 onPressed: () {
                   context.goNamed(
                     routeNameHome,
-                    queryParameters: getTitlesFilterQueryParams(
+                    queryParameters: HomeQueryParams(
+                      query: widget.queryParams?.query,
                       mediaType: _mediaType,
                       genreIds: _genreIds,
                       watchProviderIds: _watchProviderIds,
                       countryCode: _countryCode,
-                    ),
+                    ).toMap(),
                   );
                   context.pop();
                 },
