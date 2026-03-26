@@ -127,6 +127,8 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
     if (ModalRoute.of(context)?.isCurrent == true && widget.index == widget.currentPage) {
       _play();
       createUserTitleTie(context, widget.title);
+    } else if (ModalRoute.of(context)?.isCurrent != true && widget.index == widget.currentPage) {
+      _pause();
     } else {
       _stop();
     }

@@ -163,7 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _queryController.text = widget.query ?? '';
     }
 
-    if (widget.extraParams?.page != _pageController?.page) {
+    if (widget.extraParams?.page != null && widget.extraParams?.page != _pageController?.page) {
       _pageController?.jumpToPage(widget.extraParams?.page ?? 0);
     }
   }
