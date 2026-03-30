@@ -6,12 +6,14 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import '../components/filters_row.dart';
 import '../components/search_dialog.dart';
 import '../components/search_field.dart';
+import '../config.dart';
 import '../graphql/schema.graphql.dart';
 import '../components/titles_filter_dialog.dart';
 import '../components/sentitive_page_view.dart';
 import '../components/user_button.dart';
 import '../constants.dart';
 import '../graphql/queries/titles.graphql.dart';
+import 'show_ad_screen.dart';
 import 'show_video_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -110,16 +112,32 @@ class _HomeScreenState extends State<HomeScreen> {
                     return previousResultData;
                   }
 
-                  fetchMoreResultData['titles']['nodes'] = [
-                    ...previousResultData?['titles']['nodes'],
-                    ...fetchMoreResultData['titles']['nodes']
+                  final nodes = previousResultData?['titles']['nodes'];
+
+                  if (Config.adUrl != null) {
+                    nodes.add({
+                      'id': 'ad',
+                      'mediaType': '',
+                      'name': '',
+                      'crew': {'nodes': [], '__typename': ''},
+                      'genres': {'nodes': [], '__typename': ''},
+                      'videos': {'nodes': [], '__typename': ''},
+                      'createdAt': DateTime.now().toIso8601String(),
+                      '__typename': '',
+                    });
+                  }
+
+                  nodes.addAll(
+                    fetchMoreResultData['titles']['nodes']
                         .where(
                           (node) =>
                               previousResultData?['titles']['nodes'].map((node1) => node1['id']).contains(node['id']) !=
                               true,
                         )
                         .toList(),
-                  ];
+                  );
+
+                  fetchMoreResultData['titles']['nodes'] = nodes;
 
                   return fetchMoreResultData;
                 },
@@ -129,6 +147,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
           itemBuilder: (context, index) {
             final title = titles!.nodes[index];
+
+            if (title.id == 'ad') {
+              return const ShowAdScreen();
+            }
 
             return ShowVideoScreen(
               index: index,
