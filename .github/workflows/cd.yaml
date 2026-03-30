@@ -97,6 +97,7 @@ jobs:
               uses: actions/upload-pages-artifact@v4
               with:
                   path: ./build/web
+                  include-hidden-files: true
 
     release:
         needs: build_android_apk
