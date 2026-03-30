@@ -27,4 +27,8 @@ class Config {
   static final Uri trailersApiUrl = Uri.parse(
     const String.fromEnvironment('TRAILERS_API_URL', defaultValue: 'http://127.0.0.1:8015'),
   );
+
+  static final Uri trailersUrl = Uri.parse(
+    const String.fromEnvironment('TRAILERS_URL', defaultValue: 'https://trailers.mango3.app/'),
+  );
 }

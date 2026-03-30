@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../components/screen_lifecycle.dart';
+import '../config.dart';
 import '../graphql/fragments/user_title_tie_fragment.graphql.dart';
 import '../graphql/mutations/update_bookmark.graphql.dart';
 import '../graphql/mutations/update_like.graphql.dart';
@@ -92,6 +94,7 @@ class ActionButtons extends StatelessWidget {
           },
           child: Flex(
             mainAxisSize: MainAxisSize.min,
+            spacing: 8,
             direction: direction,
             children: [
               IconButton(
@@ -113,7 +116,6 @@ class ActionButtons extends StatelessWidget {
                 icon: SvgPicture.asset(isWatched ? 'assets/watched_filled.svg' : 'assets/watched.svg'),
                 tooltip: 'Watched',
               ),
-              const SizedBox(height: 8, width: 8),
               IconButton(
                 onPressed: () async {
                   final isAuthorized = await IdentityClient.isAuthorized();
@@ -133,7 +135,6 @@ class ActionButtons extends StatelessWidget {
                 icon: SvgPicture.asset(isLiked ? 'assets/heart_filled.svg' : 'assets/heart.svg'),
                 tooltip: 'Like',
               ),
-              const SizedBox(height: 8, width: 8),
               IconButton(
                 onPressed: () async {
                   final isAuthorized = await IdentityClient.isAuthorized();
@@ -152,6 +153,18 @@ class ActionButtons extends StatelessWidget {
                 },
                 icon: SvgPicture.asset(isBookmarked ? 'assets/bookmark_filled.svg' : 'assets/bookmark.svg'),
                 tooltip: 'Bookmark',
+              ),
+              IconButton(
+                onPressed: () {
+                  SharePlus.instance.share(
+                    ShareParams(
+                      text:
+                          'Check out this title on Trailers: ${Config.trailersUrl.replace(fragment: '/titles/$titleId')}',
+                    ),
+                  );
+                },
+                icon: SvgPicture.asset('assets/share.svg'),
+                tooltip: 'Share',
               ),
             ],
           ),

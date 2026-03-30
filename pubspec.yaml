@@ -45,6 +45,7 @@ dependencies:
     oauth2_client: ^4.2.3
     video_player: ^2.11.1
     flutter_inappwebview: ^6.2.0-beta.3
+    share_plus: ^12.0.2
 
 dev_dependencies:
     flutter_test:

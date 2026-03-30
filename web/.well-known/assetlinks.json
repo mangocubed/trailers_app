@@ -1,0 +1,12 @@
+[
+    {
+        "relation": ["delegate_permission/common.handle_all_urls"],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "app.mango3.trailers",
+            "sha256_cert_fingerprints": [
+                "C1:0F:19:61:F3:07:D7:9E:9B:87:28:D5:89:4C:FE:03:88:AB:81:41:D3:A2:8C:31:59:00:3D:E3:34:E9:0F:55"
+            ]
+        }
+    }
+]
