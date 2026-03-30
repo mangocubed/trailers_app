@@ -91,7 +91,8 @@ jobs:
             - uses: ./.github/actions/setup-flutter
             - run: |
                   flutter build web --release \
-                  --dart-define IDENTITY_CLIENT_ID="${{ vars.IDENTITY_CLIENT_ID }}"
+                  --dart-define IDENTITY_CLIENT_ID="${{ vars.IDENTITY_CLIENT_ID }}" \
+                  --dart-define IDENTITY_REDIRECT_URL="https://trailers.mango3.app/oauth"
             - name: Upload artifact
               uses: actions/upload-pages-artifact@v4
               with:
