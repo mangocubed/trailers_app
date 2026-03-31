@@ -1,11 +1,11 @@
 import 'package:flutter/foundation.dart';
 
 class Config {
-  static final _adUrl = const String.fromEnvironment('AD_URL', defaultValue: 'https://ads.mango3.app/336x280.html');
+  static final _adUrl = const String.fromEnvironment('AD_URL', defaultValue: 'https://ads.mango3.app/300x250.html');
 
   static final adSize = const String.fromEnvironment(
     'AD_SIZE',
-    defaultValue: '336x280',
+    defaultValue: '300x250',
   ).split('x').map((s) => double.parse(s)).toList();
 
   static final Uri? adUrl = _adUrl.isNotEmpty ? Uri.parse(_adUrl) : null;
