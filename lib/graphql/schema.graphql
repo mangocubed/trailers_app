@@ -154,7 +154,7 @@ type QueryRoot {
 	genres(after: UUID, first: Int, ids: [UUID!]): GenreObjectConnection!
 	info: InfoObject!
 	title(id: ID!): TitleObject
-	titles(after: UUID, first: Int, query: String, mediaType: TitleMediaType, genreIds: [UUID!], watchProviderIds: [UUID!], countryCode: String, includeViewed: Boolean): TitleObjectConnection!
+	titles(after: UUID, first: Int, query: String, mediaType: TitleMediaType, genreIds: [UUID!], watchProviderIds: [UUID!], countryCode: String, includeViewed: Boolean, includeWithoutVideos: Boolean): TitleObjectConnection!
 	user(username: String!): UserObject
 	watchProviders(after: UUID, first: Int, ids: [UUID!], countryCode: String): WatchProviderObjectConnection!
 }

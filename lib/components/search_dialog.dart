@@ -52,6 +52,7 @@ class _SearchDialogBodyState extends State<_SearchDialogBody> {
             watchProviderIds: widget.queryParams?.watchProviderIds,
             countryCode: widget.queryParams?.countryCode,
             includeViewed: true,
+            includeWithoutVideos: true,
           ),
           updateQuery: (previousResultData, fetchMoreResultData) {
             if (fetchMoreResultData == null || fetchMoreResultData['titles']['nodes'].length == 0) {
@@ -129,6 +130,7 @@ class _SearchDialogBodyState extends State<_SearchDialogBody> {
                         watchProviderIds: widget.queryParams?.watchProviderIds,
                         countryCode: widget.queryParams?.countryCode,
                         includeViewed: true,
+                        includeWithoutVideos: true,
                       ),
                     ),
                     builder: (result, {fetchMore, refetch}) {

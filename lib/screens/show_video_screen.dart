@@ -42,7 +42,7 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
   bool get _isReady => _videoPlayerController?.value.isInitialized ?? false;
   bool get _isPlaying => _videoPlayerController?.value.isPlaying ?? false;
 
-  Fragment$TitleFragment$videos$nodes get _video => widget.title.videos.nodes.first;
+  Fragment$TitleFragment$videos$nodes? get _video => widget.title.videos.nodes.firstOrNull;
 
   double get _thumbnailOpacity {
     if (_isReady) {
@@ -53,7 +53,11 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
   }
 
   Future<void> _play() async {
-    final sourceUrl = _video.hlsUrl != null && !kIsWeb ? _video.hlsUrl! : _video.url;
+    if (_video == null) {
+      return;
+    }
+
+    final sourceUrl = _video!.hlsUrl != null && !kIsWeb ? _video!.hlsUrl! : _video!.url;
 
     if (_videoPlayerController?.dataSource != sourceUrl.toString()) {
       await _stop();
@@ -100,14 +104,18 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
   }
 
   Widget _getVideoPlayer() {
+    if (_video == null) {
+      return const SizedBox();
+    }
+
     if (_videoPlayerController?.value.isInitialized == true) {
       return AspectRatio(
         aspectRatio: _videoPlayerController!.value.aspectRatio,
         child: VideoPlayer(_videoPlayerController!),
       );
-    } else {
-      return const CircularProgressIndicator();
     }
+
+    return const CircularProgressIndicator();
   }
 
   @override
@@ -191,23 +199,25 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
                     ),
                   )
                 : const SizedBox(),
-            InkWell(
-              onTap: _togglePlayPause,
-              child: SizedBox(
-                width: double.infinity,
-                height: double.infinity,
-                child: Visibility(
-                  visible: !_isPlaying,
-                  child: Center(
-                    child: Icon(
-                      _isReady ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                      color: Color(0x999E9E9E),
-                      size: 128,
+            _video != null
+                ? InkWell(
+                    onTap: _togglePlayPause,
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: double.infinity,
+                      child: Visibility(
+                        visible: !_isPlaying,
+                        child: Center(
+                          child: Icon(
+                            _isReady ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                            color: Color(0x999E9E9E),
+                            size: 128,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
-            ),
+                  )
+                : const SizedBox(),
           ],
         ),
         Align(

@@ -47,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Query$Titles$Widget(
       options: Options$Query$Titles(
-        fetchPolicy: !_hasFilters && !_hasQuery ? FetchPolicy.noCache : null,
+        fetchPolicy: FetchPolicy.noCache,
         typedOptimisticResult: widget.extraParams?.parsedData,
         variables: Variables$Query$Titles(
           first: widget.extraParams?.parsedData?.titles.nodes.length ?? 12,
@@ -57,6 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
           watchProviderIds: widget.watchProviderIds,
           countryCode: widget.countryCode,
           includeViewed: _hasFilters || _hasQuery,
+          includeWithoutVideos: _hasFilters || _hasQuery,
         ),
       ),
       builder: (result, {fetchMore, refetch}) {
@@ -90,8 +91,6 @@ class _HomeScreenState extends State<HomeScreen> {
         return SensitivePageView(
           controller: _pageController!,
           onPageChanged: (int page) {
-            setState(() {});
-
             if (result.isLoading || titles!.nodes.length > page + 5) {
               return;
             }
@@ -106,38 +105,37 @@ class _HomeScreenState extends State<HomeScreen> {
                   watchProviderIds: widget.watchProviderIds,
                   countryCode: widget.countryCode,
                   includeViewed: _hasFilters || _hasQuery,
+                  includeWithoutVideos: _hasFilters || _hasQuery,
                 ),
                 updateQuery: (previousResultData, fetchMoreResultData) {
                   if (fetchMoreResultData == null || fetchMoreResultData['titles']['nodes'].length == 0) {
                     return previousResultData;
                   }
 
-                  final nodes = previousResultData?['titles']['nodes'];
-
-                  if (Config.adUrl != null) {
-                    nodes.add({
-                      'id': 'ad',
-                      'mediaType': '',
-                      'name': '',
-                      'crew': {'nodes': [], '__typename': ''},
-                      'genres': {'nodes': [], '__typename': ''},
-                      'videos': {'nodes': [], '__typename': ''},
-                      'createdAt': DateTime.now().toIso8601String(),
-                      '__typename': '',
-                    });
-                  }
-
-                  nodes.addAll(
-                    fetchMoreResultData['titles']['nodes']
+                  fetchMoreResultData['titles']['nodes'] = [
+                    ...previousResultData?['titles']['nodes'],
+                    ...Config.adUrl != null
+                        ? [
+                            {
+                              'id': 'ad',
+                              'mediaType': '',
+                              'name': '',
+                              'crew': {'nodes': [], '__typename': ''},
+                              'genres': {'nodes': [], '__typename': ''},
+                              'videos': {'nodes': [], '__typename': ''},
+                              'createdAt': DateTime.now().toIso8601String(),
+                              '__typename': '',
+                            },
+                          ]
+                        : [],
+                    ...fetchMoreResultData['titles']['nodes']
                         .where(
                           (node) =>
                               previousResultData?['titles']['nodes'].map((node1) => node1['id']).contains(node['id']) !=
                               true,
                         )
                         .toList(),
-                  );
-
-                  fetchMoreResultData['titles']['nodes'] = nodes;
+                  ];
 
                   return fetchMoreResultData;
                 },
@@ -153,6 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
             }
 
             return ShowVideoScreen(
+              key: Key(title.id),
               index: index,
               currentPage: _currentPage,
               title: title,
