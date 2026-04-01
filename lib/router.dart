@@ -21,8 +21,9 @@ extension GoRouterExt on GoRouter {
         name: routeNameHome,
         path: '/',
         builder: (context, state) => HomeScreen(
+          key: ValueKey(state.uri.query),
           queryParams: HomeQueryParams.fromMap(state.uri.queryParameters),
-          extraParams: state.extra as HomeExtraParams?,
+          extraParams: state.extra is HomeExtraParams ? state.extra as HomeExtraParams : null,
         ),
         routes: [
           GoRoute(
@@ -31,7 +32,7 @@ extension GoRouterExt on GoRouter {
             builder: (context, state) {
               final id = state.pathParameters[keyTitleId]!;
 
-              return ShowTitleScreen(id: id);
+              return ShowTitleScreen(key: ValueKey(id), id: id);
             },
           ),
           GoRoute(
@@ -39,7 +40,7 @@ extension GoRouterExt on GoRouter {
             path: 'users/:$keyUsername',
             builder: (context, state) {
               final username = state.pathParameters[keyUsername]!;
-              return ShowUserScreen(username: username);
+              return ShowUserScreen(key: ValueKey(username), username: username);
             },
             routes: [
               GoRoute(
@@ -47,38 +48,49 @@ extension GoRouterExt on GoRouter {
                 path: 'bookmarks',
                 builder: (context, state) {
                   final username = state.pathParameters[keyUsername]!;
-                  final extra = state.extra as ShowUserBookmarksExtra?;
 
-                  return ShowUserBookmarksScreen(username: username, extra: extra);
+                  return ShowUserBookmarksScreen(
+                    key: ValueKey('$username?${state.uri.query}'),
+                    username: username,
+                    queryParams: UserQueryParams.fromMap(state.uri.queryParameters),
+                    extraParams: state.extra as UserExtraParams?,
+                  );
                 },
-              ),
-              GoRoute(
-                name: routeNameShowUserBookmarksTitle,
-                path: 'titles/:$keyTitleId',
-                builder: (context, state) {
-                  final id = state.pathParameters[keyTitleId]!;
+                routes: [
+                  GoRoute(
+                    name: routeNameShowUserBookmarksTitle,
+                    path: 'titles/:$keyTitleId',
+                    builder: (context, state) {
+                      final id = state.pathParameters[keyTitleId]!;
 
-                  return ShowTitleScreen(id: id);
-                },
+                      return ShowTitleScreen(key: ValueKey(id), id: id);
+                    },
+                  ),
+                ],
               ),
               GoRoute(
                 name: routeNameShowUserWatched,
                 path: 'watched',
                 builder: (context, state) {
                   final username = state.pathParameters[keyUsername]!;
-                  final extra = state.extra as ShowUserWatchedExtra?;
-
-                  return ShowUserWatchedScreen(username: username, extra: extra);
+                  return ShowUserWatchedScreen(
+                    key: ValueKey('$username?${state.uri.query}'),
+                    username: username,
+                    queryParams: UserQueryParams.fromMap(state.uri.queryParameters),
+                    extraParams: state.extra as UserExtraParams?,
+                  );
                 },
-              ),
-              GoRoute(
-                name: routeNameShowUserWatchedTitle,
-                path: 'titles/:$keyTitleId',
-                builder: (context, state) {
-                  final id = state.pathParameters[keyTitleId]!;
+                routes: [
+                  GoRoute(
+                    name: routeNameShowUserWatchedTitle,
+                    path: 'titles/:$keyTitleId',
+                    builder: (context, state) {
+                      final id = state.pathParameters[keyTitleId]!;
 
-                  return ShowTitleScreen(id: id);
-                },
+                      return ShowTitleScreen(key: ValueKey(id), id: id);
+                    },
+                  ),
+                ],
               ),
             ],
           ),

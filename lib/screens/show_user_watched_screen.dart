@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:trailers/config.dart';
 
 import '../components/sentitive_page_view.dart';
 import '../constants.dart';
 import '../components/user_button.dart';
 import '../graphql/queries/user_title_ties.graphql.dart';
 import '../screens/show_video_screen.dart';
+import 'show_ad_screen.dart';
+import 'show_user_screen.dart';
 
 class ShowUserWatchedScreen extends StatefulWidget {
-  const ShowUserWatchedScreen({super.key, required this.username, this.extra});
+  const ShowUserWatchedScreen({super.key, required this.username, this.queryParams, this.extraParams});
 
   final String username;
-  final ShowUserWatchedExtra? extra;
+  final UserQueryParams? queryParams;
+  final UserExtraParams? extraParams;
+
+  int? get page => queryParams?.page;
 
   @override
   State<ShowUserWatchedScreen> createState() => _ShowUserWatchedScreenState();
@@ -26,17 +32,17 @@ class _ShowUserWatchedScreenState extends State<ShowUserWatchedScreen> {
   Widget _getWatchedVideos() {
     return Query$UserTitleTies$Widget(
       options: Options$Query$UserTitleTies(
-        typedOptimisticResult: widget.extra?.parsedData,
+        typedOptimisticResult: widget.extraParams?.parsedData,
         variables: Variables$Query$UserTitleTies(
           username: widget.username,
           isWatched: true,
-          first: widget.extra?.parsedData?.user?.titleTies.nodes.length ?? 12,
+          first: widget.extraParams?.parsedData?.user?.titleTies.nodes.length ?? 10,
         ),
       ),
       builder: (result, {fetchMore, refetch}) {
         final titleTies = result.parsedData?.user?.titleTies;
 
-        _pageController = PageController(initialPage: widget.extra?.page ?? 0);
+        _pageController = PageController(initialPage: widget.page ?? 0);
 
         return SensitivePageView(
           controller: _pageController,
@@ -61,6 +67,25 @@ class _ShowUserWatchedScreenState extends State<ShowUserWatchedScreen> {
 
                   fetchMoreResultData['user']['titleTies']['nodes'] = [
                     ...previousResultData?['user']['titleTies']['nodes'],
+                    ...Config.adUrl != null
+                        ? [
+                            {
+                              'id': 'ad',
+                              'title': {
+                                'id': 'ad',
+                                'mediaType': '',
+                                'name': '',
+                                'crew': {'nodes': [], '__typename': ''},
+                                'genres': {'nodes': [], '__typename': ''},
+                                'videos': {'nodes': [], '__typename': ''},
+                                'createdAt': DateTime.now().toIso8601String(),
+                                '__typename': '',
+                              },
+                              'createdAt': DateTime.now().toIso8601String(),
+                              '__typename': '',
+                            },
+                          ]
+                        : [],
                     ...fetchMoreResultData['user']['titleTies']['nodes']
                         .where(
                           (node) =>
@@ -72,9 +97,6 @@ class _ShowUserWatchedScreenState extends State<ShowUserWatchedScreen> {
                         .toList(),
                   ];
 
-                  fetchMoreResultData['user']['titleTies']['pageInfo']['startCursor'] =
-                      previousResultData?['user']['titleTies']['pageInfo']['startCursor'];
-
                   return fetchMoreResultData;
                 },
               ),
@@ -83,13 +105,19 @@ class _ShowUserWatchedScreenState extends State<ShowUserWatchedScreen> {
           itemBuilder: (context, index) {
             final title = titleTies!.nodes[index].title;
 
+            if (title.id == 'ad') {
+              return const ShowAdScreen();
+            }
+
             return ShowVideoScreen(
+              key: ValueKey(title.id),
               title: title,
               index: index,
               currentPage: _currentPage,
               onSeeMore: () => context.goNamed(
                 routeNameShowUserWatchedTitle,
                 pathParameters: {keyUsername: widget.username, keyTitleId: title.id},
+                queryParameters: widget.queryParams?.toMap() ?? {},
               ),
             );
           },
@@ -127,11 +155,4 @@ class _ShowUserWatchedScreenState extends State<ShowUserWatchedScreen> {
       body: _getWatchedVideos(),
     );
   }
-}
-
-class ShowUserWatchedExtra {
-  ShowUserWatchedExtra({required this.parsedData, required this.page});
-
-  final Query$UserTitleTies? parsedData;
-  final int page;
 }

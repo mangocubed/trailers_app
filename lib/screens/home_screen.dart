@@ -27,6 +27,7 @@ class HomeScreen extends StatefulWidget {
   List<String>? get genreIds => queryParams?.genreIds;
   List<String>? get watchProviderIds => queryParams?.watchProviderIds;
   String? get countryCode => queryParams?.countryCode;
+  int? get page => queryParams?.page;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -50,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
         fetchPolicy: FetchPolicy.noCache,
         typedOptimisticResult: widget.extraParams?.parsedData,
         variables: Variables$Query$Titles(
-          first: widget.extraParams?.parsedData?.titles.nodes.length ?? 12,
+          first: widget.extraParams?.parsedData?.titles.nodes.length ?? (widget.page ?? 0) + 10,
           query: widget.query,
           mediaType: widget.mediaType,
           genreIds: widget.genreIds,
@@ -63,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (result, {fetchMore, refetch}) {
         final titles = result.parsedData?.titles;
 
-        _pageController ??= PageController(initialPage: widget.extraParams?.page ?? 0);
+        _pageController ??= PageController(initialPage: widget.page ?? 0);
 
         if (result.parsedData == null && result.isLoading) {
           return const Center(child: CircularProgressIndicator());
@@ -153,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
             }
 
             return ShowVideoScreen(
-              key: Key(title.id),
+              key: ValueKey(title.id),
               index: index,
               currentPage: _currentPage,
               title: title,
@@ -180,18 +181,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
-  void didUpdateWidget(covariant HomeScreen oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.query != oldWidget.query) {
-      _queryController.text = widget.query ?? '';
-    }
-
-    if (widget.extraParams?.page != null && widget.extraParams?.page != _pageController?.page) {
-      _pageController?.jumpToPage(widget.extraParams?.page ?? 0);
-    }
-  }
-
-  @override
   void dispose() {
     _pageController?.dispose();
     _queryController.dispose();
@@ -215,6 +204,7 @@ class _HomeScreenState extends State<HomeScreen> {
             final queryParams = widget.queryParams!;
 
             queryParams.query = null;
+            queryParams.page = null;
 
             context.goNamed(routeNameHome, queryParameters: queryParams.toMap());
           },
@@ -247,13 +237,14 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class HomeQueryParams {
-  HomeQueryParams({this.query, this.mediaType, this.genreIds, this.watchProviderIds, this.countryCode});
+  HomeQueryParams({this.query, this.mediaType, this.genreIds, this.watchProviderIds, this.countryCode, this.page});
 
   String? query;
   Enum$TitleMediaType? mediaType;
   final List<String>? genreIds;
   final List<String>? watchProviderIds;
   final String? countryCode;
+  int? page;
 
   bool get hasQuery => query != null && query!.length > 1;
   bool get hasFilters => mediaType != null || genreIds != null || watchProviderIds != null;
@@ -264,6 +255,7 @@ class HomeQueryParams {
     final genreIds = value[keyGenreIds]?.split(',');
     final watchProviderIds = value[keyWatchProviderIds]?.split(',');
     final countryCode = value[keyCountryCode];
+    final page = int.tryParse(value[keyPage] ?? '');
 
     Enum$TitleMediaType? mediaType;
 
@@ -277,6 +269,7 @@ class HomeQueryParams {
       genreIds: genreIds,
       watchProviderIds: watchProviderIds,
       countryCode: countryCode,
+      page: page,
     );
   }
 
@@ -303,13 +296,16 @@ class HomeQueryParams {
       queryParams[keyCountryCode] = countryCode!;
     }
 
+    if (page != null) {
+      queryParams[keyPage] = page!.toString();
+    }
+
     return queryParams;
   }
 }
 
 class HomeExtraParams {
-  HomeExtraParams({required this.parsedData, required this.page});
+  HomeExtraParams({required this.parsedData});
 
   final Query$Titles? parsedData;
-  final int page;
 }

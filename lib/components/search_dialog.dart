@@ -167,8 +167,9 @@ class _SearchDialogBodyState extends State<_SearchDialogBody> {
                                                   genreIds: widget.queryParams?.genreIds,
                                                   watchProviderIds: widget.queryParams?.watchProviderIds,
                                                   countryCode: widget.queryParams?.countryCode,
+                                                  page: entry.key,
                                                 ).toMap(),
-                                                extra: HomeExtraParams(parsedData: result.parsedData, page: entry.key),
+                                                extra: HomeExtraParams(parsedData: result.parsedData),
                                               );
                                               context.pop();
                                             },
