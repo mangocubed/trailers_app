@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../config.dart';
 
@@ -30,7 +31,17 @@ class ShowAdScreen extends StatelessWidget {
                     verticalScrollBarEnabled: false,
                     overScrollMode: OverScrollMode.NEVER,
                     allowsBackForwardNavigationGestures: false,
+                    useShouldOverrideUrlLoading: true,
                   ),
+                  shouldOverrideUrlLoading: (controller, navigation) async {
+                    final url = navigation.request.url;
+
+                    if (url != null && (await canLaunchUrl(url))) {
+                      launchUrl(url, mode: LaunchMode.externalApplication);
+                    }
+
+                    return NavigationActionPolicy.CANCEL;
+                  },
                 ),
               ),
             ),
