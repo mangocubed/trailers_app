@@ -91,6 +91,8 @@ class _HomeScreenState extends State<HomeScreen> {
         return SensitivePageView(
           controller: _pageController!,
           onPageChanged: (int page) {
+            setState(() {});
+
             if (result.isLoading || titles!.nodes.length > page + 5) {
               return;
             }
