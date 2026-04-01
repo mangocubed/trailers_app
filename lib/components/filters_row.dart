@@ -29,6 +29,7 @@ class FiltersRow extends StatelessWidget {
           onSelected: (value) {},
           onDeleted: () {
             queryParams!.mediaType = null;
+            queryParams!.page = null;
 
             context.goNamed(routeNameHome, queryParameters: queryParams!.toMap());
           },
@@ -63,6 +64,7 @@ class FiltersRow extends StatelessWidget {
                           onSelected: (value) {},
                           onDeleted: () {
                             queryParams!.genreIds?.remove(genre.id);
+                            queryParams!.page = null;
 
                             context.goNamed(routeNameHome, queryParameters: queryParams!.toMap());
                           },
@@ -111,6 +113,7 @@ class FiltersRow extends StatelessWidget {
                           onSelected: (value) {},
                           onDeleted: () {
                             queryParams!.watchProviderIds?.remove(watchProvider.id);
+                            queryParams!.page = null;
 
                             context.goNamed(routeNameHome, queryParameters: queryParams!.toMap());
                           },

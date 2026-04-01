@@ -12,7 +12,6 @@ query UserTitleTies($username: String!, $after: UUID, $first: Int, $isBookmarked
             }
             pageInfo {
                 endCursor
-                startCursor
             }
         }
     }

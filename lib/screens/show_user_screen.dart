@@ -10,8 +10,6 @@ import '../constants.dart';
 import '../graphql/queries/user.graphql.dart';
 import '../graphql/queries/user_title_ties.graphql.dart';
 import '../screens/not_found_screen.dart';
-import '../screens/show_user_bookmarks_screen.dart';
-import '../screens/show_user_watched_screen.dart';
 
 class ShowUserScreen extends StatefulWidget {
   const ShowUserScreen({super.key, required this.username});
@@ -63,9 +61,6 @@ class _ShowUserScreenState extends State<ShowUserScreen> {
                   .toList(),
             ];
 
-            fetchMoreResultData['user']['titleTies']['pageInfo']['startCursor'] =
-                previousResultData?['user']['titleTies']['pageInfo']['startCursor'];
-
             return fetchMoreResultData;
           },
         ),
@@ -96,9 +91,6 @@ class _ShowUserScreenState extends State<ShowUserScreen> {
                   )
                   .toList(),
             ];
-
-            fetchMoreResultData['user']['titleTies']['pageInfo']['startCursor'] =
-                previousResultData?['user']['titleTies']['pageInfo']['startCursor'];
 
             return fetchMoreResultData;
           },
@@ -134,8 +126,9 @@ class _ShowUserScreenState extends State<ShowUserScreen> {
                         title: entry.value.title,
                         onTap: () => context.goNamed(
                           routeNameShowUserBookmarks,
+                          queryParameters: UserQueryParams(page: entry.key).toMap(),
                           pathParameters: {keyUsername: widget.username},
-                          extra: ShowUserBookmarksExtra(parsedData: result.parsedData, page: entry.key),
+                          extra: UserExtraParams(parsedData: result.parsedData),
                         ),
                       ),
                     )
@@ -174,8 +167,9 @@ class _ShowUserScreenState extends State<ShowUserScreen> {
                         title: entry.value.title,
                         onTap: () => context.goNamed(
                           routeNameShowUserWatched,
+                          queryParameters: UserQueryParams(page: entry.key).toMap(),
                           pathParameters: {keyUsername: widget.username},
-                          extra: ShowUserWatchedExtra(parsedData: result.parsedData, page: entry.key),
+                          extra: UserExtraParams(parsedData: result.parsedData),
                         ),
                       ),
                     )
@@ -221,6 +215,7 @@ class _ShowUserScreenState extends State<ShowUserScreen> {
           appBar: AppBar(
             foregroundColor: Colors.white,
             backgroundColor: Colors.transparent,
+            leading: BackButton(onPressed: () => context.goNamed(routeNameHome)),
             actions: [
               Padding(
                 padding: EdgeInsets.only(right: 12),
@@ -326,4 +321,32 @@ class _ShowUserScreenState extends State<ShowUserScreen> {
       },
     );
   }
+}
+
+class UserQueryParams {
+  UserQueryParams({this.page});
+
+  final int? page;
+
+  static UserQueryParams fromMap(Map<String, String> value) {
+    final page = int.tryParse(value[keyPage] ?? '');
+
+    return UserQueryParams(page: page);
+  }
+
+  Map<String, String> toMap() {
+    final Map<String, String> queryParams = {};
+
+    if (page != null) {
+      queryParams[keyPage] = page!.toString();
+    }
+
+    return queryParams;
+  }
+}
+
+class UserExtraParams {
+  UserExtraParams({required this.parsedData});
+
+  final Query$UserTitleTies? parsedData;
 }
