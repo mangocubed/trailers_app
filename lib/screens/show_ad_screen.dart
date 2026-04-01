@@ -33,8 +33,12 @@ class ShowAdScreen extends StatelessWidget {
                     allowsBackForwardNavigationGestures: false,
                     useShouldOverrideUrlLoading: true,
                   ),
-                  shouldOverrideUrlLoading: (controller, navigation) {
-                    launchUrl(navigation.request.url!, mode: LaunchMode.externalApplication);
+                  shouldOverrideUrlLoading: (controller, navigation) async {
+                    final url = navigation.request.url;
+
+                    if (url != null && (await canLaunchUrl(url))) {
+                      launchUrl(url, mode: LaunchMode.externalApplication);
+                    }
 
                     return NavigationActionPolicy.CANCEL;
                   },
