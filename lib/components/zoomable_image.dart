@@ -29,14 +29,9 @@ class ZoomableImage extends StatelessWidget {
                         context.pop();
                       },
                       child: Stack(
+                        alignment: AlignmentGeometry.center,
                         children: [
-                          Center(
-                            child: Image.network(
-                              url!.toString(),
-                              width: screenSize.width - 24,
-                              height: screenSize.height - 24,
-                            ),
-                          ),
+                          Image.network(url!.toString(), width: screenSize.width - 24, height: screenSize.height - 24),
                           Positioned(
                             top: 12,
                             right: 12,

@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:trailers/constants.dart';
+import 'package:trailers/graphql/fragments/video_fragment.graphql.dart';
 import 'package:video_player/video_player.dart';
 
 import '../components/current_user.dart';
@@ -25,12 +27,12 @@ class TitleVideo extends StatefulWidget {
 }
 
 class _TitleVideoState extends State<TitleVideo> with RouteAware {
-  VideoPlayerController? _videoPlayerController;
+  VideoPlayerController? _controller;
 
-  bool get _isReady => _videoPlayerController?.value.isInitialized ?? false;
-  bool get _isPlaying => _videoPlayerController?.value.isPlaying ?? false;
+  bool get _isReady => _controller?.value.isInitialized ?? false;
+  bool get _isPlaying => _controller?.value.isPlaying ?? false;
 
-  Fragment$TitleFragment$videos$nodes? get _video => widget.title.videos.nodes.firstOrNull;
+  Fragment$VideoFragment? get _video => widget.title.videos.nodes.firstOrNull;
 
   double get _thumbnailOpacity {
     if (_isReady) {
@@ -47,10 +49,10 @@ class _TitleVideoState extends State<TitleVideo> with RouteAware {
 
     final sourceUrl = _video!.hlsUrl != null && !kIsWeb ? _video!.hlsUrl! : _video!.url;
 
-    if (_videoPlayerController?.dataSource != sourceUrl.toString()) {
+    if (_controller?.dataSource != sourceUrl.toString()) {
       await _stop();
 
-      _videoPlayerController = VideoPlayerController.networkUrl(sourceUrl, viewType: VideoViewType.platformView)
+      _controller = VideoPlayerController.networkUrl(sourceUrl, viewType: VideoViewType.platformView)
         ..setLooping(true)
         ..addListener(() {
           if (mounted) {
@@ -60,23 +62,23 @@ class _TitleVideoState extends State<TitleVideo> with RouteAware {
     }
 
     if (!_isReady) {
-      _videoPlayerController?.initialize().then((_) {
+      _controller?.initialize().then((_) {
         if (mounted) {
           setState(() {});
         }
       });
     }
 
-    await _videoPlayerController?.play();
+    await _controller?.play();
   }
 
   Future<void> _pause() async {
-    await _videoPlayerController?.pause();
+    await _controller?.pause();
   }
 
   Future<void> _stop() async {
-    await _videoPlayerController?.dispose();
-    _videoPlayerController = null;
+    await _controller?.dispose();
+    _controller = null;
 
     if (mounted) {
       setState(() {});
@@ -96,11 +98,8 @@ class _TitleVideoState extends State<TitleVideo> with RouteAware {
       return const SizedBox();
     }
 
-    if (_videoPlayerController?.value.isInitialized == true) {
-      return AspectRatio(
-        aspectRatio: _videoPlayerController!.value.aspectRatio,
-        child: VideoPlayer(_videoPlayerController!),
-      );
+    if (_controller?.value.isInitialized == true) {
+      return AspectRatio(aspectRatio: _controller!.value.aspectRatio, child: VideoPlayer(_controller!));
     }
 
     return const CircularProgressIndicator();
@@ -198,7 +197,7 @@ class _TitleVideoState extends State<TitleVideo> with RouteAware {
                         child: Center(
                           child: Icon(
                             _isReady ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                            color: Color(0x999E9E9E),
+                            color: colorPlayIcon,
                             size: 128,
                           ),
                         ),
