@@ -28,11 +28,7 @@ fragment TitleFragment on TitleObject {
     }
     videos(first: 1) {
         nodes {
-            id
-            url
-            hlsUrl
-            createdAt
-            updatedAt
+            ...VideoFragment
         }
     }
     currentUserTie {

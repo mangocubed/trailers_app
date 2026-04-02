@@ -1,12 +1,16 @@
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:trailers/components/ad_banner.dart';
 
+import '../components/video_dialog.dart';
 import '../components/current_user.dart';
 import '../components/action_buttons.dart';
 import '../components/genre_chip.dart';
 import '../components/title_basic_info.dart';
 import '../components/zoomable_image.dart';
+import '../constants.dart';
+import '../graphql/fragments/video_fragment.graphql.dart';
 import '../graphql/queries/title.graphql.dart';
 import '../graphql/queries/title_watch_providers.graphql.dart';
 import '../screens/not_found_screen.dart';
@@ -186,6 +190,48 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
     );
   }
 
+  Widget _getTrailer(Fragment$VideoFragment? video) {
+    if (video == null) {
+      return const SizedBox();
+    }
+
+    return Column(
+      children: [
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 14),
+          width: double.infinity,
+          child: Text(
+            'Trailer',
+            style: GoogleFonts.blackHanSans(
+              textStyle: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w400,
+                color: Colors.white,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        InkWell(
+          onTap: () {
+            showVideoDialog(context: context, video: video);
+          },
+          child: Container(
+            alignment: Alignment.center,
+            constraints: BoxConstraints(maxWidth: 320),
+            color: Colors.black,
+            child: AspectRatio(
+              aspectRatio: 16 / 9,
+              child: Center(child: Icon(Icons.play_arrow_rounded, color: colorPlayIcon, size: 96)),
+            ),
+          ),
+        ),
+        const SizedBox(height: 32),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Query$Title$Widget(
@@ -279,6 +325,9 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
                   ),
                 ),
                 _getCast(title.cast),
+                _getTrailer(title.videos.nodes.first),
+                AdBanner(compact: true),
+                const SizedBox(height: 32),
               ],
             ),
           ),
