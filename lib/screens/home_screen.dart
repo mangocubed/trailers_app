@@ -9,12 +9,12 @@ import '../components/search_field.dart';
 import '../config.dart';
 import '../graphql/schema.graphql.dart';
 import '../components/titles_filter_dialog.dart';
+import '../components/title_video.dart';
 import '../components/sentitive_page_view.dart';
 import '../components/user_button.dart';
 import '../constants.dart';
 import '../graphql/queries/titles.graphql.dart';
-import 'show_ad_screen.dart';
-import 'show_video_screen.dart';
+import '../components/ad_banner.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, this.queryParams, this.extraParams});
@@ -150,13 +150,12 @@ class _HomeScreenState extends State<HomeScreen> {
             final title = titles!.nodes[index];
 
             if (title.id == 'ad') {
-              return const ShowAdScreen();
+              return const AdBanner();
             }
 
-            return ShowVideoScreen(
+            return TitleVideo(
               key: ValueKey(title.id),
-              index: index,
-              currentPage: _currentPage,
+              isActive: index == _currentPage,
               title: title,
               countryCode: widget.countryCode,
               onSeeMore: () {

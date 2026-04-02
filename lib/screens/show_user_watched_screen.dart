@@ -3,12 +3,12 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:trailers/config.dart';
 
+import '../components/ad_banner.dart';
 import '../components/sentitive_page_view.dart';
-import '../constants.dart';
+import '../components/title_video.dart';
 import '../components/user_button.dart';
+import '../constants.dart';
 import '../graphql/queries/user_title_ties.graphql.dart';
-import '../screens/show_video_screen.dart';
-import 'show_ad_screen.dart';
 import 'show_user_screen.dart';
 
 class ShowUserWatchedScreen extends StatefulWidget {
@@ -106,14 +106,13 @@ class _ShowUserWatchedScreenState extends State<ShowUserWatchedScreen> {
             final title = titleTies!.nodes[index].title;
 
             if (title.id == 'ad') {
-              return const ShowAdScreen();
+              return const AdBanner();
             }
 
-            return ShowVideoScreen(
+            return TitleVideo(
               key: ValueKey(title.id),
               title: title,
-              index: index,
-              currentPage: _currentPage,
+              isActive: index == _currentPage,
               onSeeMore: () => context.goNamed(
                 routeNameShowUserWatchedTitle,
                 pathParameters: {keyUsername: widget.username, keyTitleId: title.id},
