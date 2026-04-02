@@ -267,7 +267,7 @@ class _ShowUserScreenState extends State<ShowUserScreen> {
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(32),
-                        border: Border.all(color: const Color(0xFFC3D350)),
+                        border: Border.all(color: colorGenreChip),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -278,14 +278,14 @@ class _ShowUserScreenState extends State<ShowUserScreen> {
                               onPressed: () => setState(() => _isInWatched = false),
                               style: OutlinedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
-                                side: const BorderSide(color: Color(0xFFC3D350)),
+                                side: const BorderSide(color: colorGenreChip),
                                 backgroundColor: !_isInWatched ? const Color(0x66C3D350) : null,
-                                foregroundColor: const Color(0xFFC3D350),
+                                foregroundColor: colorGenreChip,
                               ),
                               label: Text('Bookmarks'),
                               icon: SvgPicture.asset(
                                 'assets/bookmark.svg',
-                                colorFilter: const ColorFilter.mode(Color(0xFFC3D350), BlendMode.srcIn),
+                                colorFilter: const ColorFilter.mode(colorGenreChip, BlendMode.srcIn),
                               ),
                             ),
                           ),
@@ -296,14 +296,14 @@ class _ShowUserScreenState extends State<ShowUserScreen> {
                               onPressed: () => setState(() => _isInWatched = true),
                               style: OutlinedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
-                                side: const BorderSide(color: Color(0xFFC3D350)),
+                                side: const BorderSide(color: colorGenreChip),
                                 backgroundColor: _isInWatched ? const Color(0x66C3D350) : null,
-                                foregroundColor: const Color(0xFFC3D350),
+                                foregroundColor: colorGenreChip,
                               ),
                               label: Text('Watched'),
                               icon: SvgPicture.asset(
                                 'assets/watched.svg',
-                                colorFilter: const ColorFilter.mode(Color(0xFFC3D350), BlendMode.srcIn),
+                                colorFilter: const ColorFilter.mode(colorGenreChip, BlendMode.srcIn),
                               ),
                             ),
                           ),

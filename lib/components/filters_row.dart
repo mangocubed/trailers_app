@@ -55,11 +55,11 @@ class FiltersRow extends StatelessWidget {
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                             color: WidgetStateColor.resolveWith((state) {
-                              return state.contains(WidgetState.selected) ? Colors.black : Color(0xFFC3D350);
+                              return state.contains(WidgetState.selected) ? Colors.black : colorGenreChip;
                             }),
                           ),
-                          side: BorderSide(color: Color(0xFFC3D350)),
-                          selectedColor: Color(0xFFC3D350),
+                          side: BorderSide(color: colorGenreChip),
+                          selectedColor: colorGenreChip,
                           selected: true,
                           onSelected: (value) {},
                           onDeleted: () {

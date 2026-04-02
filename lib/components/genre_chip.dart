@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../constants.dart';
+
 class GenreChip extends StatelessWidget {
   const GenreChip({super.key, required this.name});
 
@@ -12,12 +14,12 @@ class GenreChip extends StatelessWidget {
       margin: const EdgeInsets.only(right: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFC3D350)),
+        border: Border.all(color: colorGenreChip),
       ),
       child: Text(
         name,
         overflow: TextOverflow.ellipsis,
-        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFFC3D350)),
+        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: colorGenreChip),
       ),
     );
   }

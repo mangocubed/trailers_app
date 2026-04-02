@@ -1,3 +1,10 @@
+import 'package:flutter/material.dart';
+
+const colorChip = Color(0xFFDBFCFF);
+const colorGenreChip = Color(0xFFC3D350);
+const colorPrimary = Color(0xFFFC7753);
+const colorTranslucent = Color(0x22000000);
+
 const keyAccessToken = 'access_token';
 const keyGenreIds = 'genre_ids';
 const keyMediaType = 'media_type';
