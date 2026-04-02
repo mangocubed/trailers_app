@@ -1,42 +1,30 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:video_player/video_player.dart';
 
 import '../components/current_user.dart';
-import '../utils.dart';
 import '../components/action_buttons.dart';
 import '../components/genre_chip.dart';
 import '../components/title_basic_info.dart';
-import '../constants.dart';
 import '../graphql/fragments/title_fragment.graphql.dart';
 import '../graphql/queries/title_watch_providers.graphql.dart';
 import '../router.dart';
+import '../utils.dart';
 
-class ShowVideoScreen extends StatefulWidget {
-  const ShowVideoScreen({
-    super.key,
-    required this.title,
-    required this.index,
-    required this.currentPage,
-    this.countryCode,
-    this.onUpdated,
-    this.onSeeMore,
-  });
+class TitleVideo extends StatefulWidget {
+  const TitleVideo({super.key, required this.title, required this.isActive, required this.onSeeMore, this.countryCode});
 
-  final int index;
-  final int currentPage;
+  final bool isActive;
   final Fragment$TitleFragment title;
+  final void Function() onSeeMore;
   final String? countryCode;
-  final void Function()? onUpdated;
-  final void Function()? onSeeMore;
 
   @override
-  createState() => _ShowVideoScreenState();
+  createState() => _TitleVideoState();
 }
 
-class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
+class _TitleVideoState extends State<TitleVideo> with RouteAware {
   VideoPlayerController? _videoPlayerController;
 
   bool get _isReady => _videoPlayerController?.value.isInitialized ?? false;
@@ -122,20 +110,20 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
   void initState() {
     super.initState();
 
-    if (widget.index == widget.currentPage) {
+    if (widget.isActive) {
       _play();
       createUserTitleTie(context, widget.title);
     }
   }
 
   @override
-  didUpdateWidget(ShowVideoScreen oldWidget) {
+  didUpdateWidget(TitleVideo oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (ModalRoute.of(context)?.isCurrent == true && widget.index == widget.currentPage) {
+    if (ModalRoute.of(context)?.isCurrent == true && widget.isActive) {
       _play();
       createUserTitleTie(context, widget.title);
-    } else if (ModalRoute.of(context)?.isCurrent != true && widget.index == widget.currentPage) {
+    } else if (ModalRoute.of(context)?.isCurrent != true && widget.isActive) {
       _pause();
     } else {
       _stop();
@@ -160,7 +148,7 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
 
   @override
   void didPopNext() {
-    if (widget.index == widget.currentPage) {
+    if (widget.isActive) {
       _play();
       createUserTitleTie(context, widget.title);
     }
@@ -334,12 +322,8 @@ class _ShowVideoScreenState extends State<ShowVideoScreen> with RouteAware {
                         width: double.infinity,
                         child: FilledButton(
                           onPressed: () {
-                            if (widget.onSeeMore != null) {
-                              widget.onSeeMore?.call();
-                              return;
-                            }
-
-                            context.goNamed(routeNameShowTitle, pathParameters: {keyTitleId: widget.title.id});
+                            widget.onSeeMore.call();
+                            return;
                           },
                           child: Text('MORE DETAILS'),
                         ),

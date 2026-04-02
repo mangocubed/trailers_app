@@ -4,8 +4,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../config.dart';
 
-class ShowAdScreen extends StatelessWidget {
-  const ShowAdScreen({super.key});
+class AdBanner extends StatelessWidget {
+  const AdBanner({super.key});
 
   @override
   Widget build(BuildContext context) {
