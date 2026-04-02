@@ -57,14 +57,14 @@ class App extends StatelessWidget {
             ),
           ),
           outlinedButtonTheme: OutlinedButtonThemeData(
-            style: FilledButton.styleFrom(
+            style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.all(20),
               textStyle: GoogleFonts.amiko(fontSize: 14, fontWeight: FontWeight.w700),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
           ),
           textButtonTheme: TextButtonThemeData(
-            style: FilledButton.styleFrom(
+            style: TextButton.styleFrom(
               padding: const EdgeInsets.all(20),
               textStyle: GoogleFonts.amiko(fontSize: 14, fontWeight: FontWeight.w700),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
