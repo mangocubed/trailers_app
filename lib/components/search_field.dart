@@ -53,7 +53,7 @@ class _SearchFieldState extends State<SearchField> {
         ),
         contentPadding: const EdgeInsets.only(top: 8, right: 8, bottom: 8, left: 16),
         suffixIcon: widget.controller.text.isNotEmpty
-            ? GestureDetector(
+            ? InkWell(
                 onTap: () {
                   widget.controller.clear();
                   widget.onClear?.call();

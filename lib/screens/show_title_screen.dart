@@ -1,13 +1,14 @@
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:trailers/graphql/queries/title_watch_providers.graphql.dart';
 
 import '../components/current_user.dart';
 import '../components/action_buttons.dart';
 import '../components/genre_chip.dart';
 import '../components/title_basic_info.dart';
+import '../components/zoomable_image.dart';
 import '../graphql/queries/title.graphql.dart';
+import '../graphql/queries/title_watch_providers.graphql.dart';
 import '../screens/not_found_screen.dart';
 import '../utils.dart';
 
@@ -158,14 +159,12 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
                           backgroundColor: Colors.white,
                           radius: 40,
                           child: ClipOval(
-                            child: cast.person.profileImageUrl != null
-                                ? Image.network(
-                                    cast.person.profileImageUrl.toString(),
-                                    width: 71,
-                                    height: 71,
-                                    fit: BoxFit.cover,
-                                  )
-                                : const SizedBox(),
+                            child: ZoomableImage(
+                              url: cast.person.profileImageUrl,
+                              width: 71,
+                              height: 71,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -217,9 +216,7 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
                   margin: const EdgeInsets.only(right: 14, bottom: 32, left: 14),
                   child: Column(
                     children: [
-                      title.posterImageUrl != null
-                          ? Image.network(title.posterImageUrl.toString(), width: 200)
-                          : const SizedBox(),
+                      ZoomableImage(url: title.posterImageUrl, width: 200),
                       const SizedBox(height: 12),
                       ActionButtons(direction: Axis.horizontal, titleId: title.id),
                       const SizedBox(height: 12),
