@@ -275,11 +275,11 @@ class _TitlesFilterDialogBodyState extends State<_TitlesFilterDialogBody> {
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
                                 color: WidgetStateColor.resolveWith((state) {
-                                  return state.contains(WidgetState.selected) ? Colors.black : Color(0xFFC3D350);
+                                  return state.contains(WidgetState.selected) ? Colors.black : colorGenreChip;
                                 }),
                               ),
-                              side: BorderSide(color: Color(0xFFC3D350)),
-                              selectedColor: Color(0xFFC3D350),
+                              side: BorderSide(color: colorGenreChip),
+                              selectedColor: colorGenreChip,
                               selected: _genreIds?.contains(genre.id) ?? false,
                               onSelected: (value) {
                                 _genreIds ??= [];

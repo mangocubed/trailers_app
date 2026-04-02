@@ -4,6 +4,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../components/screen_lifecycle.dart';
 import '../config.dart';
+import '../constants.dart';
 import '../graphql/fragments/user_title_tie_fragment.graphql.dart';
 import '../graphql/mutations/update_bookmark.graphql.dart';
 import '../graphql/mutations/update_like.graphql.dart';
@@ -93,8 +94,8 @@ class ActionButtons extends StatelessWidget {
             }
           },
           child: Container(
-            decoration: BoxDecoration(color: const Color(0x22000000), borderRadius: BorderRadius.circular(24)),
-            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(color: colorTranslucent, borderRadius: BorderRadius.circular(24)),
+            padding: const EdgeInsets.all(4),
             child: Flex(
               mainAxisSize: MainAxisSize.min,
               spacing: 8,

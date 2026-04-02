@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
+import 'constants.dart';
 import 'graphql_client.dart';
 import 'router.dart';
 
@@ -41,7 +42,7 @@ class App extends StatelessWidget {
         scrollBehavior: const MobileLikeScrollBehavior(),
         themeMode: ThemeMode.dark,
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Color(0xffFC7753), brightness: Brightness.dark),
+          colorScheme: ColorScheme.fromSeed(seedColor: colorPrimary, brightness: Brightness.dark),
           useMaterial3: true,
           textTheme: TextTheme(
             bodyLarge: GoogleFonts.amiko(fontSize: 18, fontWeight: FontWeight.w400, color: Colors.white),
@@ -52,7 +53,7 @@ class App extends StatelessWidget {
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.all(20),
               textStyle: GoogleFonts.amiko(fontSize: 14, fontWeight: FontWeight.w700),
-              backgroundColor: const Color(0xffFC7753),
+              backgroundColor: colorPrimary,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
           ),
@@ -73,9 +74,9 @@ class App extends StatelessWidget {
           chipTheme: ChipThemeData(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.0)),
             labelPadding: const EdgeInsets.all(4),
-            side: BorderSide(color: Color(0xFFDBFCFF)),
+            side: BorderSide(color: colorChip),
             brightness: Brightness.dark,
-            selectedColor: Color(0xFFDBFCFF),
+            selectedColor: colorChip,
             backgroundColor: Colors.transparent,
             checkmarkColor: Colors.black,
             deleteIconColor: Colors.black,
@@ -83,7 +84,7 @@ class App extends StatelessWidget {
               fontSize: 13,
               fontWeight: FontWeight.w600,
               color: WidgetStateColor.resolveWith((state) {
-                return state.contains(WidgetState.selected) ? Colors.black : Color(0xFFDBFCFF);
+                return state.contains(WidgetState.selected) ? Colors.black : colorChip;
               }),
             ),
           ),

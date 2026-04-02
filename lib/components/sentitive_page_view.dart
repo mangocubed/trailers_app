@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:trailers/constants.dart';
 
 class SensitivePhysics extends BouncingScrollPhysics {
   const SensitivePhysics({super.parent});
@@ -95,8 +96,8 @@ class _SensitivePageViewState extends State<SensitivePageView> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 6),
                 child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(color: const Color(0x22000000), borderRadius: BorderRadius.circular(24)),
+                  decoration: BoxDecoration(color: colorTranslucent, borderRadius: BorderRadius.circular(24)),
+                  padding: const EdgeInsets.all(4),
                   child: Column(
                     spacing: 8,
                     mainAxisSize: MainAxisSize.min,
