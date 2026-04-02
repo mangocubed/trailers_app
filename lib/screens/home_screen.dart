@@ -193,7 +193,8 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: Colors.black,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: const Color(0x22000000),
+        scrolledUnderElevation: 0,
         title: SearchField(
           controller: _queryController,
           readOnly: true,

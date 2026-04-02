@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -67,19 +69,67 @@ class _SensitivePageViewState extends State<SensitivePageView> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final isMobile = min(size.width, size.height) < 600;
+
     return NotificationListener<ScrollEndNotification>(
       onNotification: (ScrollEndNotification notification) {
         widget.onPageChanged(_currentPage);
 
         return true;
       },
-      child: PageView.builder(
-        controller: widget.controller,
-        allowImplicitScrolling: true,
-        scrollDirection: Axis.vertical,
-        physics: SensitivePhysics(),
-        itemCount: widget.itemCount,
-        itemBuilder: widget.itemBuilder,
+      child: Stack(
+        children: [
+          PageView.builder(
+            controller: widget.controller,
+            allowImplicitScrolling: true,
+            scrollDirection: Axis.vertical,
+            physics: SensitivePhysics(),
+            itemCount: widget.itemCount,
+            itemBuilder: widget.itemBuilder,
+          ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Visibility(
+              visible: !isMobile,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 6),
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(color: const Color(0x22000000), borderRadius: BorderRadius.circular(24)),
+                  child: Column(
+                    spacing: 8,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.arrow_upward_rounded),
+                        disabledColor: Colors.grey,
+                        color: Colors.white,
+                        tooltip: 'Previous',
+                        onPressed: widget.controller.positions.isNotEmpty && (widget.controller.page ?? 0) > 0
+                            ? () {
+                                widget.controller.previousPage(
+                                  duration: Duration(milliseconds: 300),
+                                  curve: Curves.easeInOut,
+                                );
+                              }
+                            : null,
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.arrow_downward_rounded),
+                        color: Colors.white,
+                        tooltip: 'Next',
+                        onPressed: () {
+                          widget.controller.nextPage(duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
