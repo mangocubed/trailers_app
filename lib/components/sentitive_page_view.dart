@@ -102,6 +102,7 @@ class _SensitivePageViewState extends State<SensitivePageView> with RouteAware {
   @override
   void dispose() {
     ServicesBinding.instance.keyboard.removeHandler(_onKeyDown);
+    routeObserver.unsubscribe(this);
     _isActive = false;
     super.dispose();
   }

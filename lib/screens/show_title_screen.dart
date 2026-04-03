@@ -325,7 +325,7 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
                   ),
                 ),
                 _getCast(title.cast),
-                _getTrailer(title.videos.nodes.first),
+                _getTrailer(title.videos.nodes.firstOrNull),
                 AdBanner(compact: true),
                 const SizedBox(height: 32),
               ],
