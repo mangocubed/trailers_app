@@ -68,6 +68,10 @@ class _TitlePageItemState extends State<TitlePageItem> {
     if (oldWidget.isActive != widget.isActive) {
       _isInitialized = false;
       _play = widget.isActive;
+
+      if (widget.isActive) {
+        createUserTitleTie(context, widget.title);
+      }
     }
   }
 
