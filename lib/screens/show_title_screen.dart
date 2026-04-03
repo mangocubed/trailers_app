@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:trailers/components/ad_banner.dart';
 
-import '../components/video_dialog.dart';
+import '../components/video_player_dialog.dart';
 import '../components/current_user.dart';
 import '../components/action_buttons.dart';
 import '../components/genre_chip.dart';
@@ -215,7 +215,7 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
         const SizedBox(height: 8),
         InkWell(
           onTap: () {
-            showVideoDialog(context: context, video: video);
+            showVideoPlayerDialog(context: context, video: video);
           },
           child: Container(
             alignment: Alignment.center,

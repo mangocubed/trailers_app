@@ -5,7 +5,7 @@ import 'package:trailers/config.dart';
 
 import '../components/ad_banner.dart';
 import '../components/sentitive_page_view.dart';
-import '../components/title_video.dart';
+import '../components/title_page_item.dart';
 import '../components/user_button.dart';
 import '../constants.dart';
 import '../graphql/queries/user_title_ties.graphql.dart';
@@ -27,8 +27,6 @@ class ShowUserWatchedScreen extends StatefulWidget {
 class _ShowUserWatchedScreenState extends State<ShowUserWatchedScreen> {
   late PageController _pageController;
 
-  int get _currentPage => _pageController.page?.round() ?? 0;
-
   Widget _getWatchedVideos() {
     return Query$UserTitleTies$Widget(
       options: Options$Query$UserTitleTies(
@@ -49,7 +47,7 @@ class _ShowUserWatchedScreenState extends State<ShowUserWatchedScreen> {
           onPageChanged: (page) {
             setState(() {});
 
-            if (result.isLoading || (titleTies?.nodes.length ?? 0) > _currentPage + 5) {
+            if (result.isLoading || (titleTies?.nodes.length ?? 0) > page + 5) {
               return;
             }
 
@@ -102,17 +100,17 @@ class _ShowUserWatchedScreenState extends State<ShowUserWatchedScreen> {
               ),
             );
           },
-          itemBuilder: (context, index) {
+          itemBuilder: (context, index, isActive) {
             final title = titleTies!.nodes[index].title;
 
             if (title.id == 'ad') {
               return const AdBanner();
             }
 
-            return TitleVideo(
+            return TitlePageItem(
               key: ValueKey(title.id),
               title: title,
-              isActive: index == _currentPage,
+              isActive: isActive,
               onSeeMore: () => context.goNamed(
                 routeNameShowUserWatchedTitle,
                 pathParameters: {keyUsername: widget.username, keyTitleId: title.id},

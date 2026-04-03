@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:trailers/constants.dart';
 
+import '../router.dart';
+
 class SensitivePhysics extends BouncingScrollPhysics {
   const SensitivePhysics({super.parent});
 
@@ -26,7 +28,7 @@ class SensitivePageView extends StatefulWidget {
   });
 
   final PageController controller;
-  final Widget Function(BuildContext, int) itemBuilder;
+  final Widget Function(BuildContext context, int index, bool isActive) itemBuilder;
   final int? itemCount;
   final void Function(int) onPageChanged;
 
@@ -34,7 +36,9 @@ class SensitivePageView extends StatefulWidget {
   State<SensitivePageView> createState() => _SensitivePageViewState();
 }
 
-class _SensitivePageViewState extends State<SensitivePageView> {
+class _SensitivePageViewState extends State<SensitivePageView> with RouteAware {
+  bool _isActive = false;
+
   int get _currentPage => widget.controller.page?.round() ?? 0;
 
   bool _onKeyDown(KeyEvent event) {
@@ -57,14 +61,48 @@ class _SensitivePageViewState extends State<SensitivePageView> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final currentRoute = ModalRoute.of(context);
+
+    if (currentRoute != null) {
+      routeObserver.subscribe(this, currentRoute);
+    }
+  }
+
+  @override
+  void didPushNext() {
+    setState(() {
+      _isActive = false;
+    });
+  }
+
+  @override
+  void didPopNext() {
+    setState(() {
+      _isActive = true;
+    });
+  }
+
+  @override
+  didUpdateWidget(oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    _isActive = ModalRoute.of(context)?.isCurrent == true;
+  }
+
+  @override
   void initState() {
     super.initState();
+    _isActive = true;
     ServicesBinding.instance.keyboard.addHandler(_onKeyDown);
   }
 
   @override
   void dispose() {
     ServicesBinding.instance.keyboard.removeHandler(_onKeyDown);
+    _isActive = false;
     super.dispose();
   }
 
@@ -87,7 +125,7 @@ class _SensitivePageViewState extends State<SensitivePageView> {
             scrollDirection: Axis.vertical,
             physics: SensitivePhysics(),
             itemCount: widget.itemCount,
-            itemBuilder: widget.itemBuilder,
+            itemBuilder: (context, index) => widget.itemBuilder(context, index, _isActive && _currentPage == index),
           ),
           Align(
             alignment: Alignment.centerLeft,

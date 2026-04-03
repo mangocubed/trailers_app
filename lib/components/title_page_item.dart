@@ -1,21 +1,25 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:trailers/constants.dart';
-import 'package:trailers/graphql/fragments/video_fragment.graphql.dart';
-import 'package:video_player/video_player.dart';
 
 import '../components/current_user.dart';
 import '../components/action_buttons.dart';
 import '../components/genre_chip.dart';
 import '../components/title_basic_info.dart';
 import '../graphql/fragments/title_fragment.graphql.dart';
+import '../graphql/fragments/video_fragment.graphql.dart';
 import '../graphql/queries/title_watch_providers.graphql.dart';
-import '../router.dart';
+import '../constants.dart';
 import '../utils.dart';
+import 'title_video_player.dart';
 
-class TitleVideo extends StatefulWidget {
-  const TitleVideo({super.key, required this.title, required this.isActive, required this.onSeeMore, this.countryCode});
+class TitlePageItem extends StatefulWidget {
+  const TitlePageItem({
+    super.key,
+    required this.title,
+    required this.isActive,
+    required this.onSeeMore,
+    this.countryCode,
+  });
 
   final bool isActive;
   final Fragment$TitleFragment title;
@@ -23,141 +27,54 @@ class TitleVideo extends StatefulWidget {
   final String? countryCode;
 
   @override
-  createState() => _TitleVideoState();
+  createState() => _TitlePageItemState();
 }
 
-class _TitleVideoState extends State<TitleVideo> with RouteAware {
-  VideoPlayerController? _controller;
-
-  bool get _isReady => _controller?.value.isInitialized ?? false;
-  bool get _isPlaying => _controller?.value.isPlaying ?? false;
+class _TitlePageItemState extends State<TitlePageItem> {
+  bool _isInitialized = false;
+  bool _play = false;
 
   Fragment$VideoFragment? get _video => widget.title.videos.nodes.firstOrNull;
 
   double get _thumbnailOpacity {
-    if (_isReady) {
+    if (_isInitialized) {
       return 0.0;
     } else {
       return 1.0;
     }
   }
 
-  Future<void> _play() async {
-    if (_video == null) {
-      return;
-    }
-
-    final sourceUrl = _video!.hlsUrl != null && !kIsWeb ? _video!.hlsUrl! : _video!.url;
-
-    if (_controller?.dataSource != sourceUrl.toString()) {
-      await _stop();
-
-      _controller = VideoPlayerController.networkUrl(sourceUrl, viewType: VideoViewType.platformView)
-        ..setLooping(true)
-        ..addListener(() {
-          if (mounted) {
-            setState(() {});
-          }
-        });
-    }
-
-    if (!_isReady) {
-      _controller?.initialize().then((_) {
-        if (mounted) {
-          setState(() {});
-        }
-      });
-    }
-
-    await _controller?.play();
-  }
-
-  Future<void> _pause() async {
-    await _controller?.pause();
-  }
-
-  Future<void> _stop() async {
-    await _controller?.dispose();
-    _controller = null;
-
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
   void _togglePlayPause() async {
-    if (_isPlaying) {
-      _pause();
-    } else {
-      _play();
-    }
-  }
-
-  Widget _getVideoPlayer() {
-    if (_video == null) {
-      return const SizedBox();
-    }
-
-    if (_controller?.value.isInitialized == true) {
-      return AspectRatio(aspectRatio: _controller!.value.aspectRatio, child: VideoPlayer(_controller!));
-    }
-
-    return const CircularProgressIndicator();
+    setState(() {
+      _play = !_isInitialized || !_play;
+    });
   }
 
   @override
   void initState() {
     super.initState();
 
+    _play = widget.isActive;
+
     if (widget.isActive) {
-      _play();
       createUserTitleTie(context, widget.title);
     }
   }
 
   @override
-  didUpdateWidget(TitleVideo oldWidget) {
+  didUpdateWidget(TitlePageItem oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (ModalRoute.of(context)?.isCurrent == true && widget.isActive) {
-      _play();
-      createUserTitleTie(context, widget.title);
-    } else if (ModalRoute.of(context)?.isCurrent != true && widget.isActive) {
-      _pause();
-    } else {
-      _stop();
-    }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    final currentRoute = ModalRoute.of(context);
-
-    if (currentRoute != null) {
-      routeObserver.subscribe(this, currentRoute);
-    }
-  }
-
-  @override
-  void didPushNext() {
-    _stop();
-  }
-
-  @override
-  void didPopNext() {
-    if (widget.isActive) {
-      _play();
-      createUserTitleTie(context, widget.title);
+    if (oldWidget.isActive != widget.isActive) {
+      _isInitialized = false;
+      _play = widget.isActive;
     }
   }
 
   @override
   void dispose() {
-    _stop();
-
-    routeObserver.unsubscribe(this);
+    _isInitialized = false;
+    _play = false;
 
     super.dispose();
   }
@@ -172,7 +89,21 @@ class _TitleVideoState extends State<TitleVideo> with RouteAware {
         Stack(
           children: [
             Center(
-              child: OverflowBox(maxWidth: double.infinity, maxHeight: screenSize.height, child: _getVideoPlayer()),
+              child: OverflowBox(
+                maxWidth: double.infinity,
+                maxHeight: screenSize.height,
+                child: widget.isActive && _video != null
+                    ? TitleVideoPlayer(
+                        video: _video!,
+                        play: _play,
+                        onInitialize: () {
+                          setState(() {
+                            _isInitialized = true;
+                          });
+                        },
+                      )
+                    : SizedBox(),
+              ),
             ),
             widget.title.posterImageUrl != null
                 ? AnimatedOpacity(
@@ -193,10 +124,10 @@ class _TitleVideoState extends State<TitleVideo> with RouteAware {
                       width: double.infinity,
                       height: double.infinity,
                       child: Visibility(
-                        visible: !_isPlaying,
+                        visible: !_isInitialized || !_play,
                         child: Center(
                           child: Icon(
-                            _isReady ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                            _isInitialized ? Icons.pause_rounded : Icons.play_arrow_rounded,
                             color: colorPlayIcon,
                             size: 128,
                           ),
