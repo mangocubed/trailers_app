@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../components/ad_banner.dart';
 import '../components/sentitive_page_view.dart';
-import '../components/title_video.dart';
+import '../components/title_page_item.dart';
 import '../components/user_button.dart';
 import '../config.dart';
 import '../constants.dart';
@@ -26,8 +26,6 @@ class ShowUserBookmarksScreen extends StatefulWidget {
 
 class _ShowUserBookmarksScreenState extends State<ShowUserBookmarksScreen> {
   late PageController _pageController;
-
-  int get _currentPage => _pageController.page?.round() ?? 0;
 
   Widget _getBookmarksVideos() {
     return Query$UserTitleTies$Widget(
@@ -102,17 +100,17 @@ class _ShowUserBookmarksScreenState extends State<ShowUserBookmarksScreen> {
               ),
             );
           },
-          itemBuilder: (context, index) {
+          itemBuilder: (context, index, isActive) {
             final title = titleTies!.nodes[index].title;
 
             if (title.id == 'ad') {
               return const AdBanner();
             }
 
-            return TitleVideo(
+            return TitlePageItem(
               key: ValueKey(title.id),
               title: title,
-              isActive: index == _currentPage,
+              isActive: isActive,
               onSeeMore: () => context.goNamed(
                 routeNameShowUserBookmarksTitle,
                 pathParameters: {keyUsername: widget.username, keyTitleId: title.id},

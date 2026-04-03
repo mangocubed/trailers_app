@@ -9,7 +9,7 @@ import '../components/search_field.dart';
 import '../config.dart';
 import '../graphql/schema.graphql.dart';
 import '../components/titles_filter_dialog.dart';
-import '../components/title_video.dart';
+import '../components/title_page_item.dart';
 import '../components/sentitive_page_view.dart';
 import '../components/user_button.dart';
 import '../constants.dart';
@@ -36,8 +36,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   PageController? _pageController;
   final _queryController = TextEditingController();
-
-  int get _currentPage => _pageController?.page?.round() ?? 0;
 
   bool get _hasFilters => widget.queryParams?.hasFilters == true;
 
@@ -146,16 +144,16 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           },
 
-          itemBuilder: (context, index) {
+          itemBuilder: (context, index, isActive) {
             final title = titles!.nodes[index];
 
             if (title.id == 'ad') {
               return const AdBanner();
             }
 
-            return TitleVideo(
+            return TitlePageItem(
               key: ValueKey(title.id),
-              isActive: index == _currentPage,
+              isActive: isActive,
               title: title,
               countryCode: widget.countryCode,
               onSeeMore: () {
