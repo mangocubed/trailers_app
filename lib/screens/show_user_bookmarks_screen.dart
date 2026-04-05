@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../components/ad_banner.dart';
+import '../components/screen_title.dart';
 import '../components/sentitive_page_view.dart';
 import '../components/title_page_item.dart';
 import '../components/user_button.dart';
@@ -108,7 +109,7 @@ class _ShowUserBookmarksScreenState extends State<ShowUserBookmarksScreen> {
             }
 
             return TitlePageItem(
-              key: ValueKey(title.id),
+              key: PageStorageKey(title.id),
               title: title,
               isActive: isActive,
               onSeeMore: () => context.goNamed(
@@ -126,30 +127,33 @@ class _ShowUserBookmarksScreenState extends State<ShowUserBookmarksScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        foregroundColor: Colors.white,
-        backgroundColor: Colors.transparent,
-        title: OutlinedButton(
-          onPressed: context.pop,
-          style: OutlinedButton.styleFrom(
-            side: const BorderSide(color: Colors.white),
-            padding: const EdgeInsets.only(top: 8, right: 8, bottom: 8, left: 16),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    return ScreenTitle(
+      title: '@${widget.username} > Bookmarks',
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.transparent,
+          title: OutlinedButton(
+            onPressed: context.pop,
+            style: OutlinedButton.styleFrom(
+              side: const BorderSide(color: Colors.white),
+              padding: const EdgeInsets.only(top: 8, right: 8, bottom: 8, left: 16),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            ),
+            child: Row(
+              children: [
+                SvgPicture.asset('assets/bookmark.svg'),
+                const SizedBox(width: 16),
+                Text('@${widget.username}\'s bookmarks', style: const TextStyle(fontSize: 16, color: Colors.white)),
+              ],
+            ),
           ),
-          child: Row(
-            children: [
-              SvgPicture.asset('assets/bookmark.svg'),
-              const SizedBox(width: 16),
-              Text('@${widget.username}\'s bookmarks', style: const TextStyle(fontSize: 16, color: Colors.white)),
-            ],
-          ),
+          actions: const [Padding(padding: EdgeInsets.only(right: 12), child: UserButton())],
         ),
-        actions: const [Padding(padding: EdgeInsets.only(right: 12), child: UserButton())],
+        body: _getBookmarksVideos(),
       ),
-      body: _getBookmarksVideos(),
     );
   }
 }

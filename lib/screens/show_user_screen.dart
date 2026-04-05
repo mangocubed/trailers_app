@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../components/current_user.dart';
+import '../components/screen_title.dart';
 import '../components/title_card.dart';
 import '../config.dart';
 import '../constants.dart';
@@ -210,112 +211,118 @@ class _ShowUserScreenState extends State<ShowUserScreen> {
           }
         }
 
-        return Scaffold(
-          backgroundColor: const Color(0xff353535),
-          appBar: AppBar(
-            foregroundColor: Colors.white,
-            backgroundColor: Colors.transparent,
-            leading: BackButton(onPressed: () => context.goNamed(routeNameHome)),
-            actions: [
-              Padding(
-                padding: EdgeInsets.only(right: 12),
-                child: CurrentUser(
-                  builder: (currentUser, {refetch}) {
-                    if (currentUser != null && currentUser.id == user.id) {
-                      return IconButton(
-                        onPressed: () {
-                          launchUrl(
-                            Config.identityUrl,
-                            customTabsOptions: CustomTabsOptions(
-                              showTitle: true,
-                              browser: const CustomTabsBrowserConfiguration(prefersDefaultBrowser: true),
-                            ),
-                          );
-                        },
-                        tooltip: 'Account Settings',
-                        icon: SvgPicture.asset('assets/cog.svg'),
-                      );
-                    } else {
-                      return const SizedBox();
-                    }
-                  },
+        return ScreenTitle(
+          title: '@${user.identityUser.username}',
+          child: Scaffold(
+            backgroundColor: const Color(0xff353535),
+            appBar: AppBar(
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.transparent,
+              leading: BackButton(onPressed: () => context.goNamed(routeNameHome)),
+              actions: [
+                Padding(
+                  padding: EdgeInsets.only(right: 12),
+                  child: CurrentUser(
+                    builder: (currentUser, {refetch}) {
+                      if (currentUser != null && currentUser.id == user.id) {
+                        return IconButton(
+                          onPressed: () {
+                            launchUrl(
+                              Config.identityUrl,
+                              customTabsOptions: CustomTabsOptions(
+                                showTitle: true,
+                                browser: const CustomTabsBrowserConfiguration(prefersDefaultBrowser: true),
+                              ),
+                            );
+                          },
+                          tooltip: 'Account Settings',
+                          icon: SvgPicture.asset('assets/cog.svg'),
+                        );
+                      } else {
+                        return const SizedBox();
+                      }
+                    },
+                  ),
                 ),
-              ),
-            ],
-          ),
-          body: CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              SliverList(
-                delegate: SliverChildListDelegate([
-                  const SizedBox(height: 16),
-                  Center(
-                    child: CircleAvatar(
-                      radius: 48,
-                      child: Text(user.identityUser.initials, style: TextStyle(fontSize: 48)),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    '@${user.identityUser.username}',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white),
-                  ),
-                  const SizedBox(height: 28),
-                  Center(
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(32),
-                        border: Border.all(color: colorGenreChip),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SizedBox(
-                            height: 32,
-                            child: OutlinedButton.icon(
-                              onPressed: () => setState(() => _isInWatched = false),
-                              style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
-                                side: const BorderSide(color: colorGenreChip),
-                                backgroundColor: !_isInWatched ? const Color(0x66C3D350) : null,
-                                foregroundColor: colorGenreChip,
-                              ),
-                              label: Text('Bookmarks'),
-                              icon: SvgPicture.asset(
-                                'assets/bookmark.svg',
-                                colorFilter: const ColorFilter.mode(colorGenreChip, BlendMode.srcIn),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          SizedBox(
-                            height: 32,
-                            child: OutlinedButton.icon(
-                              onPressed: () => setState(() => _isInWatched = true),
-                              style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
-                                side: const BorderSide(color: colorGenreChip),
-                                backgroundColor: _isInWatched ? const Color(0x66C3D350) : null,
-                                foregroundColor: colorGenreChip,
-                              ),
-                              label: Text('Watched'),
-                              icon: SvgPicture.asset(
-                                'assets/watched.svg',
-                                colorFilter: const ColorFilter.mode(colorGenreChip, BlendMode.srcIn),
-                              ),
-                            ),
-                          ),
-                        ],
+              ],
+            ),
+            body: CustomScrollView(
+              controller: _scrollController,
+              slivers: [
+                SliverList(
+                  delegate: SliverChildListDelegate([
+                    const SizedBox(height: 16),
+                    Center(
+                      child: CircleAvatar(
+                        radius: 48,
+                        child: Text(user.identityUser.initials, style: TextStyle(fontSize: 48)),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 28),
-                ]),
-              ),
-              SliverPadding(padding: const EdgeInsets.all(16), sliver: _isInWatched ? _getWatched() : _getBookmarks()),
-            ],
+                    const SizedBox(height: 16),
+                    Text(
+                      '@${user.identityUser.username}',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white),
+                    ),
+                    const SizedBox(height: 28),
+                    Center(
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(32),
+                          border: Border.all(color: colorGenreChip),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(
+                              height: 32,
+                              child: OutlinedButton.icon(
+                                onPressed: () => setState(() => _isInWatched = false),
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
+                                  side: const BorderSide(color: colorGenreChip),
+                                  backgroundColor: !_isInWatched ? const Color(0x66C3D350) : null,
+                                  foregroundColor: colorGenreChip,
+                                ),
+                                label: Text('Bookmarks'),
+                                icon: SvgPicture.asset(
+                                  'assets/bookmark.svg',
+                                  colorFilter: const ColorFilter.mode(colorGenreChip, BlendMode.srcIn),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            SizedBox(
+                              height: 32,
+                              child: OutlinedButton.icon(
+                                onPressed: () => setState(() => _isInWatched = true),
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
+                                  side: const BorderSide(color: colorGenreChip),
+                                  backgroundColor: _isInWatched ? const Color(0x66C3D350) : null,
+                                  foregroundColor: colorGenreChip,
+                                ),
+                                label: Text('Watched'),
+                                icon: SvgPicture.asset(
+                                  'assets/watched.svg',
+                                  colorFilter: const ColorFilter.mode(colorGenreChip, BlendMode.srcIn),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 28),
+                  ]),
+                ),
+                SliverPadding(
+                  padding: const EdgeInsets.all(16),
+                  sliver: _isInWatched ? _getWatched() : _getBookmarks(),
+                ),
+              ],
+            ),
           ),
         );
       },

@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:trailers/components/ad_banner.dart';
 
-import '../components/video_player_dialog.dart';
-import '../components/current_user.dart';
 import '../components/action_buttons.dart';
+import '../components/current_user.dart';
 import '../components/genre_chip.dart';
+import '../components/screen_title.dart';
 import '../components/title_basic_info.dart';
+import '../components/video_player_dialog.dart';
 import '../components/zoomable_image.dart';
 import '../constants.dart';
 import '../graphql/fragments/video_fragment.graphql.dart';
@@ -249,86 +250,89 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
 
         createUserTitleTie(context, title);
 
-        return Scaffold(
-          appBar: AppBar(
-            iconTheme: const IconThemeData(color: Color(0xffF3EAF4)),
-            backgroundColor: Colors.transparent,
-          ),
-          backgroundColor: const Color(0xff353535),
-          body: SingleChildScrollView(
-            child: Column(
-              children: [
-                Container(
-                  margin: const EdgeInsets.only(right: 14, bottom: 32, left: 14),
-                  child: Column(
-                    children: [
-                      ZoomableImage(url: title.posterImageUrl, width: 200),
-                      const SizedBox(height: 12),
-                      ActionButtons(direction: Axis.horizontal, titleId: title.id),
-                      const SizedBox(height: 12),
-                      Text(
-                        title.name,
-                        style: GoogleFonts.blackHanSans(
-                          textStyle: const TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.white,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      TitleBasicInfo(
-                        releasedOn: title.releasedOn,
-                        directorName: title.crew.nodes.firstOrNull?.person.name,
-                        runtime: title.runtime,
-                        mediaType: title.mediaType,
-                      ),
-                    ],
-                  ),
-                ),
-                _getWatchProviders(title),
-                Container(
-                  margin: const EdgeInsets.only(right: 14, bottom: 32, left: 14),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        width: double.infinity,
-                        child: Text(
-                          'Synopsis',
+        return ScreenTitle(
+          title: title.name,
+          child: Scaffold(
+            appBar: AppBar(
+              iconTheme: const IconThemeData(color: Color(0xffF3EAF4)),
+              backgroundColor: Colors.transparent,
+            ),
+            backgroundColor: const Color(0xff353535),
+            body: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(right: 14, bottom: 32, left: 14),
+                    child: Column(
+                      children: [
+                        ZoomableImage(url: title.posterImageUrl, width: 200),
+                        const SizedBox(height: 12),
+                        ActionButtons(direction: Axis.horizontal, titleId: title.id),
+                        const SizedBox(height: 12),
+                        Text(
+                          title.name,
                           style: GoogleFonts.blackHanSans(
                             textStyle: const TextStyle(
-                              fontSize: 20,
+                              fontSize: 32,
                               fontWeight: FontWeight.w400,
                               color: Colors.white,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        title.overview,
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: Colors.white),
-                      ),
-                      title.genres.nodes.isNotEmpty
-                          ? Container(
-                              margin: const EdgeInsets.only(top: 12),
-                              width: double.infinity,
-                              child: Wrap(
-                                runSpacing: 8,
-                                children: title.genres.nodes.map((genre) => GenreChip(name: genre.name)).toList(),
-                              ),
-                            )
-                          : const SizedBox(),
-                    ],
+                        const SizedBox(height: 8),
+                        TitleBasicInfo(
+                          releasedOn: title.releasedOn,
+                          directorName: title.crew.nodes.firstOrNull?.person.name,
+                          runtime: title.runtime,
+                          mediaType: title.mediaType,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                _getCast(title.cast),
-                _getTrailer(title.videos.nodes.firstOrNull),
-                AdBanner(compact: true),
-                const SizedBox(height: 32),
-              ],
+                  _getWatchProviders(title),
+                  Container(
+                    margin: const EdgeInsets.only(right: 14, bottom: 32, left: 14),
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          width: double.infinity,
+                          child: Text(
+                            'Synopsis',
+                            style: GoogleFonts.blackHanSans(
+                              textStyle: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.white,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          title.overview,
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: Colors.white),
+                        ),
+                        title.genres.nodes.isNotEmpty
+                            ? Container(
+                                margin: const EdgeInsets.only(top: 12),
+                                width: double.infinity,
+                                child: Wrap(
+                                  runSpacing: 8,
+                                  children: title.genres.nodes.map((genre) => GenreChip(name: genre.name)).toList(),
+                                ),
+                              )
+                            : const SizedBox(),
+                      ],
+                    ),
+                  ),
+                  _getCast(title.cast),
+                  _getTrailer(title.videos.nodes.firstOrNull),
+                  AdBanner(compact: true),
+                  const SizedBox(height: 32),
+                ],
+              ),
             ),
           ),
         );

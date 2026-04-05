@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
 import '../components/filters_row.dart';
+import '../components/screen_title.dart';
 import '../components/search_dialog.dart';
 import '../components/search_field.dart';
 import '../config.dart';
@@ -152,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
             }
 
             return TitlePageItem(
-              key: ValueKey(title.id),
+              key: PageStorageKey(title.id),
               isActive: isActive,
               title: title,
               countryCode: widget.countryCode,
@@ -186,49 +187,52 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: colorTranslucent,
-        scrolledUnderElevation: 0,
-        title: SearchField(
-          controller: _queryController,
-          readOnly: true,
-          onTap: () {
-            SearchDialog(context, queryParams: widget.queryParams);
-          },
-          onClear: () {
-            final queryParams = widget.queryParams!;
+    return ScreenTitle(
+      title: 'Home',
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          backgroundColor: colorTranslucent,
+          scrolledUnderElevation: 0,
+          title: SearchField(
+            controller: _queryController,
+            readOnly: true,
+            onTap: () {
+              SearchDialog(context, queryParams: widget.queryParams);
+            },
+            onClear: () {
+              final queryParams = widget.queryParams!;
 
-            queryParams.query = null;
-            queryParams.page = null;
+              queryParams.query = null;
+              queryParams.page = null;
 
-            context.goNamed(routeNameHome, queryParameters: queryParams.toMap());
-          },
-        ),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 12),
-            child: IconButton.outlined(
-              isSelected: _hasFilters,
-              icon: SvgPicture.asset(
-                'assets/adjust.svg',
-                colorFilter: _hasFilters ? ColorFilter.mode(Colors.black, BlendMode.srcIn) : null,
-              ),
-              onPressed: () {
-                TitlesFilterDialog(context, queryParams: widget.queryParams);
-              },
-            ),
+              context.goNamed(routeNameHome, queryParameters: queryParams.toMap());
+            },
           ),
-          Padding(padding: EdgeInsets.only(right: 12), child: UserButton()),
-        ],
-      ),
-      body: Stack(
-        children: [
-          _getTitles(),
-          SafeArea(child: FiltersRow(queryParams: widget.queryParams)),
-        ],
+          actions: [
+            Padding(
+              padding: EdgeInsets.only(right: 12),
+              child: IconButton.outlined(
+                isSelected: _hasFilters,
+                icon: SvgPicture.asset(
+                  'assets/adjust.svg',
+                  colorFilter: _hasFilters ? ColorFilter.mode(Colors.black, BlendMode.srcIn) : null,
+                ),
+                onPressed: () {
+                  TitlesFilterDialog(context, queryParams: widget.queryParams);
+                },
+              ),
+            ),
+            Padding(padding: EdgeInsets.only(right: 12), child: UserButton()),
+          ],
+        ),
+        body: Stack(
+          children: [
+            _getTitles(),
+            SafeArea(child: FiltersRow(queryParams: widget.queryParams)),
+          ],
+        ),
       ),
     );
   }
