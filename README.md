@@ -11,8 +11,8 @@ Movies and TV Series recommendations.
 
 | Name                  | Type   | Default                             |
 | --------------------- | ------ | ----------------------------------- |
-| AD_SIZE               | String | 336x280                             |
-| AD_URL                | String | https://ads.mango3.app/336x280.html |
+| AD_SIZE               | String | 300x250                             |
+| AD_URL                | String | https://ads.mango3.app/300x250.html |
 | IDENTITY_API_URL      | String | https://api.id.mango3.app/          |
 | IDENTITY_CLIENT_ID    | String |                                     |
 | IDENTITY_REDIRECT_URL | String | app.mango3.trailers://oauth         |
