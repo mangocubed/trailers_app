@@ -38,7 +38,7 @@ class App extends StatelessWidget {
     return GraphQLProvider(
       client: ValueNotifier(graphQLClient),
       child: MaterialApp.router(
-        title: 'Trailers',
+        title: 'Filmstrip',
         scrollBehavior: const MobileLikeScrollBehavior(),
         themeMode: ThemeMode.dark,
         theme: ThemeData(

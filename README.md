@@ -1,4 +1,4 @@
-# Mango³ Trailers Application
+# Trailers (aka Filmstrip) App
 
 Movies and TV Series recommendations.
 

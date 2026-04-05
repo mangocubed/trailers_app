@@ -1,6 +1,6 @@
 {
-    "name": "Mango³ Trailers",
-    "short_name": "Trailers",
+    "name": "Filmstrip",
+    "short_name": "Filmstrip",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#fc7753",

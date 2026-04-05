@@ -161,10 +161,7 @@ class ActionButtons extends StatelessWidget {
                 IconButton(
                   onPressed: () {
                     SharePlus.instance.share(
-                      ShareParams(
-                        text:
-                            'Check out this title on Trailers: ${Config.trailersUrl.replace(fragment: '/titles/$titleId')}',
-                      ),
+                      ShareParams(uri: Config.trailersUrl.replace(fragment: '/titles/$titleId')),
                     );
                   },
                   icon: SvgPicture.asset('assets/share.svg'),
