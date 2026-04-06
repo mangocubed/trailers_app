@@ -27,6 +27,10 @@ class Config {
     const String.fromEnvironment('IDENTITY_URL', defaultValue: 'https://id.mango3.app/'),
   );
 
+  static final Duration searchDebounce = Duration(
+    milliseconds: int.parse(const String.fromEnvironment('SEARCH_DEBOUNCE', defaultValue: '500')),
+  );
+
   static final Uri trailersApiUrl = Uri.parse(
     const String.fromEnvironment('TRAILERS_API_URL', defaultValue: 'https://api.trailers.mango3.app/'),
   );

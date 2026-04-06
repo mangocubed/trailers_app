@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../config.dart';
+
 class SearchField extends StatefulWidget {
   const SearchField({
     super.key,
@@ -30,7 +32,7 @@ class _SearchFieldState extends State<SearchField> {
   void _onChanged(String text) {
     _timer?.cancel();
 
-    _timer = Timer(const Duration(milliseconds: 300), () {
+    _timer = Timer(Config.searchDebounce, () {
       widget.onChanged?.call(widget.controller.text);
     });
   }
