@@ -36,6 +36,6 @@ class Config {
   );
 
   static final Uri trailersUrl = Uri.parse(
-    const String.fromEnvironment('TRAILERS_URL', defaultValue: 'https://trailers.mango3.app/'),
+    const String.fromEnvironment('TRAILERS_URL', defaultValue: 'https://filmstrip.mango3.app/'),
   );
 }

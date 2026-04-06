@@ -19,4 +19,4 @@ Movies and TV Series recommendations.
 | IDENTITY_URL          | String | https://id.mango3.app/              |
 | SEARCH_DEBOUNCE       | Number | 500                                 |
 | TRAILERS_API_URL      | String | https://api.trailers.mango3.app/    |
-| TRAILERS_URL          | String | https://trailers.mango3.app/        |
+| TRAILERS_URL          | String | https://filmstrip.mango3.app/        |

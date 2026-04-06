@@ -100,7 +100,7 @@ jobs:
                   --dart-define AD_URL="${{ vars.AD_URL || 'https://ads.mango3.app/300x250.html' }}" \
                   --dart-define AD_SIZE="${{ vars.AD_SIZE || '300x250' }}" \
                   --dart-define IDENTITY_CLIENT_ID="${{ vars.IDENTITY_CLIENT_ID }}" \
-                  --dart-define IDENTITY_REDIRECT_URL="https://trailers.mango3.app/oauth" \
+                  --dart-define IDENTITY_REDIRECT_URL="https://filmstrip.mango3.app/oauth" \
                   --dart-define SEARCH_DEBOUNCE="${{ vars.SEARCH_DEBOUNCE || '500' }}"
             - name: Upload artifact
               uses: actions/upload-pages-artifact@v4
