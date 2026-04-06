@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../components/screen_lifecycle.dart';
 import '../config.dart';
 import '../constants.dart';
 import '../graphql/fragments/user_title_tie_fragment.graphql.dart';
@@ -85,90 +84,79 @@ class ActionButtons extends StatelessWidget {
         final isLiked = userTitleTie?.isLiked ?? false;
         final isBookmarked = userTitleTie?.isBookmarked ?? false;
 
-        return ScreenLifecycle(
-          onResume: () async {
-            if (!result.isLoading) {
-              try {
-                await refetch?.call();
-              } catch (_) {}
-            }
-          },
-          child: Container(
-            decoration: BoxDecoration(color: colorTranslucent, borderRadius: BorderRadius.circular(24)),
-            padding: const EdgeInsets.all(4),
-            child: Flex(
-              mainAxisSize: MainAxisSize.min,
-              spacing: 8,
-              direction: direction,
-              children: [
-                IconButton(
-                  onPressed: () async {
-                    final isAuthorized = await IdentityClient.isAuthorized();
+        return Container(
+          decoration: BoxDecoration(color: colorTranslucent, borderRadius: BorderRadius.circular(24)),
+          padding: const EdgeInsets.all(4),
+          child: Flex(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 8,
+            direction: direction,
+            children: [
+              IconButton(
+                onPressed: () async {
+                  final isAuthorized = await IdentityClient.isAuthorized();
 
-                    if (!context.mounted) {
-                      return;
-                    }
+                  if (!context.mounted) {
+                    return;
+                  }
 
-                    if (isAuthorized) {
-                      await _onWatchedPressed(context, !isWatched);
+                  if (isAuthorized) {
+                    await _onWatchedPressed(context, !isWatched);
 
-                      await refetch?.call();
-                    } else {
-                      await IdentityClient.authorize(context);
-                    }
-                  },
-                  icon: SvgPicture.asset(isWatched ? 'assets/watched_filled.svg' : 'assets/watched.svg'),
-                  tooltip: 'Watched',
-                ),
-                IconButton(
-                  onPressed: () async {
-                    final isAuthorized = await IdentityClient.isAuthorized();
+                    await refetch?.call();
+                  } else {
+                    await IdentityClient.authorize(context);
+                  }
+                },
+                icon: SvgPicture.asset(isWatched ? 'assets/watched_filled.svg' : 'assets/watched.svg'),
+                tooltip: 'Watched',
+              ),
+              IconButton(
+                onPressed: () async {
+                  final isAuthorized = await IdentityClient.isAuthorized();
 
-                    if (!context.mounted) {
-                      return;
-                    }
+                  if (!context.mounted) {
+                    return;
+                  }
 
-                    if (isAuthorized) {
-                      await _onLikePressed(context, !isLiked);
+                  if (isAuthorized) {
+                    await _onLikePressed(context, !isLiked);
 
-                      await refetch?.call();
-                    } else {
-                      await IdentityClient.authorize(context);
-                    }
-                  },
-                  icon: SvgPicture.asset(isLiked ? 'assets/heart_filled.svg' : 'assets/heart.svg'),
-                  tooltip: 'Like',
-                ),
-                IconButton(
-                  onPressed: () async {
-                    final isAuthorized = await IdentityClient.isAuthorized();
+                    await refetch?.call();
+                  } else {
+                    await IdentityClient.authorize(context);
+                  }
+                },
+                icon: SvgPicture.asset(isLiked ? 'assets/heart_filled.svg' : 'assets/heart.svg'),
+                tooltip: 'Like',
+              ),
+              IconButton(
+                onPressed: () async {
+                  final isAuthorized = await IdentityClient.isAuthorized();
 
-                    if (!context.mounted) {
-                      return;
-                    }
+                  if (!context.mounted) {
+                    return;
+                  }
 
-                    if (isAuthorized) {
-                      await _onBookmarkPressed(context, !isBookmarked);
+                  if (isAuthorized) {
+                    await _onBookmarkPressed(context, !isBookmarked);
 
-                      await refetch?.call();
-                    } else {
-                      await IdentityClient.authorize(context);
-                    }
-                  },
-                  icon: SvgPicture.asset(isBookmarked ? 'assets/bookmark_filled.svg' : 'assets/bookmark.svg'),
-                  tooltip: 'Bookmark',
-                ),
-                IconButton(
-                  onPressed: () {
-                    SharePlus.instance.share(
-                      ShareParams(uri: Config.trailersUrl.replace(fragment: '/titles/$titleId')),
-                    );
-                  },
-                  icon: SvgPicture.asset('assets/share.svg'),
-                  tooltip: 'Share',
-                ),
-              ],
-            ),
+                    await refetch?.call();
+                  } else {
+                    await IdentityClient.authorize(context);
+                  }
+                },
+                icon: SvgPicture.asset(isBookmarked ? 'assets/bookmark_filled.svg' : 'assets/bookmark.svg'),
+                tooltip: 'Bookmark',
+              ),
+              IconButton(
+                onPressed: () {
+                  SharePlus.instance.share(ShareParams(uri: Config.trailersUrl.replace(fragment: '/titles/$titleId')));
+                },
+                icon: SvgPicture.asset('assets/share.svg'),
+                tooltip: 'Share',
+              ),
+            ],
           ),
         );
       },
