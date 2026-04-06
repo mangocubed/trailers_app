@@ -142,8 +142,8 @@ class _SearchDialogBodyState extends State<_SearchDialogBody> {
                         return Center(child: Text('No results for "$_query" 💨', style: textTheme.bodyLarge));
                       }
 
+                      _fetchMore ??= fetchMore;
                       _endCursor = titles?.pageInfo.endCursor;
-                      _fetchMore = fetchMore;
 
                       return CustomScrollView(
                         controller: _scrollController,
