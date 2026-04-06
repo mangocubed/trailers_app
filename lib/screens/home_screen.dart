@@ -7,6 +7,7 @@ import '../components/filters_row.dart';
 import '../components/screen_title.dart';
 import '../components/search_dialog.dart';
 import '../components/search_field.dart';
+import '../components/welcome_dialog.dart';
 import '../config.dart';
 import '../graphql/schema.graphql.dart';
 import '../components/titles_filter_dialog.dart';
@@ -16,6 +17,7 @@ import '../components/user_button.dart';
 import '../constants.dart';
 import '../graphql/queries/titles.graphql.dart';
 import '../components/ad_banner.dart';
+import '../settings.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, this.queryParams, this.extraParams});
@@ -37,6 +39,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   PageController? _pageController;
   final _queryController = TextEditingController();
+  bool _isActive = true;
 
   bool get _hasFilters => widget.queryParams?.hasFilters == true;
 
@@ -154,7 +157,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
             return TitlePageItem(
               key: PageStorageKey(title.id),
-              isActive: isActive,
+              isActive: _isActive && isActive,
               title: title,
               countryCode: widget.countryCode,
               onSeeMore: () {
@@ -175,7 +178,24 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+
     _queryController.text = widget.query ?? '';
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (await Settings.getShowWelcome() && mounted) {
+        setState(() {
+          _isActive = false;
+        });
+
+        await showWelcomeDialog(context).then((_) {
+          setState(() {
+            _isActive = true;
+          });
+
+          Settings.setShowWelcome(false);
+        });
+      }
+    });
   }
 
   @override

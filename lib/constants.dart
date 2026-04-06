@@ -16,6 +16,7 @@ const keyUsername = 'username';
 const keyWatchProviderIds = 'watch_provider_ids';
 const keyCountryCode = 'country_code';
 const keyPage = 'page';
+const keyShowWelcome = 'show_welcome';
 
 const routeNameHome = 'home';
 const routeNameSearchResults = 'search_results';
