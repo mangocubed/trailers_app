@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../config.dart';
@@ -12,12 +13,21 @@ import '../graphql/schema.graphql.dart';
 import '../graphql/queries/title_current_user_tie.graphql.dart';
 import '../graphql_client.dart';
 import '../identity_client.dart';
+import '../router.dart';
 
-class ActionButtons extends StatelessWidget {
+class ActionButtons extends StatefulWidget {
   const ActionButtons({super.key, required this.direction, required this.titleId});
 
   final Axis direction;
   final String titleId;
+
+  @override
+  State<ActionButtons> createState() => _ActionButtonsState();
+}
+
+class _ActionButtonsState extends State<ActionButtons> with RouteAware {
+  bool _isLoading = false;
+  Refetch<Query$TitleCurrentUserTie>? _refetch;
 
   void _updateCache(BuildContext context, Fragment$UserTitleTieFragment? userTitleTie) {
     if (userTitleTie == null) {
@@ -35,7 +45,7 @@ class ActionButtons extends StatelessWidget {
     final result = await context.graphQLClient.value.mutate$UpdateBookmark(
       Options$Mutation$UpdateBookmark(
         variables: Variables$Mutation$UpdateBookmark(
-          input: Input$UserTitleTieInputObject(titleId: titleId, isChecked: isChecked),
+          input: Input$UserTitleTieInputObject(titleId: widget.titleId, isChecked: isChecked),
         ),
       ),
     );
@@ -49,7 +59,7 @@ class ActionButtons extends StatelessWidget {
     final result = await context.graphQLClient.value.mutate$UpdateLike(
       Options$Mutation$UpdateLike(
         variables: Variables$Mutation$UpdateLike(
-          input: Input$UserTitleTieInputObject(titleId: titleId, isChecked: isChecked),
+          input: Input$UserTitleTieInputObject(titleId: widget.titleId, isChecked: isChecked),
         ),
       ),
     );
@@ -63,7 +73,7 @@ class ActionButtons extends StatelessWidget {
     final result = await context.graphQLClient.value.mutate$UpdateWatched(
       Options$Mutation$UpdateWatched(
         variables: Variables$Mutation$UpdateWatched(
-          input: Input$UserTitleTieInputObject(titleId: titleId, isChecked: isChecked),
+          input: Input$UserTitleTieInputObject(titleId: widget.titleId, isChecked: isChecked),
         ),
       ),
     );
@@ -74,11 +84,41 @@ class ActionButtons extends StatelessWidget {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final currentRoute = ModalRoute.of(context);
+
+    if (currentRoute != null) {
+      routeObserver.subscribe(this, currentRoute);
+    }
+  }
+
+  @override
+  void didPopNext() {
+    if (!_isLoading) {
+      try {
+        _refetch?.call();
+      } catch (_) {}
+    }
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Query$TitleCurrentUserTie$Widget(
-      options: Options$Query$TitleCurrentUserTie(variables: Variables$Query$TitleCurrentUserTie(id: titleId)),
+      options: Options$Query$TitleCurrentUserTie(variables: Variables$Query$TitleCurrentUserTie(id: widget.titleId)),
       builder: (result, {fetchMore, refetch}) {
         final userTitleTie = result.parsedData?.title?.currentUserTie;
+
+        _refetch ??= refetch;
+        _isLoading = result.isLoading;
 
         final isWatched = userTitleTie?.isWatched ?? false;
         final isLiked = userTitleTie?.isLiked ?? false;
@@ -90,7 +130,7 @@ class ActionButtons extends StatelessWidget {
           child: Flex(
             mainAxisSize: MainAxisSize.min,
             spacing: 8,
-            direction: direction,
+            direction: widget.direction,
             children: [
               IconButton(
                 onPressed: () async {
@@ -151,7 +191,9 @@ class ActionButtons extends StatelessWidget {
               ),
               IconButton(
                 onPressed: () {
-                  SharePlus.instance.share(ShareParams(uri: Config.trailersUrl.replace(fragment: '/titles/$titleId')));
+                  SharePlus.instance.share(
+                    ShareParams(uri: Config.trailersUrl.replace(fragment: '/titles/${widget.titleId}')),
+                  );
                 },
                 icon: SvgPicture.asset('assets/share.svg'),
                 tooltip: 'Share',
