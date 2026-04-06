@@ -29,7 +29,9 @@ class _TitleVideoPlayerState extends State<TitleVideoPlayer> {
       await _controller.initialize();
     }
 
-    await _controller.play();
+    if (widget.play) {
+      await _controller.play();
+    }
 
     if (!isInitialized && _controller.value.isInitialized) {
       widget.onInitialize();
