@@ -68,7 +68,7 @@ class _ShowUserWatchedScreenState extends State<ShowUserWatchedScreen> {
 
                   fetchMoreResultData['user']['titleTies']['nodes'] = [
                     ...previousResultData?['user']['titleTies']['nodes'],
-                    ...Config.adUrl != null
+                    ...Config.hasAds
                         ? [
                             {
                               'id': 'ad',

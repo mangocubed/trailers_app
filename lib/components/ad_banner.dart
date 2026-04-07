@@ -13,6 +13,10 @@ class AdBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (!Config.hasAds) {
+      return const SizedBox();
+    }
+
     return SafeArea(
       child: Stack(
         alignment: AlignmentGeometry.center,

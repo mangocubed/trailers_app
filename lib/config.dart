@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 class Config {
-  static final _adUrl = const String.fromEnvironment('AD_URL', defaultValue: 'https://ads.mango3.app/300x250.html');
+  static final _adUrl = const String.fromEnvironment('AD_URL', defaultValue: '');
 
   static final adSize = const String.fromEnvironment(
     'AD_SIZE',
@@ -9,6 +9,8 @@ class Config {
   ).split('x').map((s) => double.parse(s)).toList();
 
   static final Uri? adUrl = _adUrl.isNotEmpty ? Uri.parse(_adUrl) : null;
+
+  static bool get hasAds => adUrl != null && adSize.length == 2;
 
   static final Uri identityApiUrl = Uri.parse(
     const String.fromEnvironment('IDENTITY_API_URL', defaultValue: 'https://api.id.mango3.app/'),
