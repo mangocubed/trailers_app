@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 
 import '../components/ad_banner.dart';
 import '../components/screen_title.dart';
