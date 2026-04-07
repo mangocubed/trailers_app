@@ -119,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   fetchMoreResultData['titles']['nodes'] = [
                     ...previousResultData?['titles']['nodes'],
-                    ...Config.adUrl != null
+                    ...Config.hasAds
                         ? [
                             {
                               'id': 'ad',

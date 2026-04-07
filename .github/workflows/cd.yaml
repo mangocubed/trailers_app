@@ -34,8 +34,8 @@ jobs:
                   echo "storeFile=keystore.jks" >> android/key.properties
             - run: |
                   flutter build appbundle --release --obfuscate --split-debug-info=./build/symbols \
-                  --dart-define AD_URL="${{ vars.AD_URL || 'https://ads.mango3.app/300x250.html' }}" \
-                  --dart-define AD_SIZE="${{ vars.AD_SIZE || '300x250' }}" \
+                  --dart-define AD_URL="${{ vars.AD_URL || 'https://ads.filmstrip.mango3.app/336x280.html' }}" \
+                  --dart-define AD_SIZE="${{ vars.AD_SIZE || '336x280' }}" \
                   --dart-define IDENTITY_CLIENT_ID="${{ vars.IDENTITY_CLIENT_ID }}" \
                   --dart-define SEARCH_DEBOUNCE="${{ vars.SEARCH_DEBOUNCE || '500' }}"
             - run: |
@@ -73,8 +73,8 @@ jobs:
                   echo "storeFile=keystore.jks" >> android/key.properties
             - run: |
                   flutter build apk --release \
-                  --dart-define AD_URL="${{ vars.AD_URL || 'https://ads.mango3.app/300x250.html' }}" \
-                  --dart-define AD_SIZE="${{ vars.AD_SIZE || '300x250' }}" \
+                  --dart-define AD_URL="${{ vars.AD_URL || 'https://ads.filmstrip.mango3.app/336x280.html' }}" \
+                  --dart-define AD_SIZE="${{ vars.AD_SIZE || '336x280' }}" \
                   --dart-define IDENTITY_CLIENT_ID="${{ vars.IDENTITY_CLIENT_ID }}" \
                   --dart-define SEARCH_DEBOUNCE="${{ vars.SEARCH_DEBOUNCE || '500' }}"
             - name: Rename package
@@ -97,8 +97,8 @@ jobs:
             - uses: ./.github/actions/setup-flutter
             - run: |
                   flutter build web --release \
-                  --dart-define AD_URL="${{ vars.AD_URL || 'https://ads.mango3.app/300x250.html' }}" \
-                  --dart-define AD_SIZE="${{ vars.AD_SIZE || '300x250' }}" \
+                  --dart-define AD_URL="${{ vars.AD_URL || 'https://ads.filmstrip.mango3.app/336x280.html' }}" \
+                  --dart-define AD_SIZE="${{ vars.AD_SIZE || '336x280' }}" \
                   --dart-define IDENTITY_CLIENT_ID="${{ vars.IDENTITY_CLIENT_ID }}" \
                   --dart-define IDENTITY_REDIRECT_URL="https://filmstrip.mango3.app/oauth" \
                   --dart-define SEARCH_DEBOUNCE="${{ vars.SEARCH_DEBOUNCE || '500' }}"
