@@ -37,7 +37,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  PageController? _pageController;
   final _queryController = TextEditingController();
   bool _isActive = true;
 
@@ -66,8 +65,6 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (result, {fetchMore, refetch}) {
         final titles = result.parsedData?.titles;
 
-        _pageController ??= PageController(initialPage: widget.page ?? 0);
-
         if (result.parsedData == null && result.isLoading) {
           return const Center(child: CircularProgressIndicator());
         } else if (titles?.nodes.isNotEmpty != true) {
@@ -92,7 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
         }
 
         return SensitivePageView(
-          controller: _pageController!,
+          initialPage: widget.page ?? 0,
           onPageChanged: (int page) {
             setState(() {});
 
@@ -169,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             );
           },
-          itemCount: result.parsedData?.titles.nodes.length,
+          itemCount: titles?.nodes.length ?? 0,
         );
       },
     );
@@ -200,7 +197,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    _pageController?.dispose();
     _queryController.dispose();
     super.dispose();
   }

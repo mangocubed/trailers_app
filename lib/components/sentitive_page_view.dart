@@ -21,15 +21,15 @@ class SensitivePhysics extends BouncingScrollPhysics {
 class SensitivePageView extends StatefulWidget {
   const SensitivePageView({
     super.key,
-    required this.controller,
+    required this.initialPage,
     required this.itemBuilder,
     required this.itemCount,
     required this.onPageChanged,
   });
 
-  final PageController controller;
+  final int initialPage;
   final Widget Function(BuildContext context, int index, bool isActive) itemBuilder;
-  final int? itemCount;
+  final int itemCount;
   final void Function(int) onPageChanged;
 
   @override
@@ -37,9 +37,15 @@ class SensitivePageView extends StatefulWidget {
 }
 
 class _SensitivePageViewState extends State<SensitivePageView> with RouteAware {
+  late final PageController _controller;
+
   bool _isActive = false;
 
-  int get _currentPage => widget.controller.page?.round() ?? 0;
+  int get _currentPage => _controller.positions.isNotEmpty ? _controller.page?.round() ?? 0 : widget.initialPage;
+
+  bool get _hasNextPage => _currentPage < widget.itemCount - 1;
+
+  bool get _hasPreviousPage => _currentPage > 0;
 
   bool _onKeyDown(KeyEvent event) {
     if (event is KeyDownEvent) {
@@ -47,10 +53,10 @@ class _SensitivePageViewState extends State<SensitivePageView> with RouteAware {
 
       switch (keyId) {
         case 4294968068: // Up arrow
-          widget.controller.previousPage(duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+          _controller.previousPage(duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
           break;
         case 4294968065: // Down arrow
-          widget.controller.nextPage(duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+          _controller.nextPage(duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
           break;
         default:
           break;
@@ -95,12 +101,14 @@ class _SensitivePageViewState extends State<SensitivePageView> with RouteAware {
   @override
   void initState() {
     super.initState();
+    _controller = PageController(initialPage: widget.initialPage);
     _isActive = true;
     ServicesBinding.instance.keyboard.addHandler(_onKeyDown);
   }
 
   @override
   void dispose() {
+    _controller.dispose();
     ServicesBinding.instance.keyboard.removeHandler(_onKeyDown);
     routeObserver.unsubscribe(this);
     _isActive = false;
@@ -121,7 +129,7 @@ class _SensitivePageViewState extends State<SensitivePageView> with RouteAware {
       child: Stack(
         children: [
           PageView.builder(
-            controller: widget.controller,
+            controller: _controller,
             allowImplicitScrolling: true,
             scrollDirection: Axis.vertical,
             physics: SensitivePhysics(),
@@ -143,12 +151,11 @@ class _SensitivePageViewState extends State<SensitivePageView> with RouteAware {
                     children: [
                       IconButton(
                         icon: Icon(Icons.arrow_upward_rounded),
-                        disabledColor: Colors.grey,
                         color: Colors.white,
                         tooltip: 'Previous',
-                        onPressed: widget.controller.positions.isNotEmpty && (widget.controller.page ?? 0) > 0
+                        onPressed: _hasPreviousPage
                             ? () {
-                                widget.controller.previousPage(
+                                _controller.previousPage(
                                   duration: Duration(milliseconds: 300),
                                   curve: Curves.easeInOut,
                                 );
@@ -159,9 +166,11 @@ class _SensitivePageViewState extends State<SensitivePageView> with RouteAware {
                         icon: Icon(Icons.arrow_downward_rounded),
                         color: Colors.white,
                         tooltip: 'Next',
-                        onPressed: () {
-                          widget.controller.nextPage(duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
-                        },
+                        onPressed: _hasNextPage
+                            ? () {
+                                _controller.nextPage(duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+                              }
+                            : null,
                       ),
                     ],
                   ),

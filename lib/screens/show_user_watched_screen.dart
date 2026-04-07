@@ -27,8 +27,6 @@ class ShowUserWatchedScreen extends StatefulWidget {
 }
 
 class _ShowUserWatchedScreenState extends State<ShowUserWatchedScreen> {
-  late PageController _pageController;
-
   Widget _getWatchedVideos() {
     return Query$UserTitleTies$Widget(
       options: Options$Query$UserTitleTies(
@@ -43,10 +41,8 @@ class _ShowUserWatchedScreenState extends State<ShowUserWatchedScreen> {
       builder: (result, {fetchMore, refetch}) {
         final titleTies = result.parsedData?.user?.titleTies;
 
-        _pageController = PageController(initialPage: widget.page ?? 0);
-
         return SensitivePageView(
-          controller: _pageController,
+          initialPage: widget.page ?? 0,
           onPageChanged: (page) {
             setState(() {});
 
@@ -121,7 +117,7 @@ class _ShowUserWatchedScreenState extends State<ShowUserWatchedScreen> {
               ),
             );
           },
-          itemCount: titleTies?.nodes.length,
+          itemCount: titleTies?.nodes.length ?? 0,
         );
       },
     );
