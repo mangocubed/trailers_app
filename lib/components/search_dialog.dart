@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:trailers/components/filters_row.dart';
 
 import 'search_field.dart';
@@ -122,6 +123,7 @@ class _SearchDialogBodyState extends State<_SearchDialogBody> {
             child: _query.length > 1
                 ? Query$Titles$Widget(
                     options: Options$Query$Titles(
+                      fetchPolicy: FetchPolicy.noCache,
                       variables: Variables$Query$Titles(
                         first: 12,
                         query: _query,

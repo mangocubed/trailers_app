@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 
 import '../components/ad_banner.dart';
 import '../components/screen_title.dart';
@@ -31,6 +32,7 @@ class _ShowUserWatchedScreenState extends State<ShowUserWatchedScreen> {
   Widget _getWatchedVideos() {
     return Query$UserTitleTies$Widget(
       options: Options$Query$UserTitleTies(
+        fetchPolicy: FetchPolicy.noCache,
         typedOptimisticResult: widget.extraParams?.parsedData,
         variables: Variables$Query$UserTitleTies(
           username: widget.username,
