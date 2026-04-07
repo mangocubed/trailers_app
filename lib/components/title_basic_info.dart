@@ -60,9 +60,9 @@ class TitleBasicInfo extends StatelessWidget {
 
     return Column(
       crossAxisAlignment: isCentered ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+      spacing: 8,
       children: [
         Row(mainAxisAlignment: isCentered ? MainAxisAlignment.center : MainAxisAlignment.start, children: rowChildren),
-        const SizedBox(height: 8),
         chips,
       ],
     );
