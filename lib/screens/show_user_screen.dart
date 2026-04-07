@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 
 import '../components/current_user.dart';
 import '../components/screen_title.dart';
@@ -103,6 +104,7 @@ class _ShowUserScreenState extends State<ShowUserScreen> {
   Widget _getBookmarks() {
     return Query$UserTitleTies$Widget(
       options: Options$Query$UserTitleTies(
+        fetchPolicy: FetchPolicy.noCache,
         variables: Variables$Query$UserTitleTies(username: widget.username, isBookmarked: true, first: 12),
       ),
       builder: (result, {fetchMore, refetch}) {
@@ -144,6 +146,7 @@ class _ShowUserScreenState extends State<ShowUserScreen> {
   Widget _getWatched() {
     return Query$UserTitleTies$Widget(
       options: Options$Query$UserTitleTies(
+        fetchPolicy: FetchPolicy.noCache,
         variables: Variables$Query$UserTitleTies(username: widget.username, isWatched: true, first: 12),
       ),
       builder: (result, {fetchMore, refetch}) {

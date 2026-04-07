@@ -31,6 +31,7 @@ class _ShowUserWatchedScreenState extends State<ShowUserWatchedScreen> {
   Widget _getWatchedVideos() {
     return Query$UserTitleTies$Widget(
       options: Options$Query$UserTitleTies(
+        fetchPolicy: FetchPolicy.noCache,
         typedOptimisticResult: widget.extraParams?.parsedData,
         variables: Variables$Query$UserTitleTies(
           username: widget.username,
