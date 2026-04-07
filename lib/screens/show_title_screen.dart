@@ -70,9 +70,9 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
             }
 
             return Column(
+              spacing: 8,
               children: [
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 14),
+                SizedBox(
                   width: double.infinity,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -117,7 +117,6 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
                   width: double.infinity,
                   child: SingleChildScrollView(scrollDirection: Axis.horizontal, child: watchProviders),
                 ),
-                const SizedBox(height: 32),
               ],
             );
           },
@@ -132,9 +131,9 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
     }
 
     return Column(
+      spacing: 8,
       children: [
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 14),
+        SizedBox(
           width: double.infinity,
           child: Text(
             'Cast',
@@ -148,7 +147,6 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
             ),
           ),
         ),
-        const SizedBox(height: 8),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
@@ -186,7 +184,6 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
                 .toList(),
           ),
         ),
-        const SizedBox(height: 32),
       ],
     );
   }
@@ -197,9 +194,9 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
     }
 
     return Column(
+      spacing: 8,
       children: [
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 14),
+        SizedBox(
           width: double.infinity,
           child: Text(
             'Trailer',
@@ -213,7 +210,6 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
             ),
           ),
         ),
-        const SizedBox(height: 8),
         InkWell(
           onTap: () {
             showVideoPlayerDialog(context: context, video: video);
@@ -228,7 +224,6 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
             ),
           ),
         ),
-        const SizedBox(height: 32),
       ],
     );
   }
@@ -259,78 +254,71 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
             ),
             backgroundColor: const Color(0xff353535),
             body: SingleChildScrollView(
+              padding: const EdgeInsets.only(right: 14, bottom: 32, left: 14),
               child: Column(
+                spacing: 32,
                 children: [
-                  Container(
-                    margin: const EdgeInsets.only(right: 14, bottom: 32, left: 14),
-                    child: Column(
-                      children: [
-                        ZoomableImage(url: title.posterImageUrl, width: 200),
-                        const SizedBox(height: 12),
-                        ActionButtons(direction: Axis.horizontal, titleId: title.id),
-                        const SizedBox(height: 12),
-                        Text(
-                          title.name,
+                  Column(
+                    spacing: 12,
+                    children: [
+                      ZoomableImage(url: title.posterImageUrl, width: 200),
+                      ActionButtons(direction: Axis.horizontal, titleId: title.id),
+                      Text(
+                        title.name,
+                        style: GoogleFonts.blackHanSans(
+                          textStyle: const TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.white,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                      TitleBasicInfo(
+                        releasedOn: title.releasedOn,
+                        directorName: title.crew.nodes.firstOrNull?.person.name,
+                        runtime: title.runtime,
+                        mediaType: title.mediaType,
+                      ),
+                    ],
+                  ),
+                  _getWatchProviders(title),
+                  Column(
+                    spacing: 8,
+                    children: [
+                      SizedBox(
+                        width: double.infinity,
+                        child: Text(
+                          'Synopsis',
                           style: GoogleFonts.blackHanSans(
                             textStyle: const TextStyle(
-                              fontSize: 32,
+                              fontSize: 20,
                               fontWeight: FontWeight.w400,
                               color: Colors.white,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        TitleBasicInfo(
-                          releasedOn: title.releasedOn,
-                          directorName: title.crew.nodes.firstOrNull?.person.name,
-                          runtime: title.runtime,
-                          mediaType: title.mediaType,
-                        ),
-                      ],
-                    ),
-                  ),
-                  _getWatchProviders(title),
-                  Container(
-                    margin: const EdgeInsets.only(right: 14, bottom: 32, left: 14),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          width: double.infinity,
-                          child: Text(
-                            'Synopsis',
-                            style: GoogleFonts.blackHanSans(
-                              textStyle: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.white,
-                                overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        title.overview,
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: Colors.white),
+                      ),
+                      title.genres.nodes.isNotEmpty
+                          ? Container(
+                              margin: const EdgeInsets.only(top: 8),
+                              width: double.infinity,
+                              child: Wrap(
+                                runSpacing: 8,
+                                children: title.genres.nodes.map((genre) => GenreChip(name: genre.name)).toList(),
                               ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          title.overview,
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: Colors.white),
-                        ),
-                        title.genres.nodes.isNotEmpty
-                            ? Container(
-                                margin: const EdgeInsets.only(top: 12),
-                                width: double.infinity,
-                                child: Wrap(
-                                  runSpacing: 8,
-                                  children: title.genres.nodes.map((genre) => GenreChip(name: genre.name)).toList(),
-                                ),
-                              )
-                            : const SizedBox(),
-                      ],
-                    ),
+                            )
+                          : const SizedBox(),
+                    ],
                   ),
                   _getCast(title.cast),
                   _getTrailer(title.videos.nodes.firstOrNull),
                   AdBanner(compact: true),
-                  const SizedBox(height: 32),
                 ],
               ),
             ),
