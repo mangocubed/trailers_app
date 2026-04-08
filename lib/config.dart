@@ -18,6 +18,8 @@ class Config {
 
   static final String identityClientId = const String.fromEnvironment('IDENTITY_CLIENT_ID');
 
+  static final String identityClientToken = const String.fromEnvironment('IDENTITY_CLIENT_TOKEN');
+
   static final Uri identityRedirectUrl = Uri.parse(
     const String.fromEnvironment(
       'IDENTITY_REDIRECT_URL',

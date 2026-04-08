@@ -91,11 +91,11 @@ class IdentityClient {
     }
   }
 
-  static Future<String?> getBearer() async {
+  static Future<String> getBearer() async {
     var accessToken = await _getAccessToken();
 
     if (accessToken == null) {
-      return null;
+      return 'Bearer ${Config.identityClientToken}';
     }
 
     return 'Bearer ${accessToken.accessToken}';
