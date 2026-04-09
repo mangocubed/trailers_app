@@ -49,6 +49,8 @@ dependencies:
     shared_preferences: ^2.5.5
     url_launcher: ^6.3.2
     video_player: ^2.11.1
+    http: ^1.6.0
+    restart_app: ^1.7.3
 
 dev_dependencies:
     flutter_test:

@@ -17,7 +17,7 @@ extension StringExt on String {
 }
 
 Future<void> createUserTitleTie(BuildContext context, Fragment$TitleFragment title) async {
-  if (title.currentUserTie == null && await IdentityClient.isAuthorized() && context.mounted) {
+  if (title.currentUserTie == null && await IdentityClient.hasAccessToken() && context.mounted) {
     await context.graphQLClient.value.mutate$CreateUserTitleTie(
       Options$Mutation$CreateUserTitleTie(
         variables: Variables$Mutation$CreateUserTitleTie(input: Input$UserTitleTieInputObject(titleId: title.id)),

@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:trailers/identity_client.dart';
 
 import '../components/current_user.dart';
 import '../components/screen_title.dart';
 import '../components/title_card.dart';
-import '../config.dart';
 import '../constants.dart';
 import '../graphql/queries/user.graphql.dart';
 import '../graphql/queries/user_title_ties.graphql.dart';
@@ -229,15 +228,7 @@ class _ShowUserScreenState extends State<ShowUserScreen> {
                     builder: (currentUser, {refetch}) {
                       if (currentUser != null && currentUser.id == user.id) {
                         return IconButton(
-                          onPressed: () {
-                            launchUrl(
-                              Config.identityUrl,
-                              customTabsOptions: CustomTabsOptions(
-                                showTitle: true,
-                                browser: const CustomTabsBrowserConfiguration(prefersDefaultBrowser: true),
-                              ),
-                            );
-                          },
+                          onPressed: IdentityClient.goToIdentity,
                           tooltip: 'Account Settings',
                           icon: SvgPicture.asset('assets/cog.svg'),
                         );
