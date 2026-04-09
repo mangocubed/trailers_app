@@ -15,6 +15,7 @@ Movies and TV Series recommendations.
 | AD_URL                | String |                                     |
 | IDENTITY_API_URL      | String | https://api.id.mango3.app/          |
 | IDENTITY_CLIENT_ID    | String |                                     |
+| IDENTITY_CLIENT_TOKEN | String |                                     |
 | IDENTITY_REDIRECT_URL | String | app.mango3.trailers://oauth         |
 | IDENTITY_URL          | String | https://id.mango3.app/              |
 | SEARCH_DEBOUNCE       | Number | 500                                 |

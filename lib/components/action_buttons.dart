@@ -133,58 +133,34 @@ class _ActionButtonsState extends State<ActionButtons> with RouteAware {
             direction: widget.direction,
             children: [
               IconButton(
-                onPressed: () async {
-                  final isAuthorized = await IdentityClient.isAuthorized();
-
-                  if (!context.mounted) {
-                    return;
-                  }
-
-                  if (isAuthorized) {
+                onPressed: () {
+                  IdentityClient.withAuthentication(context, (context) async {
                     await _onWatchedPressed(context, !isWatched);
 
                     await refetch?.call();
-                  } else {
-                    await IdentityClient.authorize(context);
-                  }
+                  });
                 },
                 icon: SvgPicture.asset(isWatched ? 'assets/watched_filled.svg' : 'assets/watched.svg'),
                 tooltip: 'Watched',
               ),
               IconButton(
-                onPressed: () async {
-                  final isAuthorized = await IdentityClient.isAuthorized();
-
-                  if (!context.mounted) {
-                    return;
-                  }
-
-                  if (isAuthorized) {
+                onPressed: () {
+                  IdentityClient.withAuthentication(context, (context) async {
                     await _onLikePressed(context, !isLiked);
 
                     await refetch?.call();
-                  } else {
-                    await IdentityClient.authorize(context);
-                  }
+                  });
                 },
                 icon: SvgPicture.asset(isLiked ? 'assets/heart_filled.svg' : 'assets/heart.svg'),
                 tooltip: 'Like',
               ),
               IconButton(
-                onPressed: () async {
-                  final isAuthorized = await IdentityClient.isAuthorized();
-
-                  if (!context.mounted) {
-                    return;
-                  }
-
-                  if (isAuthorized) {
+                onPressed: () {
+                  IdentityClient.withAuthentication(context, (context) async {
                     await _onBookmarkPressed(context, !isBookmarked);
 
                     await refetch?.call();
-                  } else {
-                    await IdentityClient.authorize(context);
-                  }
+                  });
                 },
                 icon: SvgPicture.asset(isBookmarked ? 'assets/bookmark_filled.svg' : 'assets/bookmark.svg'),
                 tooltip: 'Bookmark',
