@@ -37,6 +37,7 @@ jobs:
                   --dart-define AD_URL="${{ vars.AD_URL || 'https://ads.filmstrip.mango3.app/336x280.html' }}" \
                   --dart-define AD_SIZE="${{ vars.AD_SIZE || '336x280' }}" \
                   --dart-define IDENTITY_CLIENT_ID="${{ vars.IDENTITY_CLIENT_ID }}" \
+                  --dart-define IDENTITY_CLIENT_TOKEN="${{ secrets.IDENTITY_CLIENT_TOKEN }}" \
                   --dart-define SEARCH_DEBOUNCE="${{ vars.SEARCH_DEBOUNCE || '500' }}"
             - run: |
                   mkdir artifact
@@ -76,6 +77,7 @@ jobs:
                   --dart-define AD_URL="${{ vars.AD_URL || 'https://ads.filmstrip.mango3.app/336x280.html' }}" \
                   --dart-define AD_SIZE="${{ vars.AD_SIZE || '336x280' }}" \
                   --dart-define IDENTITY_CLIENT_ID="${{ vars.IDENTITY_CLIENT_ID }}" \
+                  --dart-define IDENTITY_CLIENT_TOKEN="${{ secrets.IDENTITY_CLIENT_TOKEN }}" \
                   --dart-define SEARCH_DEBOUNCE="${{ vars.SEARCH_DEBOUNCE || '500' }}"
             - name: Rename package
               run: mv ./build/app/outputs/flutter-apk/app-release.apk ./trailers-app-${{ github.ref_name }}.apk
@@ -100,6 +102,7 @@ jobs:
                   --dart-define AD_URL="${{ vars.AD_URL || 'https://ads.filmstrip.mango3.app/336x280.html' }}" \
                   --dart-define AD_SIZE="${{ vars.AD_SIZE || '336x280' }}" \
                   --dart-define IDENTITY_CLIENT_ID="${{ vars.IDENTITY_CLIENT_ID }}" \
+                  --dart-define IDENTITY_CLIENT_TOKEN="${{ secrets.IDENTITY_CLIENT_TOKEN }}" \
                   --dart-define IDENTITY_REDIRECT_URL="https://filmstrip.mango3.app/oauth" \
                   --dart-define SEARCH_DEBOUNCE="${{ vars.SEARCH_DEBOUNCE || '500' }}"
             - name: Upload artifact
