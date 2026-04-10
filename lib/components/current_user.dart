@@ -3,7 +3,7 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 
 import '../graphql/fragments/user_fragment.graphql.dart';
 import '../graphql/queries/current_user.graphql.dart';
-import '../router.dart';
+import '../identity_client.dart';
 
 class CurrentUser extends StatefulWidget {
   const CurrentUser({super.key, required this.builder});
@@ -14,23 +14,11 @@ class CurrentUser extends StatefulWidget {
   State<CurrentUser> createState() => _CurrentUserState();
 }
 
-class _CurrentUserState extends State<CurrentUser> with RouteAware {
+class _CurrentUserState extends State<CurrentUser> {
   bool _isLoading = false;
   Refetch<Query$CurrentUser>? _refetch;
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    final currentRoute = ModalRoute.of(context);
-
-    if (currentRoute != null) {
-      routeObserver.subscribe(this, currentRoute);
-    }
-  }
-
-  @override
-  void didPopNext() {
+  void _callRefetch() {
     if (!_isLoading) {
       try {
         _refetch?.call();
@@ -39,9 +27,14 @@ class _CurrentUserState extends State<CurrentUser> with RouteAware {
   }
 
   @override
-  void dispose() {
-    routeObserver.unsubscribe(this);
+  initState() {
+    super.initState();
+    IdentityClient.addListener(_callRefetch);
+  }
 
+  @override
+  void dispose() {
+    IdentityClient.removeListener(_callRefetch);
     super.dispose();
   }
 

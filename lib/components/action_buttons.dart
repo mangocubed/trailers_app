@@ -13,7 +13,6 @@ import '../graphql/schema.graphql.dart';
 import '../graphql/queries/title_current_user_tie.graphql.dart';
 import '../graphql_client.dart';
 import '../identity_client.dart';
-import '../router.dart';
 
 class ActionButtons extends StatefulWidget {
   const ActionButtons({super.key, required this.direction, required this.titleId});
@@ -25,9 +24,17 @@ class ActionButtons extends StatefulWidget {
   State<ActionButtons> createState() => _ActionButtonsState();
 }
 
-class _ActionButtonsState extends State<ActionButtons> with RouteAware {
+class _ActionButtonsState extends State<ActionButtons> {
   bool _isLoading = false;
   Refetch<Query$TitleCurrentUserTie>? _refetch;
+
+  void _callRefetch() {
+    if (!_isLoading) {
+      try {
+        _refetch?.call();
+      } catch (_) {}
+    }
+  }
 
   void _updateCache(BuildContext context, Fragment$UserTitleTieFragment? userTitleTie) {
     if (userTitleTie == null) {
@@ -84,29 +91,14 @@ class _ActionButtonsState extends State<ActionButtons> with RouteAware {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    final currentRoute = ModalRoute.of(context);
-
-    if (currentRoute != null) {
-      routeObserver.subscribe(this, currentRoute);
-    }
-  }
-
-  @override
-  void didPopNext() {
-    if (!_isLoading) {
-      try {
-        _refetch?.call();
-      } catch (_) {}
-    }
+  void initState() {
+    super.initState();
+    IdentityClient.addListener(_callRefetch);
   }
 
   @override
   void dispose() {
-    routeObserver.unsubscribe(this);
-
+    IdentityClient.removeListener(_callRefetch);
     super.dispose();
   }
 
