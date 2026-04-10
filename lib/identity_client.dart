@@ -15,6 +15,9 @@ import 'components/snackbar_alert.dart';
 import 'config.dart';
 
 class IdentityClient {
+  static AccessTokenResponse? _accessToken;
+  static final ValueNotifier<bool> _hasAccessToken = ValueNotifier(false);
+
   static final OAuth2Client _oauth2Client = OAuth2Client(
     authorizeUrl: Config.identityUrl.replace(path: '/oauth/authorize').toString(),
     redirectUri: Config.identityRedirectUrl.toString(),
@@ -27,16 +30,12 @@ class IdentityClient {
 
   static final _storage = FlutterSecureStorage();
 
-  static Future<AccessTokenResponse?> _getAccessToken() async {
-    final value = await _storage.read(key: keyAccessToken);
-
-    if (value == null) {
-      return null;
-    }
-
+  static Future<AccessTokenResponse?> _decodeAccessToken(String value) async {
     var accessToken = AccessTokenResponse.fromMap(jsonDecode(value));
 
     if (accessToken.accessToken == null) {
+      await _deleteAccessToken();
+
       return null;
     }
 
@@ -44,17 +43,53 @@ class IdentityClient {
       accessToken = await _oauth2Client.refreshToken(accessToken.refreshToken!, clientId: Config.identityClientId);
 
       if (accessToken.accessToken == null) {
+        await _deleteAccessToken();
+
         return null;
       }
 
-      await _saveAccessToken(accessToken);
+      await _writeAccessToken(accessToken);
     }
 
     return accessToken;
   }
 
-  static Future<void> _saveAccessToken(AccessTokenResponse accessToken) async {
+  static Future<AccessTokenResponse?> _readAccessToken() async {
+    final value = await _storage.read(key: keyAccessToken);
+
+    if (value == null) {
+      return null;
+    }
+
+    return await _decodeAccessToken(value);
+  }
+
+  static Future<void> _deleteAccessToken() async {
+    await _storage.delete(key: keyAccessToken);
+  }
+
+  static Future<void> _writeAccessToken(AccessTokenResponse accessToken) async {
     await _storage.write(key: keyAccessToken, value: jsonEncode(accessToken.toMap()));
+  }
+
+  static Future<void> init() async {
+    _accessToken = await _readAccessToken();
+    _hasAccessToken.value = _accessToken != null;
+
+    _storage.registerListener(
+      key: keyAccessToken,
+      listener: (value) async {
+        if (value == null) {
+          _accessToken = null;
+          _hasAccessToken.value = false;
+
+          return;
+        }
+
+        _accessToken = await _decodeAccessToken(value);
+        _hasAccessToken.value = _accessToken != null;
+      },
+    );
   }
 
   static Future<void> authorize(BuildContext context) async {
@@ -72,8 +107,7 @@ class IdentityClient {
         return;
       }
 
-      await _saveAccessToken(accessToken);
-
+      await _writeAccessToken(accessToken);
       await closeCustomTabs();
 
       if (context.mounted) {
@@ -86,9 +120,23 @@ class IdentityClient {
     }
   }
 
-  static Future<String?> getBearer() async {
-    final accessToken = await _getAccessToken();
-    final token = accessToken?.accessToken ?? Config.identityClientToken;
+  /// Checks if the app is authorized and restarts if not.
+  static Future<void> checkAuthorization() async {
+    // Restart the app if the access token has changed on another instance.
+    if (_accessToken?.accessToken != (await _readAccessToken())?.accessToken) {
+      await Restart.restartApp();
+    }
+
+    // Restart the app if the access token is not valid.
+    if (!await isAuthorized() && hasAccessToken()) {
+      await _deleteAccessToken();
+
+      await Restart.restartApp();
+    }
+  }
+
+  static String? getBearer() {
+    final token = _accessToken?.accessToken ?? Config.identityClientToken;
 
     if (token.isEmpty) {
       return null;
@@ -100,49 +148,35 @@ class IdentityClient {
   static Future<void> goToIdentity() async {
     if (await canLaunchUrl(Config.identityUrl)) {
       await launchUrl(Config.identityUrl, mode: LaunchMode.inAppBrowserView);
-
-      if (!await isAuthorized()) {
-        IdentityClient.disconnect();
-      }
     }
   }
 
-  static Future<bool> hasAccessToken() async {
-    return (await _getAccessToken()) != null;
-  }
-
-  static Future<bool> isAuthenticated() async {
-    return await hasAccessToken() && await isAuthorized();
+  static bool hasAccessToken() {
+    return _hasAccessToken.value;
   }
 
   static Future<bool> isAuthorized() async {
     final response = await http.get(
       Config.identityApiUrl.replace(path: '/authorized'),
-      headers: {'Authorization': await getBearer() ?? ''},
+      headers: {'Authorization': getBearer() ?? ''},
     );
 
     return response.statusCode == 200;
   }
 
-  static Future<void> disconnect() async {
-    if (await hasAccessToken()) {
-      await _storage.delete(key: keyAccessToken);
-
-      await Restart.restartApp();
-    }
-  }
-
   static void withAuthentication(BuildContext context, FutureOr<void> Function(BuildContext context) callback) async {
-    final hasAccessToken = await IdentityClient.hasAccessToken();
-
-    if (!context.mounted) {
-      return;
-    }
-
-    if (hasAccessToken) {
+    if (hasAccessToken()) {
       await callback(context);
     } else {
       await IdentityClient.authorize(context);
     }
+  }
+
+  static void addListener(void Function() listener) {
+    _hasAccessToken.addListener(listener);
+  }
+
+  static void removeListener(void Function() listener) {
+    _hasAccessToken.removeListener(listener);
   }
 }

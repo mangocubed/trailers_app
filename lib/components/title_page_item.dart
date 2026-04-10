@@ -57,7 +57,9 @@ class _TitlePageItemState extends State<TitlePageItem> {
     _play = widget.isActive;
 
     if (widget.isActive) {
-      createUserTitleTie(context, widget.title);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        createUserTitleTie(context, widget.title);
+      });
     }
   }
 
@@ -146,7 +148,7 @@ class _TitlePageItemState extends State<TitlePageItem> {
           alignment: Alignment.centerRight,
           child: Padding(
             padding: const EdgeInsets.only(right: 6),
-            child: ActionButtons(direction: Axis.vertical, titleId: widget.title.id),
+            child: ActionButtons(key: ValueKey(widget.title.id), direction: Axis.vertical, titleId: widget.title.id),
           ),
         ),
         Positioned(

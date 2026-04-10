@@ -262,7 +262,7 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
                     spacing: 12,
                     children: [
                       ZoomableImage(url: title.posterImageUrl, width: 200),
-                      ActionButtons(direction: Axis.horizontal, titleId: title.id),
+                      ActionButtons(key: ValueKey(title.id), direction: Axis.horizontal, titleId: title.id),
                       Text(
                         title.name,
                         style: GoogleFonts.blackHanSans(
