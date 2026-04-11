@@ -11,6 +11,8 @@ import 'graphql_client.dart';
 import 'router.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   await initHiveForFlutter();
   await IdentityClient.init();
 
