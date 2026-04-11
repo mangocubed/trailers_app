@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../components/current_user.dart';
 import '../components/action_buttons.dart';
@@ -228,7 +229,15 @@ class _TitlePageItemState extends State<TitlePageItem> {
                                       children: titleWatchProviders!.nodes
                                           .map(
                                             (watchProvider) => IconButton(
-                                              onPressed: () async {},
+                                              onPressed: () async {
+                                                if (watchProvider.watchProvider.homeUrl != null &&
+                                                    await canLaunchUrl(watchProvider.watchProvider.homeUrl!)) {
+                                                  launchUrl(
+                                                    watchProvider.watchProvider.homeUrl!,
+                                                    mode: LaunchMode.externalApplication,
+                                                  );
+                                                }
+                                              },
                                               tooltip: watchProvider.watchProvider.name,
                                               icon: ClipRRect(
                                                 borderRadius: BorderRadius.circular(6.0),

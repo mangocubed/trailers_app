@@ -1,11 +1,7 @@
 query WatchProviders($after: UUID, $ids: [UUID!], $countryCode: String) {
     watchProviders(first: 50, after: $after, ids: $ids, countryCode: $countryCode) {
         nodes {
-            id
-            name
-            logoImageUrl
-            createdAt
-            updatedAt
+            ...WatchProviderFragment
         }
         pageInfo {
             endCursor

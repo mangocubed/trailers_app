@@ -1,0 +1,8 @@
+fragment WatchProviderFragment on WatchProviderObject {
+    id
+    name
+    homeUrl
+    logoImageUrl
+    createdAt
+    updatedAt
+}

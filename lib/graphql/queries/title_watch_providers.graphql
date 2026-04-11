@@ -5,11 +5,7 @@ query TitleWatchProviders($id: ID!, $countryCode: String!) {
             nodes {
                 id
                 watchProvider {
-                    id
-                    name
-                    logoImageUrl
-                    createdAt
-                    updatedAt
+                    ...WatchProviderFragment
                 }
                 countryCodes
                 createdAt

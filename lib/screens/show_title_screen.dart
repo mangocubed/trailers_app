@@ -2,6 +2,7 @@ import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:trailers/components/ad_banner.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../components/action_buttons.dart';
 import '../components/current_user.dart';
@@ -51,7 +52,12 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
                 children: nodes
                     .map(
                       (watchProvider) => IconButton(
-                        onPressed: () async {},
+                        onPressed: () async {
+                          if (watchProvider.watchProvider.homeUrl != null &&
+                              await canLaunchUrl(watchProvider.watchProvider.homeUrl!)) {
+                            launchUrl(watchProvider.watchProvider.homeUrl!, mode: LaunchMode.externalApplication);
+                          }
+                        },
                         tooltip: watchProvider.watchProvider.name,
                         icon: ClipRRect(
                           borderRadius: BorderRadius.circular(12.0),
