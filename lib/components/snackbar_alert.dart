@@ -7,6 +7,7 @@ class SnackBarAlert {
         behavior: SnackBarBehavior.floating,
         content: Text(content),
         action: SnackBarAction(label: 'Close', onPressed: () => {}),
+        duration: const Duration(seconds: 5),
       ),
     );
   }

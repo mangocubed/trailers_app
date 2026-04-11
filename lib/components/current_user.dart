@@ -3,7 +3,6 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 
 import '../graphql/fragments/user_fragment.graphql.dart';
 import '../graphql/queries/current_user.graphql.dart';
-import '../identity_client.dart';
 
 class CurrentUser extends StatefulWidget {
   const CurrentUser({super.key, required this.builder});
@@ -15,26 +14,15 @@ class CurrentUser extends StatefulWidget {
 }
 
 class _CurrentUserState extends State<CurrentUser> {
-  bool _isLoading = false;
   Refetch<Query$CurrentUser>? _refetch;
-
-  void _callRefetch() {
-    if (!_isLoading) {
-      try {
-        _refetch?.call();
-      } catch (_) {}
-    }
-  }
 
   @override
   initState() {
     super.initState();
-    IdentityClient.addListener(_callRefetch);
   }
 
   @override
   void dispose() {
-    IdentityClient.removeListener(_callRefetch);
     super.dispose();
   }
 
@@ -45,7 +33,6 @@ class _CurrentUserState extends State<CurrentUser> {
         final user = result.parsedData?.currentUser;
 
         _refetch ??= refetch;
-        _isLoading = result.isLoading;
 
         return widget.builder(user, refetch: refetch);
       },

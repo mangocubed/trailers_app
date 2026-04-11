@@ -25,16 +25,7 @@ class ActionButtons extends StatefulWidget {
 }
 
 class _ActionButtonsState extends State<ActionButtons> {
-  bool _isLoading = false;
   Refetch<Query$TitleCurrentUserTie>? _refetch;
-
-  void _callRefetch() {
-    if (!_isLoading) {
-      try {
-        _refetch?.call();
-      } catch (_) {}
-    }
-  }
 
   void _updateCache(BuildContext context, Fragment$UserTitleTieFragment? userTitleTie) {
     if (userTitleTie == null) {
@@ -93,12 +84,10 @@ class _ActionButtonsState extends State<ActionButtons> {
   @override
   void initState() {
     super.initState();
-    IdentityClient.addListener(_callRefetch);
   }
 
   @override
   void dispose() {
-    IdentityClient.removeListener(_callRefetch);
     super.dispose();
   }
 
@@ -110,7 +99,6 @@ class _ActionButtonsState extends State<ActionButtons> {
         final userTitleTie = result.parsedData?.title?.currentUserTie;
 
         _refetch ??= refetch;
-        _isLoading = result.isLoading;
 
         final isWatched = userTitleTie?.isWatched ?? false;
         final isLiked = userTitleTie?.isLiked ?? false;
