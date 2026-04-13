@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:trailers/identity_client.dart';
 
 import '../components/filters_row.dart';
 import '../components/screen_title.dart';
@@ -101,9 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
             fetchMore?.call(
               FetchMoreOptions$Query$Titles(
                 variables: Variables$Query$Titles(
-                  after: !IdentityClient.hasAccessToken() || _hasFilters || _hasQuery
-                      ? titles.pageInfo.endCursor
-                      : null,
+                  after: titles.pageInfo.endCursor,
                   query: widget.query,
                   mediaType: widget.mediaType,
                   genreIds: widget.genreIds,

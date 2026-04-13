@@ -120,7 +120,7 @@ class _SearchDialogBodyState extends State<_SearchDialogBody> {
         children: [
           FiltersRow(queryParams: widget.queryParams),
           Expanded(
-            child: _query.length > 1
+            child: _query.length > 1 && _query == _queryController.text
                 ? Query$Titles$Widget(
                     options: Options$Query$Titles(
                       fetchPolicy: FetchPolicy.noCache,
