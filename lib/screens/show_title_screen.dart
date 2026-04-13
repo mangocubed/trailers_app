@@ -55,7 +55,7 @@ class _ShowTitleScreenState extends State<ShowTitleScreen> {
                         onPressed: () async {
                           if (watchProvider.watchProvider.homeUrl != null &&
                               await canLaunchUrl(watchProvider.watchProvider.homeUrl!)) {
-                            launchUrl(watchProvider.watchProvider.homeUrl!, mode: LaunchMode.externalApplication);
+                            launchUrl(watchProvider.watchProvider.homeUrl!);
                           }
                         },
                         tooltip: watchProvider.watchProvider.name,
