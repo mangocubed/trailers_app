@@ -106,7 +106,7 @@ jobs:
                   --dart-define IDENTITY_REDIRECT_URL="https://filmstrip.mango3.app/oauth" \
                   --dart-define SEARCH_DEBOUNCE="${{ vars.SEARCH_DEBOUNCE || '500' }}"
             - name: Upload artifact
-              uses: actions/upload-pages-artifact@v5
+              uses: actions/upload-pages-artifact@v5.0.0
               with:
                   path: ./build/web
                   include-hidden-files: true
