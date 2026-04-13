@@ -1,0 +1,8 @@
+fragment TitleStatFragment on TitleStatObject {
+    id
+    bookmarksCount
+    likesCount
+    watchCount
+    createdAt
+    updatedAt
+}

@@ -5,6 +5,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../config.dart';
 import '../constants.dart';
+import '../graphql/fragments/title_stat_fragment.graphql.dart';
 import '../graphql/fragments/user_title_tie_fragment.graphql.dart';
 import '../graphql/mutations/update_bookmark.graphql.dart';
 import '../graphql/mutations/update_like.graphql.dart';
@@ -13,12 +14,14 @@ import '../graphql/schema.graphql.dart';
 import '../graphql/queries/title_current_user_tie.graphql.dart';
 import '../graphql_client.dart';
 import '../identity_client.dart';
+import 'counter_button.dart';
 
 class ActionButtons extends StatefulWidget {
-  const ActionButtons({super.key, required this.direction, required this.titleId});
+  const ActionButtons({super.key, required this.direction, required this.titleId, required this.titleStat});
 
   final Axis direction;
   final String titleId;
+  final Fragment$TitleStatFragment titleStat;
 
   @override
   State<ActionButtons> createState() => _ActionButtonsState();
@@ -112,7 +115,7 @@ class _ActionButtonsState extends State<ActionButtons> {
             spacing: 8,
             direction: widget.direction,
             children: [
-              IconButton(
+              CounterButton(
                 onPressed: () {
                   IdentityClient.withAuthentication(context, (context) async {
                     await _onWatchedPressed(context, !isWatched);
@@ -121,9 +124,12 @@ class _ActionButtonsState extends State<ActionButtons> {
                   });
                 },
                 icon: SvgPicture.asset(isWatched ? 'assets/watched_filled.svg' : 'assets/watched.svg'),
+                count: widget.titleStat.watchCount,
+                isSelected: isWatched,
                 tooltip: 'Watched',
+                colorSelected: colorWatchedFilled,
               ),
-              IconButton(
+              CounterButton(
                 onPressed: () {
                   IdentityClient.withAuthentication(context, (context) async {
                     await _onLikePressed(context, !isLiked);
@@ -132,9 +138,12 @@ class _ActionButtonsState extends State<ActionButtons> {
                   });
                 },
                 icon: SvgPicture.asset(isLiked ? 'assets/heart_filled.svg' : 'assets/heart.svg'),
+                count: widget.titleStat.likesCount,
+                isSelected: isLiked,
                 tooltip: 'Like',
+                colorSelected: colorHeartFilled,
               ),
-              IconButton(
+              CounterButton(
                 onPressed: () {
                   IdentityClient.withAuthentication(context, (context) async {
                     await _onBookmarkPressed(context, !isBookmarked);
@@ -143,7 +152,9 @@ class _ActionButtonsState extends State<ActionButtons> {
                   });
                 },
                 icon: SvgPicture.asset(isBookmarked ? 'assets/bookmark_filled.svg' : 'assets/bookmark.svg'),
+                count: widget.titleStat.bookmarksCount,
                 tooltip: 'Bookmark',
+                isSelected: isBookmarked,
               ),
               IconButton(
                 onPressed: () {

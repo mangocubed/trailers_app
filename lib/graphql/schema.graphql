@@ -257,6 +257,7 @@ type TitleObject {
 	keywords(after: ID, first: Int): KeywordObjectConnection!
 	videos(after: UUID, first: Int): VideoObjectConnection!
 	watchProviders(after: UUID, first: Int, countryCode: String): TitleWatchProviderObjectConnection!
+	stat: TitleStatObject!
 	currentUserTie: UserTitleTieObject
 	releasedOn: NaiveDate
 	createdAt: DateTime!
@@ -290,6 +291,15 @@ type TitleObjectEdge {
 	A cursor for use in pagination
 	"""
 	cursor: String!
+}
+
+type TitleStatObject {
+	id: ID!
+	bookmarksCount: Int!
+	likesCount: Int!
+	watchCount: Int!
+	createdAt: DateTime!
+	updatedAt: DateTime
 }
 
 type TitleWatchProviderObject {
