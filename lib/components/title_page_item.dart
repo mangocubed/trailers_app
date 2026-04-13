@@ -149,7 +149,12 @@ class _TitlePageItemState extends State<TitlePageItem> {
           alignment: Alignment.centerRight,
           child: Padding(
             padding: const EdgeInsets.only(right: 6),
-            child: ActionButtons(key: ValueKey(widget.title.id), direction: Axis.vertical, titleId: widget.title.id),
+            child: ActionButtons(
+              key: ValueKey(widget.title.id),
+              direction: Axis.vertical,
+              titleId: widget.title.id,
+              titleStat: widget.title.stat,
+            ),
           ),
         ),
         Positioned(
