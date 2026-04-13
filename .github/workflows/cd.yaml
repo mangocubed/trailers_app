@@ -106,7 +106,7 @@ jobs:
                   --dart-define IDENTITY_REDIRECT_URL="https://filmstrip.mango3.app/oauth" \
                   --dart-define SEARCH_DEBOUNCE="${{ vars.SEARCH_DEBOUNCE || '500' }}"
             - name: Upload artifact
-              uses: actions/upload-pages-artifact@v4
+              uses: actions/upload-pages-artifact@v5
               with:
                   path: ./build/web
                   include-hidden-files: true
@@ -124,7 +124,7 @@ jobs:
               with:
                   files: artifact/trailers-app-${{ github.ref_name }}.apk
                   generate_release_notes: true
-                  prerelease: ${{ contains(github.ref_name, '-alpha') }}
+                  prerelease: ${{ contains(github.ref_name, '-alpha') || contains(github.ref_name, '-beta') }}
 
     publish_android_aab:
         needs: build_android_aab
