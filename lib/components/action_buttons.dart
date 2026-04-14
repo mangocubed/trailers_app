@@ -159,7 +159,7 @@ class _ActionButtonsState extends State<ActionButtons> {
               IconButton(
                 onPressed: () {
                   SharePlus.instance.share(
-                    ShareParams(uri: Config.trailersUrl.replace(fragment: '/titles/${widget.titleId}')),
+                    ShareParams(uri: Config.trailersUrl.replace(path: '/titles/${widget.titleId}')),
                   );
                 },
                 icon: SvgPicture.asset('assets/share.svg'),
