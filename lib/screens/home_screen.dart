@@ -116,20 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   fetchMoreResultData['titles']['nodes'] = [
                     ...previousResultData?['titles']['nodes'],
-                    ...Config.hasAds
-                        ? [
-                            {
-                              'id': 'ad',
-                              'mediaType': '',
-                              'name': '',
-                              'crew': {'nodes': [], '__typename': ''},
-                              'genres': {'nodes': [], '__typename': ''},
-                              'videos': {'nodes': [], '__typename': ''},
-                              'createdAt': DateTime.now().toIso8601String(),
-                              '__typename': '',
-                            },
-                          ]
-                        : [],
+                    ...Config.hasAds ? [adTitleObject] : [],
                     ...fetchMoreResultData['titles']['nodes']
                         .where(
                           (node) =>
