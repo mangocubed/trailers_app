@@ -237,7 +237,10 @@ class _TitlePageItemState extends State<TitlePageItem> {
                                               onPressed: () async {
                                                 if (watchProvider.watchProvider.homeUrl != null &&
                                                     await canLaunchUrl(watchProvider.watchProvider.homeUrl!)) {
-                                                  launchUrl(watchProvider.watchProvider.homeUrl!);
+                                                  launchUrl(
+                                                    watchProvider.watchProvider.homeUrl!,
+                                                    mode: LaunchMode.externalApplication,
+                                                  );
                                                 }
                                               },
                                               tooltip: watchProvider.watchProvider.name,
