@@ -30,3 +30,22 @@ const routeNameShowUserBookmarks = 'show_user_bookmarks';
 const routeNameShowUserBookmarksTitle = 'show_user_bookmarks_title';
 const routeNameShowUserWatched = 'show_user_watched';
 const routeNameShowUserWatchedTitle = 'show_user_watched_title';
+
+const adTitleObject = {
+  'id': 'ad',
+  'mediaType': '',
+  'name': '',
+  'crew': {'nodes': [], '__typename': ''},
+  'genres': {'nodes': [], '__typename': ''},
+  'videos': {'nodes': [], '__typename': ''},
+  'stat': {
+    'id': '',
+    'bookmarksCount': 0,
+    'likesCount': 0,
+    'watchCount': 0,
+    'createdAt': '2026-04-14T20:23:05.000Z',
+    '__typename': '',
+  },
+  'createdAt': '2026-04-14T20:23:05.000Z',
+  '__typename': '',
+};

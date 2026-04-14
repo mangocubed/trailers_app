@@ -64,25 +64,7 @@ class _ShowUserWatchedScreenState extends State<ShowUserWatchedScreen> {
 
                   fetchMoreResultData['user']['titleTies']['nodes'] = [
                     ...previousResultData?['user']['titleTies']['nodes'],
-                    ...Config.hasAds
-                        ? [
-                            {
-                              'id': 'ad',
-                              'title': {
-                                'id': 'ad',
-                                'mediaType': '',
-                                'name': '',
-                                'crew': {'nodes': [], '__typename': ''},
-                                'genres': {'nodes': [], '__typename': ''},
-                                'videos': {'nodes': [], '__typename': ''},
-                                'createdAt': DateTime.now().toIso8601String(),
-                                '__typename': '',
-                              },
-                              'createdAt': DateTime.now().toIso8601String(),
-                              '__typename': '',
-                            },
-                          ]
-                        : [],
+                    ...Config.hasAds ? [adTitleObject] : [],
                     ...fetchMoreResultData['user']['titleTies']['nodes']
                         .where(
                           (node) =>
