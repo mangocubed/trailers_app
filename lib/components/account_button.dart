@@ -5,8 +5,8 @@ import 'package:trailers/graphql/fragments/user_fragment.graphql.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../constants.dart';
-import '../identity_client.dart';
 import 'current_user.dart';
+import 'login_button.dart';
 
 class AccountButton extends StatelessWidget {
   const AccountButton({super.key});
@@ -51,14 +51,7 @@ class AccountButton extends StatelessWidget {
                         ),
                       ],
                     )
-                  : SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: () => IdentityClient.authorize(context),
-                        icon: const Icon(Icons.login_rounded),
-                        label: const Text('Login or Register'),
-                      ),
-                    ),
+                  : const SizedBox(width: double.infinity, child: LoginButton()),
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(

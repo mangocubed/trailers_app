@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../components/current_user.dart';
+import '../components/login_button.dart';
 import '../identity_client.dart';
 import '../settings.dart';
 
@@ -29,11 +30,7 @@ class SettingsScreen extends StatelessWidget {
                         label: const Text('Account'),
                       );
                     } else {
-                      return OutlinedButton.icon(
-                        onPressed: () => IdentityClient.authorize(context),
-                        icon: const Icon(Icons.login_rounded),
-                        label: const Text('Login or Register'),
-                      );
+                      return const LoginButton();
                     }
                   },
                 ),
