@@ -3,11 +3,11 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
+import '../components/account_button.dart';
 import '../components/ad_banner.dart';
 import '../components/screen_title.dart';
 import '../components/sentitive_page_view.dart';
 import '../components/title_page_item.dart';
-import '../components/user_button.dart';
 import '../config.dart';
 import '../constants.dart';
 import '../graphql/queries/user_title_ties.graphql.dart';
@@ -130,7 +130,7 @@ class _ShowUserBookmarksScreenState extends State<ShowUserBookmarksScreen> {
               ],
             ),
           ),
-          actions: const [Padding(padding: EdgeInsets.only(right: 12), child: UserButton())],
+          actions: const [Padding(padding: EdgeInsets.only(right: 12), child: AccountButton())],
         ),
         body: _getBookmarksVideos(),
       ),

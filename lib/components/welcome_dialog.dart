@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:trailers/constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 TapGestureRecognizer _getTapRecognizer(Uri url) => TapGestureRecognizer()
@@ -40,13 +41,13 @@ Future<dynamic> showWelcomeDialog(BuildContext context) {
                   TextSpan(
                     text: 'Privacy Policy',
                     style: TextStyle(decoration: TextDecoration.underline),
-                    recognizer: _getTapRecognizer(Uri.parse('https://mango3.app/privacy')),
+                    recognizer: _getTapRecognizer(Uri.parse(urlPrivacy)),
                   ),
                   TextSpan(text: ' and '),
                   TextSpan(
                     text: 'Terms of Service',
                     style: TextStyle(decoration: TextDecoration.underline),
-                    recognizer: _getTapRecognizer(Uri.parse('https://mango3.app/terms')),
+                    recognizer: _getTapRecognizer(Uri.parse(urlTerms)),
                   ),
                   TextSpan(text: '.'),
                 ],
