@@ -45,7 +45,7 @@ class AccountButton extends StatelessWidget {
                               routeNameShowUser,
                               pathParameters: {keyUsername: user.identityUser.username},
                             ),
-                            icon: const Icon(Icons.account_circle_rounded),
+                            icon: const Icon(Icons.person_rounded),
                             label: const Text('Profile'),
                           ),
                         ),
@@ -59,6 +59,14 @@ class AccountButton extends StatelessWidget {
                         label: const Text('Login or Register'),
                       ),
                     ),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => context.goNamed(routeNameSettings),
+                  icon: Icon(Icons.settings_rounded),
+                  label: const Text('Settings'),
+                ),
+              ),
               SizedBox(height: 6),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,

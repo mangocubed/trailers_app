@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'constants.dart';
 import 'screens/home_screen.dart';
 import 'screens/not_found_screen.dart';
+import 'screens/settings_screen.dart';
 import 'screens/show_title_screen.dart';
 import 'screens/show_user_bookmarks_screen.dart';
 import 'screens/show_user_screen.dart';
@@ -26,6 +27,7 @@ extension GoRouterExt on GoRouter {
           extraParams: state.extra is HomeExtraParams ? state.extra as HomeExtraParams : null,
         ),
         routes: [
+          GoRoute(name: routeNameSettings, path: 'settings', builder: (context, state) => SettingsScreen()),
           GoRoute(
             name: routeNameShowTitle,
             path: 'titles/:$keyTitleId',

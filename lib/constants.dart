@@ -24,6 +24,7 @@ const keyShowWelcome = 'show_welcome';
 const routeNameHome = 'home';
 const routeNameSearchResults = 'search_results';
 const routeNameSearchResultsTitle = 'search_results_title';
+const routeNameSettings = 'settings';
 const routeNameShowTitle = 'show_title';
 const routeNameShowUser = 'show_user';
 const routeNameShowUserBookmarks = 'show_user_bookmarks';

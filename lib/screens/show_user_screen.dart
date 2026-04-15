@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:trailers/identity_client.dart';
 
-import '../components/current_user.dart';
 import '../components/screen_title.dart';
 import '../components/title_card.dart';
 import '../constants.dart';
@@ -221,24 +219,6 @@ class _ShowUserScreenState extends State<ShowUserScreen> {
               foregroundColor: Colors.white,
               backgroundColor: Colors.transparent,
               leading: BackButton(onPressed: () => context.goNamed(routeNameHome)),
-              actions: [
-                Padding(
-                  padding: EdgeInsets.only(right: 12),
-                  child: CurrentUser(
-                    builder: (currentUser, {refetch}) {
-                      if (currentUser != null && currentUser.id == user.id) {
-                        return IconButton(
-                          onPressed: IdentityClient.goToIdentity,
-                          tooltip: 'Account Settings',
-                          icon: SvgPicture.asset('assets/cog.svg'),
-                        );
-                      } else {
-                        return const SizedBox();
-                      }
-                    },
-                  ),
-                ),
-              ],
             ),
             body: CustomScrollView(
               controller: _scrollController,
