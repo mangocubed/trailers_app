@@ -72,6 +72,7 @@ class App extends StatelessWidget {
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
+                iconAlignment: IconAlignment.start,
                 padding: const EdgeInsets.all(20),
                 textStyle: GoogleFonts.amiko(fontSize: 14, fontWeight: FontWeight.w700),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
