@@ -31,6 +31,9 @@ const routeNameShowUserBookmarksTitle = 'show_user_bookmarks_title';
 const routeNameShowUserWatched = 'show_user_watched';
 const routeNameShowUserWatchedTitle = 'show_user_watched_title';
 
+const urlPrivacy = 'https://mango3.app/privacy';
+const urlTerms = 'https://mango3.app/terms';
+
 const adTitleObject = {
   'id': 'ad',
   'mediaType': '',

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
+import '../components/account_button.dart';
 import '../components/filters_row.dart';
 import '../components/screen_title.dart';
 import '../components/search_dialog.dart';
@@ -13,7 +14,6 @@ import '../graphql/schema.graphql.dart';
 import '../components/titles_filter_dialog.dart';
 import '../components/title_page_item.dart';
 import '../components/sentitive_page_view.dart';
-import '../components/user_button.dart';
 import '../constants.dart';
 import '../graphql/queries/titles.graphql.dart';
 import '../components/ad_banner.dart';
@@ -218,16 +218,13 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: EdgeInsets.only(right: 12),
               child: IconButton.outlined(
                 isSelected: _hasFilters,
-                icon: SvgPicture.asset(
-                  'assets/adjust.svg',
-                  colorFilter: _hasFilters ? ColorFilter.mode(Colors.black, BlendMode.srcIn) : null,
-                ),
+                icon: Icon(Icons.filter_alt_outlined, color: _hasFilters ? Colors.black : null),
                 onPressed: () {
                   TitlesFilterDialog(context, queryParams: widget.queryParams);
                 },
               ),
             ),
-            Padding(padding: EdgeInsets.only(right: 12), child: UserButton()),
+            Padding(padding: EdgeInsets.only(right: 12), child: AccountButton()),
           ],
         ),
         body: Stack(
