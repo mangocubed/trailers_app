@@ -35,6 +35,7 @@ dependencies:
     # Use with the CupertinoIcons class for iOS style icons.
     cupertino_icons: ^1.0.9
 
+    connectivity_plus: ^7.1.1
     country_picker: ^2.0.27
     flutter_inappwebview: ^6.2.0-beta.3
     flutter_secure_storage: ^10.0.0

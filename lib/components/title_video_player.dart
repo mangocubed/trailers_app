@@ -25,13 +25,13 @@ class _TitleVideoPlayerState extends State<TitleVideoPlayer> {
   Future<void> _play() async {
     final isInitialized = _controller.value.isInitialized;
 
-    if (kIsWeb && !isInitialized) {
+    if (!isInitialized) {
       await _controller.initialize();
     }
 
     await _controller.play();
 
-    if (kIsWeb && !isInitialized && _controller.value.isInitialized) {
+    if (!isInitialized && _controller.value.isInitialized) {
       widget.onInitialize();
     }
   }
@@ -44,18 +44,8 @@ class _TitleVideoPlayerState extends State<TitleVideoPlayer> {
 
     _controller = VideoPlayerController.networkUrl(sourceUrl, viewType: VideoViewType.platformView)..setLooping(true);
 
-    if (kIsWeb) {
-      if (widget.play) {
-        _play();
-      }
-    } else {
-      _controller.initialize().then((_) {
-        widget.onInitialize();
-
-        if (widget.play) {
-          _play();
-        }
-      });
+    if (widget.play) {
+      _play();
     }
   }
 
