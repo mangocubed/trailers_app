@@ -10,6 +10,7 @@ import '../graphql/fragments/title_fragment.graphql.dart';
 import '../graphql/fragments/video_fragment.graphql.dart';
 import '../graphql/queries/title_watch_providers.graphql.dart';
 import '../constants.dart';
+import '../settings.dart';
 import '../utils.dart';
 import 'title_video_player.dart';
 
@@ -45,6 +46,14 @@ class _TitlePageItemState extends State<TitlePageItem> {
     }
   }
 
+  Future<void> _autoplay() async {
+    final shouldAutoplay = await (await Settings.getAutoplayVideos()).shouldAutoplay();
+
+    setState(() {
+      _play = shouldAutoplay;
+    });
+  }
+
   void _togglePlayPause() async {
     setState(() {
       _play = !_isInitialized || !_play;
@@ -55,10 +64,9 @@ class _TitlePageItemState extends State<TitlePageItem> {
   void initState() {
     super.initState();
 
-    _play = widget.isActive;
-
     if (widget.isActive) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        _autoplay();
         createUserTitleTie(context, widget.title);
       });
     }
@@ -70,9 +78,10 @@ class _TitlePageItemState extends State<TitlePageItem> {
 
     if (oldWidget.isActive != widget.isActive) {
       _isInitialized = false;
-      _play = widget.isActive;
+      _play = false;
 
       if (widget.isActive) {
+        _autoplay();
         createUserTitleTie(context, widget.title);
       }
     }

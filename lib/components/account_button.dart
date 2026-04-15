@@ -11,7 +11,7 @@ import 'current_user.dart';
 class AccountButton extends StatelessWidget {
   const AccountButton({super.key});
 
-  void _showAccountDialog(BuildContext context, {Fragment$UserFragment? user}) {
+  void _showAccountBottomSheet(BuildContext context, {Fragment$UserFragment? user}) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -120,12 +120,12 @@ class AccountButton extends StatelessWidget {
       builder: (user, {refetch}) {
         if (user != null) {
           return IconButton(
-            onPressed: () => _showAccountDialog(context, user: user),
+            onPressed: () => _showAccountBottomSheet(context, user: user),
             icon: CircleAvatar(child: Text(user.identityUser.initials)),
           );
         } else {
           return IconButton.outlined(
-            onPressed: () => _showAccountDialog(context),
+            onPressed: () => _showAccountBottomSheet(context),
             icon: const Icon(Icons.account_circle_rounded, color: Colors.white),
           );
         }
