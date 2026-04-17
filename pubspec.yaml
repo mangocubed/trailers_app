@@ -54,7 +54,9 @@ dependencies:
     restart_app: ^1.7.3
 
     toolbox:
-        git: https://github.com/mangocubed/toolbox.git
+        git:
+           url: https://github.com/mangocubed/toolbox.git
+           path: flutter
 
 dev_dependencies:
     flutter_test:

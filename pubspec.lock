@@ -1120,9 +1120,11 @@ packages:
   toolbox:
     dependency: "direct main"
     description:
-      path: "../toolbox/flutter"
-      relative: true
-    source: path
+      path: flutter
+      ref: HEAD
+      resolved-ref: "3151d5645831f3e40a0397d0c0098422f54e9038"
+      url: "https://github.com/mangocubed/toolbox.git"
+    source: git
     version: "0.0.0-alpha.0"
   typed_data:
     dependency: transitive
