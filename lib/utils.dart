@@ -1,10 +1,11 @@
 import 'package:flutter/widgets.dart';
 
+import 'package:toolbox/identity_client.dart';
+
 import 'graphql/fragments/title_fragment.graphql.dart';
 import 'graphql/mutations/create_user_title_tie.graphql.dart';
 import 'graphql/schema.graphql.dart';
 import 'graphql_client.dart';
-import 'identity_client.dart';
 
 extension StringExt on String {
   String capitalize() {

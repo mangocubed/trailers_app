@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'package:toolbox/identity_client.dart';
+
 import '../components/current_user.dart';
 import '../components/login_button.dart';
-import '../identity_client.dart';
 import '../settings.dart';
 
 class SettingsScreen extends StatelessWidget {

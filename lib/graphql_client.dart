@@ -1,7 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
-import 'identity_client.dart';
+import 'package:toolbox/identity_client.dart';
+
 import 'config.dart';
 
 extension GraphQLClientExt on GraphQLClient {

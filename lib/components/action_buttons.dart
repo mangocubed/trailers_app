@@ -3,6 +3,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 
+import 'package:toolbox/identity_client.dart';
+
 import '../config.dart';
 import '../constants.dart';
 import '../graphql/fragments/title_stat_fragment.graphql.dart';
@@ -13,7 +15,6 @@ import '../graphql/mutations/update_watched.graphql.dart';
 import '../graphql/schema.graphql.dart';
 import '../graphql/queries/title_current_user_tie.graphql.dart';
 import '../graphql_client.dart';
-import '../identity_client.dart';
 import 'counter_button.dart';
 
 class ActionButtons extends StatefulWidget {
