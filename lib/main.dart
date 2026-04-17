@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
-import 'components/identity_provider.dart';
-import 'identity_client.dart';
+import 'package:toolbox/identity_client.dart';
+import 'package:toolbox/components.dart';
+
 import 'constants.dart';
 import 'graphql_client.dart';
 import 'router.dart';

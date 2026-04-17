@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../identity_client.dart';
+import 'package:toolbox/identity_client.dart';
 
 class LoginButton extends StatelessWidget {
   const LoginButton({super.key});
