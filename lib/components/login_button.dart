@@ -12,7 +12,7 @@ class LoginButton extends StatelessWidget {
         await IdentityClient.authorize(context);
       },
       icon: const Icon(Icons.login_rounded),
-      label: const Text('Login or Register'),
+      label: const Text('Connect'),
     );
   }
 }

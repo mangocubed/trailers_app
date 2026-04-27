@@ -7,7 +7,7 @@ import 'config.dart';
 
 extension GraphQLClientExt on GraphQLClient {
   static GraphQLClient setup() => GraphQLClient(
-    link: AuthLink(getToken: IdentityClient.getBearer)
+    link: AuthLink(getToken: () => IdentityClient.bearer)
         .concat(
           ErrorLink(
             onException: (request, forward, exception) {

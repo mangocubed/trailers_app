@@ -375,7 +375,7 @@ packages:
     source: hosted
     version: "6.0.0"
   flutter_secure_storage:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: flutter_secure_storage
       sha256: da922f2aab2d733db7e011a6bcc4a825b844892d4edd6df83ff156b09a9b2e40
@@ -617,7 +617,7 @@ packages:
     source: hosted
     version: "0.15.6"
   http:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: http
       sha256: "87721a4a50b19c7f1d49001e51409bddc46303966ce89a65af4f4e6004896412"
@@ -777,7 +777,7 @@ packages:
     source: hosted
     version: "0.9.1"
   oauth2_client:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: oauth2_client
       sha256: "15a5b412324324c5d601a58724b77b2dde2f3d74a071a903837e55a5059ed77f"
@@ -953,7 +953,7 @@ packages:
     source: hosted
     version: "4.1.0"
   restart_app:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: restart_app
       sha256: "5bbeb34f7af32d1b87fbb8bc56a6501ca779596cfbb84af6ba4e3ebf57af4a23"
@@ -1121,8 +1121,8 @@ packages:
     dependency: "direct main"
     description:
       path: flutter
-      ref: HEAD
-      resolved-ref: "3151d5645831f3e40a0397d0c0098422f54e9038"
+      ref: ee38b70
+      resolved-ref: ee38b70bef30f3ee4ba7f893d619f0c6c4b4ff45
       url: "https://github.com/mangocubed/toolbox.git"
     source: git
     version: "0.0.0-alpha.0"
@@ -1367,5 +1367,5 @@ packages:
     source: hosted
     version: "3.1.3"
 sdks:
-  dart: ">=3.10.7 <4.0.0"
+  dart: ">=3.11.5 <4.0.0"
   flutter: ">=3.38.4"
