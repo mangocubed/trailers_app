@@ -2,17 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../components/current_user.dart';
-import '../components/action_buttons.dart';
-import '../components/genre_chip.dart';
-import '../components/title_basic_info.dart';
 import '../graphql/fragments/title_fragment.graphql.dart';
-import '../graphql/fragments/video_fragment.graphql.dart';
 import '../graphql/queries/title_watch_providers.graphql.dart';
-import '../constants.dart';
-import '../settings.dart';
 import '../utils.dart';
-import 'title_video_player.dart';
+import 'action_buttons.dart';
+import 'current_user.dart';
+import 'genre_chip.dart';
+import 'title_basic_info.dart';
 
 class TitlePageItem extends StatefulWidget {
   const TitlePageItem({
@@ -33,40 +29,12 @@ class TitlePageItem extends StatefulWidget {
 }
 
 class _TitlePageItemState extends State<TitlePageItem> {
-  bool _isInitialized = false;
-  bool _play = false;
-
-  Fragment$VideoFragment? get _video => widget.title.videos.nodes.firstOrNull;
-
-  double get _thumbnailOpacity {
-    if (_isInitialized) {
-      return 0.0;
-    } else {
-      return 1.0;
-    }
-  }
-
-  Future<void> _autoplay() async {
-    final shouldAutoplay = await (await Settings.getAutoplayVideos()).shouldAutoplay();
-
-    setState(() {
-      _play = shouldAutoplay;
-    });
-  }
-
-  void _togglePlayPause() async {
-    setState(() {
-      _play = !_isInitialized || !_play;
-    });
-  }
-
   @override
   void initState() {
     super.initState();
 
     if (widget.isActive) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _autoplay();
         createUserTitleTie(context, widget.title);
       });
     }
@@ -76,23 +44,9 @@ class _TitlePageItemState extends State<TitlePageItem> {
   didUpdateWidget(TitlePageItem oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (oldWidget.isActive != widget.isActive) {
-      _isInitialized = false;
-      _play = false;
-
-      if (widget.isActive) {
-        _autoplay();
-        createUserTitleTie(context, widget.title);
-      }
+    if (oldWidget.isActive != widget.isActive && widget.isActive) {
+      createUserTitleTie(context, widget.title);
     }
-  }
-
-  @override
-  void dispose() {
-    _isInitialized = false;
-    _play = false;
-
-    super.dispose();
   }
 
   @override
@@ -104,52 +58,12 @@ class _TitlePageItemState extends State<TitlePageItem> {
       children: [
         Stack(
           children: [
-            Center(
-              child: OverflowBox(
-                maxWidth: double.infinity,
-                maxHeight: screenSize.height,
-                child: widget.isActive && _video != null
-                    ? TitleVideoPlayer(
-                        video: _video!,
-                        play: _play,
-                        onInitialize: () {
-                          setState(() {
-                            _isInitialized = true;
-                          });
-                        },
-                      )
-                    : SizedBox(),
-              ),
-            ),
             widget.title.posterImageUrl != null
-                ? AnimatedOpacity(
-                    opacity: _thumbnailOpacity,
-                    duration: const Duration(milliseconds: 250),
-                    child: Container(
-                      color: Colors.black,
-                      width: screenSize.width,
-                      height: screenSize.height,
-                      child: Center(child: Image.network(widget.title.posterImageUrl!.toString())),
-                    ),
-                  )
-                : const SizedBox(),
-            _video != null
-                ? InkWell(
-                    onTap: _togglePlayPause,
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: double.infinity,
-                      child: Visibility(
-                        visible: !_isInitialized || !_play,
-                        child: Center(
-                          child: Icon(
-                            _isInitialized ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                            color: colorPlayIcon,
-                            size: 128,
-                          ),
-                        ),
-                      ),
-                    ),
+                ? Container(
+                    color: Colors.black,
+                    width: screenSize.width,
+                    height: screenSize.height,
+                    child: Center(child: Image.network(widget.title.posterImageUrl!.toString())),
                   )
                 : const SizedBox(),
           ],

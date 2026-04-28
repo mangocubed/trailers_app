@@ -26,11 +26,6 @@ fragment TitleFragment on TitleObject {
             updatedAt
         }
     }
-    videos(first: 1) {
-        nodes {
-            ...VideoFragment
-        }
-    }
     stat {
         ...TitleStatFragment
     }

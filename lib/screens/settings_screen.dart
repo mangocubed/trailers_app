@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:toolbox/identity_client.dart';
 
 import '../components/login_button.dart';
-import '../settings.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -29,7 +28,6 @@ class SettingsScreen extends StatelessWidget {
                       )
                     : LoginButton(),
               ),
-              SizedBox(width: double.infinity, child: _AutoplayVideosButton()),
               IdentityClient.hasAccessToken
                   ? SizedBox(
                       width: double.infinity,
@@ -64,70 +62,6 @@ class SettingsScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _AutoplayVideosButton extends StatefulWidget {
-  const _AutoplayVideosButton();
-
-  @override
-  State<_AutoplayVideosButton> createState() => _AutoplayVideosButtonState();
-}
-
-class _AutoplayVideosButtonState extends State<_AutoplayVideosButton> {
-  void _showAutoplayBottomSheet(AutoplayVideos currentValue) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => Container(
-        width: 480,
-        margin: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          spacing: 12,
-          children: AutoplayVideos.values
-              .map(
-                (value) => SizedBox(
-                  width: double.infinity,
-                  child: TextButton.icon(
-                    icon: value == currentValue ? const Icon(Icons.check_rounded) : null,
-                    onPressed: () {
-                      Settings.setAutoplayVideos(value);
-                      Navigator.pop(context);
-                      setState(() {});
-                    },
-                    label: Text(value.toText()),
-                  ),
-                ),
-              )
-              .toList(),
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: Settings.getAutoplayVideos(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return OutlinedButton.icon(
-            onPressed: () => _showAutoplayBottomSheet(snapshot.data!),
-            icon: const Icon(Icons.play_arrow_rounded),
-            label: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              spacing: 12,
-              children: [
-                Text('Autoplay Videos'),
-                Text('(${snapshot.data!.toText()})', style: TextStyle(fontSize: 11)),
-              ],
-            ),
-          );
-        } else {
-          return const SizedBox();
-        }
-      },
     );
   }
 }
