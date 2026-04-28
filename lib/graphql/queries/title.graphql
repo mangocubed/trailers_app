@@ -16,6 +16,11 @@ query Title($id: ID!) {
                 updatedAt
             }
         }
+        videos(first: 1) {
+            nodes {
+                ...VideoFragment
+            }
+        }
         watchProviders(first: 50) {
             nodes {
                 id
