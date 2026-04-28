@@ -410,6 +410,8 @@ type UserTitleTieObjectEdge {
 
 type VideoObject {
 	id: ID!
+	source: VideoSource!
+	sourceKey: String!
 	url: Url!
 	hlsUrl: Url
 	createdAt: DateTime!
@@ -443,6 +445,10 @@ type VideoObjectEdge {
 	A cursor for use in pagination
 	"""
 	cursor: String!
+}
+
+enum VideoSource {
+	YOUTUBE
 }
 
 type WatchProviderObject {

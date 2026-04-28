@@ -1,5 +1,7 @@
 fragment VideoFragment on VideoObject {
     id
+    source
+    sourceKey
     url
     hlsUrl
     createdAt
