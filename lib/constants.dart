@@ -42,7 +42,6 @@ const adTitleObject = {
   'name': '',
   'crew': {'nodes': [], '__typename': ''},
   'genres': {'nodes': [], '__typename': ''},
-  'videos': {'nodes': [], '__typename': ''},
   'stat': {
     'id': '',
     'bookmarksCount': 0,
